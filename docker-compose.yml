@@ -689,4 +689,3 @@ services:
     depends_on:
       - openpitrix-db-init
     container_name: "openpitrix-notification-db-ctrl"
-    

@@ -15,7 +15,11 @@ import (
 	"openpitrix.io/openpitrix/pkg/pb"
 )
 
-type Server struct {
+type Server struct{}
+
+func NewServer() (*Server, error) {
+	server := &Server{}
+	return server, nil
 }
 
 func Serve(cfg *config.Config) {
@@ -24,6 +28,8 @@ func Serve(cfg *config.Config) {
 	manager.NewGrpcServer("mbing-manager", constants.MeterbillingManagerPort).
 		ShowErrorCause(cfg.Grpc.ShowErrorCause).
 		Serve(func(server *grpc.Server) {
+			pb.RegisterSkuManagerServer(server, &s)
 			pb.RegisterMeteringManagerServer(server, &s)
+			pb.RegisterPromotionManagerServer(server, &s)
 		})
 }

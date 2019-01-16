@@ -71,6 +71,7 @@ const (
 	StatusDeleting    = "deleting"
 	StatusUpgrading   = "upgrading"
 	StatusUpdating    = "updating"
+	StatusUpdated     = "updated"
 	StatusRollbacking = "rollbacking"
 	StatusStopped     = "stopped"
 	StatusStopping    = "stopping"
@@ -100,6 +101,7 @@ const (
 	StatusSuspended = "suspended"
 	StatusInReview  = "in-review"
 	StatusNew       = "new"
+	StatusOverTime  = "overtime"
 )
 
 var DeletedStatuses = []string{
@@ -272,3 +274,10 @@ var ServiceTypes = []string{
 	ServiceTypeRuntime,
 	ServiceTypeBasicConfig,
 }
+
+const (
+	CurrencyCNY = "CNY"
+	CurrencyHKD = "HKD"
+	CurrencyUSD = "USD"
+)
+
