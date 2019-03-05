@@ -2,7 +2,7 @@
 // Use of this source code is governed by a Apache license
 // that can be found in the LICENSE file.
 
-package mbing
+package metering
 
 import (
 	"context"
@@ -15,6 +15,8 @@ import (
 const (
 	EN = "En"
 	ZH = "Zh"
+
+	NIL_STR = ""
 )
 
 const (
@@ -100,4 +102,8 @@ func notExistInOtherError(ctx context.Context, structObj, targetStructObj interf
 		structDisName[structObjSN][ZH],
 	}
 	return gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExistInOther, a)
+}
+
+func GetGroupId() string {
+	return "Group_01"
 }

@@ -2,10 +2,11 @@
 // Use of this source code is governed by a Apache license
 // that can be found in the LICENSE file.
 
-package mbing
+package metering
 
 import (
 	"context"
+	"time"
 
 	"openpitrix.io/openpitrix/pkg/db"
 	"openpitrix.io/openpitrix/pkg/manager"
@@ -29,7 +30,7 @@ func checkExistById(ctx context.Context, structName, idValue string) (bool, erro
 		Limit(1).Count()
 
 	if err != nil {
-		logger.Error(ctx, "Failed to connect DB, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to connect DB: [%+v]", err)
 		return false, err
 	}
 
@@ -46,7 +47,7 @@ func insertAttributeName(ctx context.Context, attributeName *models.AttributeNam
 		Record(attributeName).
 		Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert attributeName, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to insert attribute_name: [%+v]", err)
 	}
 	return err
 }
@@ -64,7 +65,7 @@ func DescribeAttributeNames(ctx context.Context, req *pb.DescribeAttributeNamesR
 		Load(&attributeNames)
 
 	if err != nil {
-		logger.Error(ctx, "Failed to describe attribute_name, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to describe attribute_name: [%+v]", err)
 	}
 	return attributeNames, err
 }
@@ -75,7 +76,7 @@ func insertAttributeUnit(ctx context.Context, attUnit *models.AttributeUnit) err
 		Record(attUnit).
 		Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert attribute_unit, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to insert attribute_unit: [%+v]", err)
 	}
 	return err
 }
@@ -93,7 +94,7 @@ func DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsR
 		Load(&attUnits)
 
 	if err != nil {
-		logger.Error(ctx, "Failed to describe attribute_unit, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to describe attribute_unit: [%+v]", err)
 	}
 	return attUnits, err
 }
@@ -104,7 +105,7 @@ func insertAttribute(ctx context.Context, attribute *models.Attribute) error {
 		Record(attribute).
 		Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert attribute, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to insert attribute: [%+v]", err)
 	}
 	return err
 }
@@ -118,7 +119,7 @@ func getAttribute(ctx context.Context, attributeId string) (*models.Attribute, e
 		Where(db.Eq(constants.ColumnAttributeId, attributeId)).
 		LoadOne(&attribute)
 	if err != nil {
-		logger.Error(ctx, "Failed to get attribute [%s], Errors: [%+v]", attributeId, err)
+		logger.Error(ctx, "Failed to get attribute: [%+v]", err)
 	}
 	if err == db.ErrNotFound {
 		return nil, nil
@@ -139,7 +140,7 @@ func DescribeAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) 
 		Load(&attributes)
 
 	if err != nil {
-		logger.Error(ctx, "Failed to describe attribute, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to describe attribute: [%+v]", err)
 	}
 	return attributes, err
 }
@@ -150,7 +151,7 @@ func insertSpu(ctx context.Context, spu *models.Spu) error {
 		Record(spu).
 		Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert spu, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to insert spu: [%+v]", err)
 	}
 	return err
 }
@@ -164,7 +165,7 @@ func getSpu(ctx context.Context, spuId string) (*models.Spu, error) {
 		Where(db.Eq(constants.ColumnSpuId, spuId)).
 		LoadOne(&spu)
 	if err != nil {
-		logger.Error(ctx, "Failed to get spu [%s], Errors: [%+v]", spuId, err)
+		logger.Error(ctx, "Failed to get spu: [%+v]", err)
 	}
 	if err == db.ErrNotFound {
 		return nil, nil
@@ -178,7 +179,7 @@ func insertSku(ctx context.Context, sku *models.Sku) error {
 		Record(sku).
 		Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert sku, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to insert sku: [%+v]", err)
 	}
 	return err
 }
@@ -193,7 +194,7 @@ func getSku(ctx context.Context, skuId string) (*models.Sku, error) {
 		LoadOne(sku)
 
 	if err != nil {
-		logger.Error(ctx, "Failed to get sku, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to get sku: [%+v]", err)
 	}
 	if err == db.ErrNotFound {
 		return nil, nil
@@ -207,7 +208,7 @@ func insertPrice(ctx context.Context, price *models.Price) error {
 		Record(price).
 		Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert price, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to insert price: [%+v]", err)
 	}
 	return err
 }
@@ -226,15 +227,21 @@ func insertLeasings(ctx context.Context, leasings []*models.Leasing) error {
 	return err
 }
 
+func getLeasing(ctx context.Context, leasingID, resourceId, skuId string) (*models.Leasing, error) {
+	//ids: leasingId, resourceId, skuId
+	//TODO: impl get leasing
+	return &models.Leasing{}, nil
+}
+
 //promotion
-func insertCombinationSpu(ctx context.Context, comSpu *models.CombinationSpu) error {
+func insertCombination(ctx context.Context, com *models.Combination) error {
 	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableCombinationSpu).
-		Record(comSpu).Exec()
+		InsertInto(constants.TableCombination).
+		Record(com).Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert Combination_Spu, Error: [%+v].", err)
+		logger.Error(ctx, "Failed to insert combination, Error: [%+v].", err)
 	} else {
-		logger.Info(ctx, "Insert Combination_Spu successfully.")
+		logger.Info(ctx, "Insert combination successfully.")
 	}
 	return err
 }
@@ -244,33 +251,19 @@ func insertCombinationSku(ctx context.Context, comSku *models.CombinationSku) er
 		InsertInto(constants.TableCombinationSku).
 		Record(comSku).Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert Combination_Sku, Error: [%+v].", err)
+		logger.Error(ctx, "Failed to insert combination_sku: [%+v].", err)
 	} else {
-		logger.Info(ctx, "Insert Combination_Sku successfully.")
+		logger.Info(ctx, "Insert combination_sku successfully.")
 	}
 	return err
 }
 
-func insertCombinationPrice(ctx context.Context, comPrice *models.CombinationPrice) error {
-	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableCombinationPrice).
-		Record(comPrice).Exec()
-	if err != nil {
-		logger.Error(ctx, "Failed to insert Combination_Price, Error: [%+v].", err)
-	} else {
-		logger.Info(ctx, "Insert Combination_Price successfully.")
-	}
-	return err
+func leasingToEtcd(leasing models.Leasing) error {
+	//TODO: impl add leasing to etcd
+	return nil
 }
 
-func insertProbationSku(ctx context.Context, proSku *models.ProbationSku) error {
-	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableProbationSku).
-		Record(proSku).Exec()
-	if err != nil {
-		logger.Error(ctx, "Failed to insert probation_sku, Error: [%+v].", err)
-	} else {
-		logger.Info(ctx, "Insert probation_sku successfully.")
-	}
-	return err
+func leasingToRedis(leasingId string, renewalTime time.Time) error {
+	//TODO: impl add leasing to redis
+	return nil
 }
