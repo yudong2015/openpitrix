@@ -21,26 +21,30 @@ enum Currency {
 	USD = 2;
 }
 
-//************************************* Price *************************
+//*************************************************************
+//*********************** Billing *****************************
+//*************************************************************
 //price
 message Price {
     google.protobuf.StringValue price_id = 1;
-	google.protobuf.StringValue binding_id = 2; //sku metering_attribute binding id
-	map<int64, double> prices = 3;  //{upto1: price1, upto2: price2, ...}, if upto is 0, the price is unchanged.
-	Currency currency = 4;
-	google.protobuf.StringValue status = 5;
-	google.protobuf.Timestamp start_time = 6; //start time for this price, default now
-	google.protobuf.Timestamp end_time = 7; //overdue time for this price, default null(forever)
-	google.protobuf.Timestamp create_time = 8;
-	google.protobuf.Timestamp status_time = 9;
+	google.protobuf.StringValue sku_id = 2; //sku id
+	google.protobuf.StringValue attribute_id = 3; //metering_attribute id
+	map<int64, double> prices = 4;  //{upto1: price1, upto2: price2, ...}, if upto is 0, the price is unchanged.
+	Currency currency = 5;
+	google.protobuf.StringValue status = 6;
+	google.protobuf.Timestamp start_time = 7; //start time for this price, default now
+	google.protobuf.Timestamp end_time = 8; //overdue time for this price, default null(forever)
+	google.protobuf.Timestamp create_time = 9;
+	google.protobuf.Timestamp status_time = 10;
 }
 
 message CreatePriceRequest {
-	google.protobuf.StringValue binding_id = 1;
-	map<int64, double> prices = 2;
-	Currency currency = 3;
-	google.protobuf.Timestamp start_time = 4;
-	google.protobuf.Timestamp end_time = 5;
+	google.protobuf.StringValue sku_id = 1;
+	google.protobuf.StringValue attribute_id = 2;
+	map<int64, double> prices = 3;
+	Currency currency = 4;
+	google.protobuf.Timestamp start_time = 5;
+	google.protobuf.Timestamp end_time = 6;
 }
 
 message CreatePriceResponse {
@@ -49,25 +53,27 @@ message CreatePriceResponse {
 
 message DescribePricesRequest {
 	google.protobuf.StringValue price_id = 1;
-	google.protobuf.StringValue binding_id = 2;
-	google.protobuf.StringValue status = 3;
-	google.protobuf.Timestamp start_time = 4;
-	google.protobuf.Timestamp end_time = 5;
-	google.protobuf.StringValue sort_key = 6;
-	google.protobuf.BoolValue reverse = 7;
-	uint32 offset = 8;
-	uint32 limit = 9;
+	google.protobuf.StringValue sku_id = 2;
+	google.protobuf.StringValue attribute_id = 3;
+	google.protobuf.StringValue status = 4;
+	google.protobuf.Timestamp start_time = 5;
+	google.protobuf.Timestamp end_time = 6;
+	google.protobuf.StringValue sort_key = 7;
+	google.protobuf.BoolValue reverse = 8;
+	uint32 offset = 9;
+	uint32 limit = 10;
 }
 
 message DescribePricesResponse {
-	repeated Price prices = 1;
+	uint32 total_count = 1;
+	repeated Price price_set = 2;
 }
 
 message ModifyPriceRequest {
     google.protobuf.StringValue price_id = 1;
-	google.protobuf.StringValue binding_id = 2;
-	map<int64, double> prices = 3;
-	Currency currency = 4;
+	google.protobuf.StringValue sku_id = 2;
+	google.protobuf.StringValue attribute_id = 3;
+	google.protobuf.StringValue status = 4;
 	google.protobuf.Timestamp start_time = 5;
 	google.protobuf.Timestamp end_time = 6;
 }
@@ -77,7 +83,8 @@ message ModifyPriceResponse {
 }
 
 message DeletePricesRequest {
-	repeated string price_ids = 1;
+	google.protobuf.StringValue sku_id = 1;
+	repeated string price_ids = 2;
 }
 
 message DeletePricesResponse {
@@ -119,7 +126,8 @@ message DescribeAccountsRequest {
 }
 
 message DescribeAccountsResponse {
-	repeated Account accounts = 1;
+	uint32 total_count = 1;
+	repeated Account account_set = 2;
 }
 
 message ModifyAccountRequest {
@@ -141,6 +149,81 @@ message DeleteAccountsRequest {
 
 message DeleteAccountsResponse {
 	repeated string user_ids = 1;
+}
+
+message LeasingContract {
+	google.protobuf.StringValue contract_id = 1;
+	google.protobuf.StringValue leasing_id = 2;
+	google.protobuf.StringValue resource_id = 3;
+	google.protobuf.StringValue sku_id = 4;
+	google.protobuf.StringValue user_id = 5;
+	map<string, double> metering_values = 6;
+	google.protobuf.StringValue fee_info = 7;
+	google.protobuf.DoubleValue fee = 8;
+	google.protobuf.DoubleValue due_fee = 9;
+	google.protobuf.DoubleValue other_contract_fee = 10;
+	google.protobuf.DoubleValue coupon_fee = 11;
+	google.protobuf.DoubleValue real_fee = 12;
+	google.protobuf.StringValue currency = 13;
+	google.protobuf.StringValue status = 14;
+	google.protobuf.Timestamp start_time = 15;
+	google.protobuf.Timestamp create_time = 16;
+	google.protobuf.Timestamp status_time = 17;
+}
+
+message DescribeLeasingContractsRequest {
+	google.protobuf.StringValue contract_id = 1;
+	google.protobuf.StringValue leasing_id = 2;
+	google.protobuf.StringValue resource_id = 3;
+	google.protobuf.StringValue sku_id = 4;
+	google.protobuf.StringValue user_id = 5;
+	google.protobuf.StringValue status = 6;
+	google.protobuf.StringValue sort_key = 7;
+	google.protobuf.BoolValue reverse = 8;
+	uint32 offset = 9;
+	uint32 limit = 10;
+}
+
+message DescribeLeasingContractsResponse {
+	uint32 total_count = 1;
+	repeated LeasingContract leasing_contract_set = 2;
+}
+
+message LeasedContract {
+	google.protobuf.StringValue contract_id = 1;
+	google.protobuf.StringValue leasing_id = 2;
+	google.protobuf.StringValue resource_id = 3;
+	google.protobuf.StringValue sku_id = 4;
+	google.protobuf.StringValue user_id = 5;
+	map<string, double> metering_values = 6;
+	google.protobuf.StringValue fee_info = 7;
+	google.protobuf.DoubleValue fee = 8;
+	google.protobuf.DoubleValue due_fee = 9;
+	google.protobuf.DoubleValue other_contract_fee = 10;
+	google.protobuf.DoubleValue coupon_fee = 11;
+	google.protobuf.DoubleValue real_fee = 12;
+	google.protobuf.StringValue currency = 13;
+	google.protobuf.Timestamp start_time = 14;
+	google.protobuf.Timestamp end_time = 15;
+	google.protobuf.Timestamp create_time = 16;
+}
+
+message DescribeLeasedContractsRequest {
+	google.protobuf.StringValue contract_id = 1;
+	google.protobuf.StringValue leasing_id = 2;
+	google.protobuf.StringValue resource_id = 3;
+	google.protobuf.StringValue sku_id = 4;
+	google.protobuf.StringValue user_id = 5;
+	google.protobuf.StringValue status = 6;
+	google.protobuf.StringValue sort_key = 7;
+	google.protobuf.BoolValue reverse = 8;
+	uint32 offset = 9;
+	uint32 limit = 10;
+}
+
+message DescribeLeasedContractsResponse {
+	uint32 total_count = 1;
+	repeated LeasedContract leased_contract_set = 2;
 }
 
 message Recharge {
@@ -172,7 +255,8 @@ message DescribeRechargesRequest {
 }
 
 message DescribeRechargesResponse {
-	repeated Recharge recharges = 1;
+	uint32 total_count = 1;
+	repeated Recharge recharge_set = 2;
 }
 
 message Charge {
@@ -197,7 +281,8 @@ message DescribeChargesRequest {
 }
 
 message DescribeChargesResponse {
-	repeated Charge charges = 1;
+	uint32 total_count = 1;
+	repeated Charge charge_set = 2;
 }
 
 message Refund {
@@ -221,7 +306,8 @@ message DescribeRefundsRequest {
 }
 
 message DescribeRefundsResponse {
-	repeated Refund refunds = 1;
+	uint32 total_count = 1;
+	repeated Refund refund_set = 2;
 }
 
 message Income {
@@ -244,7 +330,42 @@ message DescribeIncomesRequest {
 }
 
 message DescribeIncomesResponse {
-	repeated Income incomes = 1;
+	uint32 total_count = 1;
+	repeated Income income_set = 2;
+}
+
+message Withdraw {
+	google.protobuf.StringValue withdraw_id = 1;
+	google.protobuf.StringValue user_id = 2;
+	google.protobuf.DoubleValue balance = 3;
+	google.protobuf.Timestamp create_time = 4;
+	google.protobuf.StringValue status = 5;
+	google.protobuf.StringValue description = 6;
+}
+
+message CreateWithdrawRequest {
+	google.protobuf.StringValue user_id = 1;
+	google.protobuf.DoubleValue balance = 2;
+	google.protobuf.StringValue description = 3;
+}
+
+message CreateWithdrawResponse {
+	google.protobuf.StringValue withdraw_id = 1;
+}
+
+message DescribeWithdrawsRequest {
+	google.protobuf.StringValue withdraw_id = 1;
+	google.protobuf.StringValue user_id = 2;
+	google.protobuf.StringValue status = 3;
+	google.protobuf.StringValue sort_key = 4;
+	google.protobuf.BoolValue reverse = 5;
+	uint32 offset = 6;
+	uint32 limit = 7;
+}
+
+message DescribeWithdrawsResponse {
+	uint32 total_count = 1;
+	repeated Withdraw withdraw_set = 2;
 }
 
 service BillingManager {
@@ -326,6 +447,24 @@ service BillingManager {
 		};
 	}
 
+	rpc DescribeLeasingContracts (DescribeLeasingContractsRequest) returns (DescribeLeasingContractsResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "describe leasing_contract"
+		};
+		option (google.api.http) = {
+			get: "/v1/billing/leasing/contracts"
+		};
+	}
+
+	rpc DescribeLeasedContracts (DescribeLeasedContractsRequest) returns (DescribeLeasedContractsResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "describe leased_contract"
+		};
+		option (google.api.http) = {
+			get: "/v1/billing/leased/contracts"
+		};
+	}
+
 	rpc CreateRecharge (CreateRechargeRequest) returns (CreateRechargeResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "recharge for user"
@@ -372,25 +511,132 @@ service BillingManager {
 		};
 	}
 
+	rpc CreateWithdraw (CreateWithdrawRequest) returns (CreateWithdrawResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "create withdraw"
+		};
+		option (google.api.http) = {
+			post: "/v1/billing/withdraw"
+		};
+	}
+
+	rpc DescribeWithdraws (DescribeWithdrawsRequest) returns (DescribeWithdrawsResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "describe withdraws"
+		};
+		option (google.api.http) = {
+			get: "/v1/billing/withdraws"
+		};
+	}
 }
 
 
-//************************************* Promotion *************************
+
+//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////// Billing Backend APIs //////////////////////////////////////
+//////////////////////////        Start         //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
+message Context {
+	//context.Context
+}
+
+message Metering {
+    google.protobuf.StringValue leasing_id = 1;
+    google.protobuf.StringValue resource_id = 2;
+    google.protobuf.StringValue sku_id = 3;
+    google.protobuf.StringValue user_id = 4;
+    google.protobuf.StringValue action_id = 5;
+    map<string, double> metering_values = 6;
+	google.protobuf.Timestamp update_time = 7;
+}
+
+message BillingRequest {
+	Context context = 1;
+	Metering metering = 2;
+}
+
+message NIL {} //there is no response
+
+message CreateLeasingContractRequest {
+	google.protobuf.StringValue leasing_id = 1;
+	google.protobuf.StringValue resource_id = 2;
+	google.protobuf.StringValue sku_id = 3;
+	google.protobuf.StringValue user_id = 4;
+	map<string, double> metering_values = 5;
+	google.protobuf.Timestamp start_time = 6;
+}
+
+message CreateLeasingContractResponse {
+	LeasingContract leasing_contract = 1;
+}
+
+message CalculateRequest {
+	Context ctx = 1;
+	Metering metering = 2;
+	LeasingContract leaing_contract = 3;
+}
+
+message LeasingContractOperationRequest {
+	Context ctx = 1;
+	LeasingContract leaing_contract = 2;
+}
+
+
+service BillingBackendManager {
+	rpc Billing (BillingRequest) returns (NIL) {
+		// CreateLeasingContract() or get LeasingContract
+
+		// Calculate()
+
+		// DuductCoupon() if due_fee > 0
+		// RefundCoupon() if due_fee < 0
+
+		//CreateCharge() if due_fee > 0
+		//CreateRefund() if due_fee < 0
+
+	}
+
+	rpc CreateLeasingContract (CreateLeasingContractRequest) returns (CreateLeasingContractResponse) {}
+
+	rpc Calculate (CalculateRequest) returns (LeasingContract) {}
+
+	rpc DeductCoupon (LeasingContractOperationRequest) returns (LeasingContract) {}
+
+	rpc RefundCoupon (LeasingContractOperationRequest) returns (LeasingContract) {}
+
+	rpc CreateCharge (LeasingContractOperationRequest) returns (LeasingContract) {}
+
+	rpc CreateRefund (LeasingContractOperationRequest) returns (LeasingContract) {}
+
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////// 			End         //////////////////////////////////////
+////////////////////////// Billing Backend APIs //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+//*************************************************************************
+//*************************** Promotion ***********************************
+//*************************************************************************
 //combination_price
 message CombinationPrice {
     google.protobuf.StringValue combination_price_id = 1;
-    google.protobuf.StringValue combination_binding_id = 2;
-	map<int64, double> prices = 3;
-	Currency currency = 4;
-	google.protobuf.StringValue status = 5;
-	google.protobuf.Timestamp create_time = 6;
-	google.protobuf.Timestamp status_time = 7;
+    google.protobuf.StringValue combination_sku_id = 2;
+    google.protobuf.StringValue attribute_id = 3;
+	map<int64, double> prices = 4;
+	Currency currency = 5;
+	google.protobuf.StringValue status = 6;
+	google.protobuf.Timestamp create_time = 7;
+	google.protobuf.Timestamp status_time = 8;
 }
 
 message CreateCombinationPriceRequest {
-	google.protobuf.StringValue combination_binding_id = 1;
-	map<int64, double> prices = 2;
-	Currency currency = 3;
+	google.protobuf.StringValue combination_sku_id = 1;
+	google.protobuf.StringValue attribute_id = 2;
+	map<int64, double> prices = 3;
+	Currency currency = 4;
 }
 
 message CreateCombinationPriceResponse {
@@ -399,23 +645,26 @@ message CreateCombinationPriceResponse {
 
 message DescribeCombinationPricesRequest {
 	google.protobuf.StringValue combination_price_id = 1;
-	google.protobuf.StringValue combination_binding_id = 2;
-	google.protobuf.StringValue status = 3;
-	google.protobuf.StringValue sort_key = 4;
-	google.protobuf.BoolValue reverse = 5;
-	uint32 offset = 6;
-	uint32 limit = 7;
+	google.protobuf.StringValue combination_sku_id = 2;
+	google.protobuf.StringValue attribute_id = 3;
+	google.protobuf.StringValue status = 4;
+	google.protobuf.StringValue sort_key = 5;
+	google.protobuf.BoolValue reverse = 6;
+	uint32 offset = 7;
+	uint32 limit = 8;
 }
 
 message DescribeCombinationPricesResponse {
-	repeated CombinationPrice combination_prices = 1;
+	uint32 total_count = 1;
+	repeated CombinationPrice combination_price_set = 2;
 }
 
 message ModifyCombinationPriceRequest {
 	google.protobuf.StringValue combination_price_id = 1;
-	google.protobuf.StringValue combination_binding_id = 2;
-	map<int64, double> prices = 3;
-	Currency currency = 4;
+	google.protobuf.StringValue combination_sku_id = 2;
+	google.protobuf.StringValue attribute_id = 3;
+	map<int64, double> prices = 4;
+	Currency currency = 5;
 }
 
 message ModifyCombinationPriceResponse {
@@ -423,7 +672,8 @@ message ModifyCombinationPriceResponse {
 }
 
 message DeleteCombinationPricesRequest {
-	repeated string combination_price_ids = 1;
+	google.protobuf.StringValue combination_sku_id = 1;
+	repeated string combination_price_ids = 2;
 }
 
 message DeleteCombinationPricesResponse {
@@ -464,7 +714,8 @@ message DescribeProbationsRequest {
 }
 
 message DescribeProbationsResponse {
-	repeated Probation probations = 1;
+	uint32 total_count = 1;
+	repeated Probation probation_set = 2;
 }
 
 message ModifyProbationRequest {
@@ -530,7 +781,8 @@ message DescribeDiscountsRequest {
 }
 
 message DescribeDiscountsResponse {
-	repeated Discount discounts = 1;
+	uint32 total_count = 1;
+	repeated Discount discount_set = 2;
 }
 
 message ModifyDiscountRequest {
@@ -600,7 +852,8 @@ message DescribeCouponsRequest {
 }
 
 message DescribeCouponsResponse {
-	repeated Coupon coupons = 1;
+	uint32 total_count = 1;
+	repeated Coupon coupon_set = 2;
 }
 
 message ModifyCouponRequest {
@@ -657,7 +910,8 @@ message DescribeCouponReceivedsRequest {
 }
 
 message DescribeCouponReceivedsResponse {
-	repeated CouponReceived coupon_receiveds = 1;
+	uint32 total_count = 1;
+	repeated CouponReceived coupon_received_set = 2;
 }
 
 message DeleteCouponReceivedsRequest {

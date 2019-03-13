@@ -16,8 +16,7 @@ import (
 func (s *Server) CreatePrice(ctx context.Context, req *pb.CreatePriceRequest) (*pb.CreatePriceResponse, error) {
 	price := models.PbToPrice(req)
 
-	//TODO: how to check bindId
-	//How about do not check bindId?
+	//TODO: how to check skuId and attributeId
 
 	//insert price
 	err := insertPrice(ctx, price)
@@ -40,26 +39,6 @@ func (s *Server) ModifyPrice(ctx context.Context, req *pb.ModifyPriceRequest) (*
 func (s *Server) DeletePrices(ctx context.Context, req *pb.DeletePricesRequest) (*pb.DeletePricesResponse, error) {
 	//TODO: impl DeletePrices
 	return &pb.DeletePricesResponse{}, nil
-}
-
-func (s *Server) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest) (*pb.CreateAccountResponse, error) {
-	//TODO: impl CreateAccount
-	return &pb.CreateAccountResponse{}, nil
-}
-
-func (s *Server) DescribeAccounts(ctx context.Context, req *pb.DescribeAccountsRequest) (*pb.DescribeAccountsResponse, error) {
-	//TODO: impl DescribeAccounts
-	return &pb.DescribeAccountsResponse{}, nil
-}
-
-func (s *Server) ModifyAccount(ctx context.Context, req *pb.ModifyAccountRequest) (*pb.ModifyAccountResponse, error) {
-	//TODO: impl ModifyAccount
-	return &pb.ModifyAccountResponse{}, nil
-}
-
-func (s *Server) DeleteAccounts(ctx context.Context, req *pb.DeleteAccountsRequest) (*pb.DeleteAccountsResponse, error) {
-	//TODO: impl DeleteAccounts
-	return &pb.DeleteAccountsResponse{}, nil
 }
 
 type Metering struct {
@@ -103,14 +82,14 @@ func Billing(ctx context.Context, metering Metering) {
 
 	//deduct coupon
 	if contract.DueFee > 0 {
-		deductCoupon(contract)
+		deductCoupon(ctx, contract)
 	}
 	if contract.DueFee < 0 {
-		refundCoupon(contract)
+		refundCoupon(ctx, contract)
 	}
 
 	//charge due_fee from account
- 	if contract.DueFee > 0 {
+	if contract.DueFee > 0 {
 		_, err := charge(contract)
 		if err != nil {
 			if err.Error() == "balance not enough" {
@@ -199,7 +178,7 @@ func discountFromSku(spuId, skuId, priceId string, startTime, endTime time.Time)
 
 //TODO: Make sure condition of the coupon
 //TODO: Make sure the sequence(eg: Remain, EndTime) of coupons to deduct for due_fee
-func deductCoupon(contract *models.LeasingContract) error {
+func deductCoupon(ctx context.Context, contract *models.LeasingContract) error {
 	//TODO: update Status of CouponUsed used by contract from undetermined to done
 
 	//TODO: get CouponReceiveds by UserId and Status (active and using)
@@ -210,7 +189,7 @@ func deductCoupon(contract *models.LeasingContract) error {
 	return nil
 }
 
-func refundCoupon(contract *models.LeasingContract) error {
+func refundCoupon(ctx context.Context, contract *models.LeasingContract) error {
 	//TODO: update Status of CouponUsed of the contract from undetermined to deleted or done by DueFee and Balance
 	//TODO: update The Remian/Status of CouponReceived
 	return nil

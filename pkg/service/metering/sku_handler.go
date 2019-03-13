@@ -34,7 +34,7 @@ func (s *Server) DescribeAttributeNames(ctx context.Context, req *pb.DescribeAtt
 		pbAttributeNames = append(pbAttributeNames, models.AttributeNameToPb(attName))
 	}
 
-	return &pb.DescribeAttributeNamesResponse{AttributeNames: pbAttributeNames}, nil
+	return &pb.DescribeAttributeNamesResponse{AttributeNameSet: pbAttributeNames}, nil
 }
 
 func (s *Server) ModifyAttributeName(ctx context.Context, req *pb.ModifyAttributeNameRequest) (*pb.ModifyAttributeNameResponse, error) {
@@ -67,7 +67,7 @@ func (s *Server) DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAtt
 		pbAttributeUnits = append(pbAttributeUnits, models.AttributeUnitToPb(attUnit))
 	}
 
-	return &pb.DescribeAttributeUnitsResponse{AttributeUnits: pbAttributeUnits}, nil
+	return &pb.DescribeAttributeUnitsResponse{AttributeUnitSet: pbAttributeUnits}, nil
 }
 
 func (s *Server) ModifyAttributeUnit(ctx context.Context, req *pb.ModifyAttributeUnitRequest) (*pb.ModifyAttributeUnitResponse, error) {
@@ -117,7 +117,7 @@ func (s *Server) DescribeAttributes(ctx context.Context, req *pb.DescribeAttribu
 		pbAttributes = append(pbAttributes, models.AttributeToPb(att))
 	}
 
-	return &pb.DescribeAttributesResponse{Attributes: pbAttributes}, nil
+	return &pb.DescribeAttributesResponse{AttributeSet: pbAttributes}, nil
 }
 
 func (s *Server) ModifyAttribute(ctx context.Context, req *pb.ModifyAttributeRequest) (*pb.ModifyAttributeResponse, error) {
@@ -192,26 +192,6 @@ func (s *Server) ModifySku(ctx context.Context, req *pb.ModifySkuRequest) (*pb.M
 func (s *Server) DeleteSkus(ctx context.Context, req *pb.DeleteSkusRequest) (*pb.DeleteSkusResponse, error) {
 	//TODO: impl DeleteSkus
 	return &pb.DeleteSkusResponse{}, nil
-}
-
-func (s *Server) CreateMeteringAttributeBindings(ctx context.Context, req *pb.CreateMeteringAttributeBindingsRequest) (*pb.CreateMeteringAttributeBindingsResponse, error) {
-	//TODO: impl CreateMeteringAttributeBindings
-	return &pb.CreateMeteringAttributeBindingsResponse{}, nil
-}
-
-func (s *Server) DescribeMeteringAttributeBindings(ctx context.Context, req *pb.DescribeMeteringAttributeBindingsRequest) (*pb.DescribeMeteringAttributeBindingsResponse, error) {
-	//TODO: impl DescribeMeteringAttributeBindings
-	return &pb.DescribeMeteringAttributeBindingsResponse{}, nil
-}
-
-func (s *Server) ModifyMeteringAttributeBinding(ctx context.Context, req *pb.ModifyMeteringAttributeBindingRequest) (*pb.ModifyMeteringAttributeBindingResponse, error) {
-	//TODO: impl ModifyMeteringAttributeBinding
-	return &pb.ModifyMeteringAttributeBindingResponse{}, nil
-}
-
-func (s *Server) DeleteMeteringAttributeBindings(ctx context.Context, req *pb.DeleteMeteringAttributeBindingsRequest) (*pb.DeleteMeteringAttributeBindingsResponse, error) {
-	//TODO: impl DeleteMeteringAttributeBindings
-	return &pb.DeleteMeteringAttributeBindingsResponse{}, nil
 }
 
 func renewalTimeFromSku(ctx context.Context, skuId string, actionTime time.Time) (*time.Time, error) {

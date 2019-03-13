@@ -57,35 +57,22 @@ CREATE TABLE IF NOT EXISTS spu (
 
 
 CREATE TABLE IF NOT EXISTS sku (
-	sku_id        VARCHAR(50) NOT NULL UNIQUE,
-	spu_id        VARCHAR(50) NOT NULL,
-	attribute_ids JSON COMMENT 'sku attributes with value of spu.',
-	status        VARCHAR(16) DEFAULT 'active'
+	sku_id                 VARCHAR(50) NOT NULL UNIQUE,
+	spu_id                 VARCHAR(50) NOT NULL,
+	attribute_ids          JSON COMMENT 'attributes of sku',
+	metering_attribute_ids JSON COMMENT 'metering attributes of sku',
+	status                 VARCHAR(16) DEFAULT 'active'
 	COMMENT 'active, deleted',
-	create_time   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-	status_time   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+	create_time            TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+	status_time            TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 	ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (sku_id)
-);
-
-
-CREATE TABLE IF NOT EXISTS metering_attribute_binding (
-	binding_id   VARCHAR(50) NOT NULL UNIQUE,
-	sku_id       VARCHAR(50) NOT NULL,
-	attribute_id VARCHAR(50) NOT NULL,
-	status       VARCHAR(16) DEFAULT 'active'
-	COMMENT 'active, deleted',
-	create_time  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-	status_time  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
-	ON UPDATE CURRENT_TIMESTAMP,
-	PRIMARY KEY (binding_id)
 );
 
 
 /**  Metering  **/
 CREATE TABLE IF NOT EXISTS leasing (
 	leasing_id           VARCHAR(50) NOT NULL UNIQUE,
-	group_id             VARCHAR(50) NOT NULL,
 	user_id              VARCHAR(50) NOT NULL,
 	resource_id          VARCHAR(50) NOT NULL,
 	sku_id               VARCHAR(50) NOT NULL,
@@ -93,11 +80,11 @@ CREATE TABLE IF NOT EXISTS leasing (
 	lease_time           TIMESTAMP   NOT NULL,
 	update_duration_time TIMESTAMP   NULL,
 	renewal_time         TIMESTAMP   NULL,
-	create_time          TIMESTAMP            DEFAULT CURRENT_TIMESTAMP,
-	status_time          TIMESTAMP            DEFAULT CURRENT_TIMESTAMP
+	create_time          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+	status_time          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 	ON UPDATE CURRENT_TIMESTAMP,
 	stop_times           JSON COMMENT '[{close_time: restart_time}, ..]',
-	status               VARCHAR(16)          DEFAULT 'active'
+	status               VARCHAR(16) DEFAULT 'active'
 	COMMENT 'active, handStop, forceStop, terminate',
 	PRIMARY KEY (leasing_id)
 );
@@ -105,12 +92,10 @@ CREATE TABLE IF NOT EXISTS leasing (
 
 CREATE TABLE IF NOT EXISTS leased (
 	leased_id       VARCHAR(50) NOT NULL UNIQUE,
-	group_id        VARCHAR(50) NOT NULL,
 	user_id         VARCHAR(50) NOT NULL,
 	resource_id     VARCHAR(50) NOT NULL
 	COMMENT 'the same as cluster_id',
 	sku_id          VARCHAR(50) NOT NULL,
-	other_info      VARCHAR(50) COMMENT 'used for distinguish when resource_id and sku_id are same with others',
 	metering_values JSON COMMENT 'the values of metering_attributes, {att_id: value, ..}',
 	lease_time      TIMESTAMP   NULL,
 	end_time        TIMESTAMP   NULL,

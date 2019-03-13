@@ -1,4 +1,4 @@
-// Copyright 2017 The OpenPitrix Authors. All rights reserved.
+// Copyright 2019 The OpenPitrix Authors. All rights reserved.
 // Use of this source code is governed by a Apache license
 // that can be found in the LICENSE file.
 
@@ -10,7 +10,6 @@ import (
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/db"
 
-	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/util/idutil"
 )
 
@@ -21,7 +20,6 @@ func NewLeasingId() string {
 //SkuMetering
 type Leasing struct {
 	LeasingId          string
-	GroupId            string
 	UserId             string
 	ResourceId         string
 	SkuId              string
@@ -37,23 +35,13 @@ type Leasing struct {
 
 var LeasingColumns = db.GetColumnsFromStruct(&Leasing{})
 
-func pbToMeteringValues(pbMeteringValues []*pb.MeteringValue) map[string]float64 {
-	metertingValues := map[string]float64{}
-	for _, pbMetVal := range pbMeteringValues {
-		attributeId := pbMetVal.GetAttributeId().GetValue()
-		metertingValues[attributeId] = pbMetVal.GetValue().Value
-	}
-	return metertingValues
-}
-
-func NewLeasing(req *pb.MeteringValue, groupId, resourceId, skuId, userId string, actionTime, renewalTime time.Time) *Leasing {
+func NewLeasing(values map[string]float64, userId, resourceId, skuId string, actionTime, renewalTime time.Time) *Leasing {
 	return &Leasing{
 		LeasingId:          NewLeasingId(),
-		GroupId:            groupId,
 		UserId:             userId,
 		ResourceId:         resourceId,
 		SkuId:              skuId,
-		MeteringValues:     pbToMeteringValues(req),
+		MeteringValues:     values,
 		LeaseTime:          actionTime,
 		UpdateDurationTime: actionTime,
 		RenewalTime:        renewalTime,
@@ -66,7 +54,6 @@ func NewLeasing(req *pb.MeteringValue, groupId, resourceId, skuId, userId string
 
 type Leased struct {
 	LeasedId       string
-	GroupId        string
 	UserId         string
 	ResourceId     string
 	SkuId          string
@@ -79,7 +66,6 @@ type Leased struct {
 func (l *Leasing) ToLeased() *Leased {
 	return &Leased{
 		LeasedId:       l.LeasingId,
-		GroupId:        l.GroupId,
 		UserId:         l.UserId,
 		ResourceId:     l.ResourceId,
 		SkuId:          l.SkuId,

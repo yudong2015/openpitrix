@@ -19,8 +19,9 @@ enum AttributeType {
 	METERING = 1;
 }
 
-//************************************* Sku *************************
-//the values of status are: active/deleted
+//***************************************************
+//********************* Sku *************************
+//***************************************************
 //attribute_name
 message AttributeName {
 	google.protobuf.StringValue attribute_name_id = 1;
@@ -54,7 +55,8 @@ message DescribeAttributeNamesRequest {
 }
 
 message DescribeAttributeNamesResponse {
-	repeated AttributeName attribute_names = 1;
+	uint32 total_count = 1;
+	repeated AttributeName attribute_name_set = 2;
 }
 
 message ModifyAttributeNameRequest {
@@ -104,7 +106,8 @@ message DescribeAttributeUnitsRequest {
 }
 
 message DescribeAttributeUnitsResponse {
-	repeated AttributeUnit attribute_units = 1;
+	uint32 total_count = 1;
+	repeated AttributeUnit attribute_unit_set = 2;
 }
 
 message ModifyAttributeUnitRequest {
@@ -160,7 +163,8 @@ message DescribeAttributesRequest {
 }
 
 message DescribeAttributesResponse {
-	repeated Attribute attributes = 1;
+	uint32 total_count = 1;
+	repeated Attribute attribute_set = 2;
 }
 
 message ModifyAttributeRequest {
@@ -212,7 +216,8 @@ message DescribeSpusRequest {
 }
 
 message DescribeSpusResponse {
-	repeated Spu spus = 1;
+	uint32 total_count = 1;
+	repeated Spu spu_set = 2;
 }
 
 message ModifySpuRequest {
@@ -237,14 +242,16 @@ message Sku {
 	google.protobuf.StringValue sku_id = 1;
 	google.protobuf.StringValue spu_id = 2;
 	repeated string attribute_ids = 3;
-	google.protobuf.StringValue status = 4;
-	google.protobuf.Timestamp create_time = 5;
-	google.protobuf.Timestamp status_time = 6;
+	repeated string metering_attribute_ids = 4;
+	google.protobuf.StringValue status = 5;
+	google.protobuf.Timestamp create_time = 6;
+	google.protobuf.Timestamp status_time = 7;
 }
 
 message CreateSkuRequest {
 	google.protobuf.StringValue spu_id = 1;
 	repeated string attribute_ids = 2;
+	repeated string metering_attribute_ids = 3;
 }
 
 message CreateSkuResponse {
@@ -262,13 +269,15 @@ message DescribeSkusRequest {
 }
 
 message DescribeSkusResponse {
-	repeated Sku skus = 1;
+	uint32 total_count = 1;
+	repeated Sku sku_set = 2;
 }
 
 message ModifySkuRequest {
 	google.protobuf.StringValue sku_id = 1;
 	google.protobuf.StringValue spu_id = 2;
 	repeated string attribute_ids = 3;
+	repeated string metering_attribute_ids = 4;
 }
 
 message ModifySkuResponse {
@@ -281,57 +290,6 @@ message DeleteSkusRequest {
 
 message DeleteSkusResponse {
 	repeated string sku_ids = 1;
-}
-
-//metering_attribute_binding
-message MeteringAttributeBinding { // binding metering_attribute_id into sku_id
-	google.protobuf.StringValue binding_id = 1;
-	google.protobuf.StringValue sku_id = 2;
-	google.protobuf.StringValue attribute_id = 3; //the attribute id that need to metering
-	google.protobuf.StringValue status = 4;
-	google.protobuf.Timestamp create_time = 5;
-	google.protobuf.Timestamp status_time = 6;
-}
-
-message CreateMeteringAttributeBindingsRequest {
-	google.protobuf.StringValue sku_id = 1;
-	repeated string attribute_ids = 2;
-}
-
-message CreateMeteringAttributeBindingsResponse {
-	repeated string binding_ids = 1;
-}
-
-message DescribeMeteringAttributeBindingsRequest {
-	google.protobuf.StringValue binding_id = 1;
-	google.protobuf.StringValue sku_id = 2;
-	google.protobuf.StringValue status = 3;
-	google.protobuf.StringValue sort_key = 4;
-	google.protobuf.BoolValue reverse = 5;
-	uint32 offset = 6;
-	uint32 limit = 7;
-}
-
-message DescribeMeteringAttributeBindingsResponse {
-	repeated MeteringAttributeBinding meteringAttributeBindings = 1;
-}
-
-message ModifyMeteringAttributeBindingRequest {
-	google.protobuf.StringValue binding_id = 1;
-	google.protobuf.StringValue sku_id = 2;
-	google.protobuf.StringValue attribute_id = 3;
-}
-
-message ModifyMeteringAttributeBindingResponse {
-	google.protobuf.StringValue binding_id = 1;
-}
-
-message DeleteMeteringAttributeBindingsRequest {
-	repeated string binding_ids = 1;
-}
-
-message DeleteMeteringAttributeBindingsResponse {
-	repeated string binding_ids = 1;
 }
 
 service SkuManager {
@@ -529,52 +487,160 @@ service SkuManager {
 			body: "*"
 		};
 	}
+}
 
-	rpc CreateMeteringAttributeBindings (CreateMeteringAttributeBindingsRequest) returns (CreateMeteringAttributeBindingsResponse) {
+
+//********************************************************************
+//************************** metering ********************************
+//********************************************************************
+message SkuMetering {
+	google.protobuf.StringValue sku_id = 1;
+	map<string, double> value = 2; //{attribute_id: value}
+
+}
+
+message UpdateMeteringValue {
+	google.protobuf.StringValue attribute_id = 1;
+	google.protobuf.DoubleValue value = 2;
+	enum UpdateValueTypes {
+		INCREMENTAL = 0;
+		REPLACE = 1;
+	}
+	UpdateValueTypes type = 3;
+}
+
+message UpdateSkuMetering {
+	google.protobuf.StringValue sku_id = 1; //distinct sku/cobination by prefix
+	//if the metering attributes of sku is only duration, this is nil
+	repeated UpdateMeteringValue metering_values = 2;
+}
+
+message InitMeteringRequest {
+	google.protobuf.StringValue user_id = 1;
+	google.protobuf.StringValue resource_id = 2;
+	repeated SkuMetering sku_meterings = 3;
+}
+
+message UpdateMeteringRequest {
+	google.protobuf.StringValue resource_id = 1;
+	repeated UpdateSkuMetering update_sku_meterings = 2;
+}
+
+message StopMeteringsRequest {
+	google.protobuf.StringValue resource_id = 1;
+	repeated string sku_ids = 2;
+}
+
+message StartMeteringsRequest {
+	google.protobuf.StringValue resource_id = 1;
+	repeated string sku_ids = 2;
+}
+
+message TerminateMeteringsRequest {
+	google.protobuf.StringValue resource_id = 1;
+	repeated string sku_ids = 2;
+}
+
+message CommonMeteringResponse {
+	google.protobuf.StringValue resource_id = 1;
+}
+
+message CommonMeteringsResponse {
+	repeated string resource_ids = 1;
+}
+
+message Leasing {
+	google.protobuf.StringValue LeasingId = 1;
+	google.protobuf.StringValue UserId = 3;
+	google.protobuf.StringValue ResourceId = 4;
+	google.protobuf.StringValue SkuId = 5;
+	map<string, double> MeteringValues = 6; //<attribute_id, value>
+	google.protobuf.StringValue Status = 7;
+	google.protobuf.Timestamp LeaseTime = 8;
+	google.protobuf.Timestamp UpdateDurationTime = 9;
+	google.protobuf.Timestamp RenewalTime = 10;
+	google.protobuf.Timestamp CreateTime = 11;
+	google.protobuf.Timestamp StatusTime = 12;
+	map<string, string> StopTimes = 13; //<stop_time, start_time>
+}
+
+message DescribeLeasingsRequest {
+	google.protobuf.StringValue LeasingId = 1;
+	google.protobuf.StringValue UserId = 3;
+	google.protobuf.StringValue ResourceId = 4;
+	google.protobuf.StringValue SkuId = 5;
+	google.protobuf.StringValue Status = 6;
+	google.protobuf.StringValue sort_key = 7;
+	google.protobuf.BoolValue reverse = 8;
+	uint32 offset = 9;
+	uint32 limit = 10;
+}
+
+message DescribeLeasingsResponse {
+	uint32 total_count = 1;
+	repeated Leasing leasing_set = 2;
+}
+
+service MeteringManager {
+	rpc InitMetering (InitMeteringRequest) returns (CommonMeteringResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "create metering attribute bindings of sku"
+			summary: "init metering about the skus"
+		};
+		option (google.api.http) = {
+			post: "/v1/metering"
+			body: "*"
+		};
+	}
+
+	rpc UpdateMetering (UpdateMeteringRequest) returns (CommonMeteringResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "update metering value about the sku"
+		};
+		option (google.api.http) = {
+			put: "/v1/metering"
+			body: "*"
+		};
+	}
+
+	rpc StopMeterings (StopMeteringsRequest) returns (CommonMeteringsResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "stop metering about the skus"
+		};
+		option (google.api.http) = {
+			put: "/v1/metering/stop"
+			body: "*"
+		};
+	}
+
+	//start for stopped metering
+	rpc StartMeterings (StartMeteringsRequest) returns (CommonMeteringsResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "start metering about the skus"
+		};
+		option (google.api.http) = {
+			put: "/v1/metering/start"
+			body: "*"
+		};
+	}
+
+	rpc TerminateMeterings (TerminateMeteringsRequest) returns (CommonMeteringsResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "terminate metering about the skus"
         };
 		option (google.api.http) = {
-            post: "/v1/metering/attribute/bingings"
+            delete: "/v1/metering"
             body: "*"
         };
-	}
-
-	rpc DescribeMeteringAttributeBindings (DescribeMeteringAttributeBindingsRequest) returns (DescribeMeteringAttributeBindingsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "describe metering attribute bindings of sku"
-		};
-		option (google.api.http) = {
-			get: "/v1/metering/attribute/bindings"
-		};
-	}
-
-	rpc ModifyMeteringAttributeBinding (ModifyMeteringAttributeBindingRequest) returns (ModifyMeteringAttributeBindingResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "modify metering attribute binding of sku"
-		};
-		option (google.api.http) = {
-			put: "/v1/metering/attribute/binding"
-			body: "*"
-		};
-	}
-
-	rpc DeleteMeteringAttributeBindings (DeleteMeteringAttributeBindingsRequest) returns (DeleteMeteringAttributeBindingsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "delete metering attribute bindings of sku"
-		};
-		option (google.api.http) = {
-			delete: "/v1/metering/attribute/bindings"
-			body: "*"
-		};
 	}
 }
 
 
-//************************************* Promotion *************************
+//*************************************************************************
+//*************************** Promotion ***********************************
+//*************************************************************************
 //combination
 message Combination {
-    google.protobuf.StringValue combination_id = 1;
+	google.protobuf.StringValue combination_id = 1;
 	google.protobuf.StringValue name = 2;
 	google.protobuf.StringValue description = 3;
 	google.protobuf.StringValue owner = 4;
@@ -608,7 +674,8 @@ message DescribeCombinationsRequest {
 }
 
 message DescribeCombinationsResponse {
-	repeated Combination combinations = 1;
+	uint32 total_count = 1;
+	repeated Combination combination_set = 2;
 }
 
 message ModifyCombinationRequest {
@@ -633,8 +700,8 @@ message DeleteCombinationsResponse {
 
 //combination_sku
 message CombinationSku {
-    google.protobuf.StringValue combination_sku_id = 1;
-    google.protobuf.StringValue combination_id = 2;
+	google.protobuf.StringValue combination_sku_id = 1;
+	google.protobuf.StringValue combination_id = 2;
 	google.protobuf.StringValue sku_id = 3;
 	google.protobuf.StringValue status = 4;
 	google.protobuf.Timestamp create_time = 5;
@@ -662,7 +729,8 @@ message DescribeCombinationSkusRequest {
 }
 
 message DescribeCombinationSkusResponse {
-	repeated CombinationSku combination_skus = 1;
+	uint32 total_count = 1;
+	repeated CombinationSku combination_sku_set = 2;
 }
 
 message ModifyCombinationSkuRequest {
@@ -681,57 +749,6 @@ message DeleteCombinationSkusRequest {
 
 message DeleteCombinationSkusResponse {
 	repeated string combination_sku_ids = 1;
-}
-
-//CombinationMABinding: CombinationMeteringAttributeBinding
-message CombinationMABinding {
-	google.protobuf.StringValue combination_binding_id = 1;
-	google.protobuf.StringValue combination_sku_id = 2;
-	google.protobuf.StringValue attribute_id = 3;
-	google.protobuf.StringValue status = 4;
-	google.protobuf.Timestamp create_time = 5;
-	google.protobuf.Timestamp status_time = 6;
-}
-
-message CreateCombinationMABindingRequest {
-	google.protobuf.StringValue combination_sku_id = 1;
-	google.protobuf.StringValue attribute_id = 2;
-}
-
-message CreateCombinationMABindingResponse {
-	google.protobuf.StringValue combination_binding_id = 1;
-}
-
-message DescribeCombinationMABindingsRequest {
-	google.protobuf.StringValue combination_binding_id = 1;
-	google.protobuf.StringValue combination_sku_id = 2;
-	google.protobuf.StringValue status = 3;
-	google.protobuf.StringValue sort_key = 4;
-	google.protobuf.BoolValue reverse = 5;
-	uint32 offset = 6;
-	uint32 limit = 7;
-}
-
-message DescribeCombinationMABindingsResponse {
-	repeated CombinationMABinding combination_ma_bindings = 1;
-}
-
-message ModifyCombinationMABindingRequest {
-	google.protobuf.StringValue combination_binding_id = 1;
-	google.protobuf.StringValue combination_sku_id = 2;
-	google.protobuf.StringValue attribute_id = 3;
-}
-
-message ModifyCombinationMABindingResponse {
-	google.protobuf.StringValue combination_binding_id = 1;
-}
-
-message DeleteCombinationMABindingsRequest {
-	repeated string combination_binding_ids = 1;
-}
-
-message DeleteCombinationMABindingsResponse {
-	repeated string combination_binding_ids = 1;
 }
 
 service PromotionSkuManager {
@@ -813,188 +830,4 @@ service PromotionSkuManager {
 		};
 	}
 
-	rpc CreateCombinationMABinding (CreateCombinationMABindingRequest) returns (CreateCombinationMABindingResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "create combination_ma_binding"
-        };
-		option (google.api.http) = {
-            post: "/v1/metering/combination/mabinding"
-            body: "*"
-        };
-	}
-
-	rpc DescribeCombinationMABindings (DescribeCombinationMABindingsRequest) returns (DescribeCombinationMABindingsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "describe combination_ma_bindings"
-		};
-		option (google.api.http) = {
-			get: "/v1/metering/combination/mabindings"
-		};
-	}
-
-	rpc ModifyCombinationMABinding (ModifyCombinationMABindingRequest) returns (ModifyCombinationMABindingResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "modify combination_ma_binding"
-		};
-		option (google.api.http) = {
-			put: "/v1/metering/combination/mabinding"
-			body: "*"
-		};
-	}
-
-	rpc DeleteCombinationMABindings (DeleteCombinationMABindingsRequest) returns (DeleteCombinationMABindingsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "delete combination_ma_bindings"
-		};
-		option (google.api.http) = {
-			delete: "/v1/metering/combination/mabindings"
-			body: "*"
-		};
-	}
-}
-
-
-//************************** metering ****************************
-
-message MeteringValue {
-	google.protobuf.StringValue attribute_id = 1;
-	google.protobuf.DoubleValue value = 2;
-}
-
-message UpdateMeteringValue {
-	MeteringValue metering_value = 1;
-	enum UpdateValueTypes {
-		INCREMENTAL = 0;
-		REPLACE = 1;
-	}
-	UpdateValueTypes type = 2;
-}
-
-message UpdateSkuMetering {
-	google.protobuf.StringValue sku_id = 1; //distinct sku/cobination by prefix
-	//if the metering attributes of sku is only duration, this is nil
-	repeated UpdateMeteringValue metering_values = 2;
-}
-
-//if sku_ids = [], mean is all skus of the reource
-message Resource {
-	google.protobuf.StringValue resource_id = 1;
-	repeated string sku_ids = 2;
-}
-
-message InitMeteringRequest {
-	google.protobuf.StringValue user_id = 1;
-	google.protobuf.StringValue resource_id = 2;
-	map<string, MeteringValue> sku_meterings = 3; //<skuId, MeteringValue>
-}
-
-message StartMeteringsRequest {
-	repeated Resource resources = 1;
-}
-
-message UpdateMeteringRequest {
-	google.protobuf.StringValue resource_id = 1;
-	repeated UpdateSkuMetering sku_meterings = 2;
-}
-
-message StopMeteringsRequest {
-	repeated Resource resources = 1;
-}
-
-message TerminateMeteringsRequest {
-	repeated Resource resources = 1;
-}
-
-message CommonMeteringResponse {
-	google.protobuf.StringValue resource_id = 1;
-}
-
-message CommonMeteringsResponse {
-	repeated string resource_ids = 1;
-}
-
-message Leasing {
-	google.protobuf.StringValue LeasingId = 1;
-	google.protobuf.StringValue GroupId = 2;
-	google.protobuf.StringValue UserId = 3;
-	google.protobuf.StringValue ResourceId = 4;
-	google.protobuf.StringValue SkuId = 5;
-	map<string, double> MeteringValues = 6; //<attribute_id, value>
-	google.protobuf.StringValue Status = 7;
-	google.protobuf.Timestamp LeaseTime = 8;
-	google.protobuf.Timestamp UpdateDurationTime = 9;
-	google.protobuf.Timestamp RenewalTime = 10;
-	google.protobuf.Timestamp CreateTime = 11;
-	google.protobuf.Timestamp StatusTime = 12;
-	map<string, string> StopTimes = 13; //<stop_time, start_time>
-}
-
-message DescribeLeasingsRequest {
-	google.protobuf.StringValue LeasingId = 1;
-	google.protobuf.StringValue GroupId = 2;
-	google.protobuf.StringValue UserId = 3;
-	google.protobuf.StringValue ResourceId = 4;
-	google.protobuf.StringValue SkuId = 5;
-	google.protobuf.StringValue Status = 6;
-	google.protobuf.StringValue sort_key = 7;
-	google.protobuf.BoolValue reverse = 8;
-	uint32 offset = 9;
-	uint32 limit = 10;
-}
-
-message DescribeLeasingsResponse {
-	repeated Leasing leasings = 1;
-}
-
-service MeteringManager {
-	rpc InitMetering (InitMeteringRequest) returns (CommonMeteringResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "init metering about the skus"
-		};
-		option (google.api.http) = {
-			post: "/v1/metering/skus"
-			body: "*"
-		};
-	}
-
-	//start for stopped metering
-	rpc StartMeterings (StartMeteringsRequest) returns (CommonMeteringsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "start metering about the skus"
-		};
-		option (google.api.http) = {
-			put: "/v1/metering/start"
-			body: "*"
-		};
-	}
-
-	rpc UpdateMetering (UpdateMeteringRequest) returns (CommonMeteringResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "update metering value about the sku"
-		};
-		option (google.api.http) = {
-			put: "/v1/metering/skus"
-			body: "*"
-		};
-	}
-
-	rpc StopMeterings (StopMeteringsRequest) returns (CommonMeteringsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "stop metering about the skus"
-		};
-		option (google.api.http) = {
-			put: "/v1/metering/stop"
-			body: "*"
-		};
-	}
-
-	rpc TerminateMeterings (TerminateMeteringsRequest) returns (CommonMeteringsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "terminate metering about the skus"
-        };
-		option (google.api.http) = {
-            delete: "/v1/metering/skus"
-            body: "*"
-        };
-	}
 }
