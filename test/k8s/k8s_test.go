@@ -181,12 +181,16 @@ func TestK8S(t *testing.T) {
 			VersionID:     appVersion1.VersionID,
 		})
 
+		log.Info(nil, "client: %+v", client)
+		log.Info(nil, "params: %+v", createParams)
+
 		createResp, err := client.ClusterManager.CreateCluster(createParams, nil)
+		log.Info(nil, "%#v", createResp.Payload)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		clusterId = createResp.Payload.ClusterID
@@ -194,10 +198,10 @@ func TestK8S(t *testing.T) {
 
 		err = waitJobFinish(t, client, jobId)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		log.Info(nil, "Cluster [%s] created", clusterId)
@@ -215,20 +219,20 @@ func TestK8S(t *testing.T) {
 
 		upgradeResp, err := client.ClusterManager.UpgradeCluster(upgradeParams, nil)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		jobId := upgradeResp.Payload.JobID
 
 		err = waitJobFinish(t, client, jobId)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		log.Info(nil, "Cluster [%s] upgraded", clusterId)
@@ -245,20 +249,20 @@ func TestK8S(t *testing.T) {
 
 		rollbackResp, err := client.ClusterManager.RollbackCluster(rollbackParams, nil)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		jobId := rollbackResp.Payload.JobID
 
 		err = waitJobFinish(t, client, jobId)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		log.Info(nil, "Cluster [%s] roll back", clusterId)
@@ -278,20 +282,20 @@ Description: test`
 
 		updateEnvResp, err := client.ClusterManager.UpdateClusterEnv(updateEnvParams, nil)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		jobId := updateEnvResp.Payload.JobID
 
 		err = waitJobFinish(t, client, jobId)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		log.Info(nil, "Cluster [%s] env updated", clusterId)
@@ -308,20 +312,20 @@ Description: test`
 
 		deleteResp, err := client.ClusterManager.DeleteClusters(deleteParams, nil)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		jobId := deleteResp.Payload.JobID[0]
 
 		err = waitJobFinish(t, client, jobId)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		log.Info(nil, "Cluster [%s] deleted", clusterId)
@@ -338,20 +342,20 @@ Description: test`
 
 		ceaseResp, err := client.ClusterManager.CeaseClusters(ceaseParams, nil)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		jobId := ceaseResp.Payload.JobID[0]
 
 		err = waitJobFinish(t, client, jobId)
 		if err != nil {
+			t.Fatal(err)
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-cluster-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-job-manager"))
 			fmt.Print(testutil.ExecCmd(t, "docker-compose logs openpitrix-task-manager"))
-			t.Fatal(err)
 		}
 
 		log.Info(nil, "Cluster [%s] purged", clusterId)

@@ -20,6 +20,8 @@ addons:
   apt:
     packages:
     - docker-ce
+    - socat
+    - ebtables
 before_install:
 - sudo docker run -d -it --name nsenter ubuntu:16.04 bash
 - sudo docker cp nsenter:/usr/bin/nsenter /usr/local/bin/nsenter
