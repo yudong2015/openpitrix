@@ -2834,6 +2834,1515 @@
         ]
       }
     },
+    "/v1/billing/account": {
+      "post": {
+        "summary": "create account",
+        "operationId": "CreateAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateAccountResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      },
+      "put": {
+        "summary": "modify  account",
+        "operationId": "ModifyAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyAccountResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/accounts": {
+      "get": {
+        "summary": "describe accounts",
+        "operationId": "DescribeAccounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeAccountsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user_type",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete accounts",
+        "operationId": "DeleteAccounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteAccountsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteAccountsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/charges": {
+      "get": {
+        "summary": "describe charges",
+        "operationId": "DescribeCharges",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeChargesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "charge_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "contract_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/combination/price": {
+      "post": {
+        "summary": "create combination price of combination sku",
+        "operationId": "CreateCombinationPrice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCombinationPriceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCombinationPriceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      },
+      "put": {
+        "summary": "modify  combination price",
+        "operationId": "ModifyCombinationPrice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyCombinationPriceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyCombinationPriceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/combination/prices": {
+      "get": {
+        "summary": "describe combination prices",
+        "operationId": "DescribeCombinationPrices",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeCombinationPricesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "combination_price_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "combination_sku_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "attribute_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete combination prices",
+        "operationId": "DeleteCombinationPrices",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCombinationPricesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCombinationPricesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/coupon": {
+      "post": {
+        "summary": "create coupon",
+        "operationId": "CreateCoupon",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCouponResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCouponRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      },
+      "put": {
+        "summary": "modify coupon",
+        "operationId": "ModifyCoupon",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyCouponResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyCouponRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/coupon/received": {
+      "post": {
+        "summary": "receive coupon",
+        "operationId": "CreateCouponReceived",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCouponReceivedResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCouponReceivedRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/coupon/receiveds": {
+      "get": {
+        "summary": "describe coupon_receiveds",
+        "operationId": "DescribeCouponReceiveds",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeCouponReceivedsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "coupon_received_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "coupon_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete coupon_receiveds",
+        "operationId": "DeleteCouponReceiveds",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCouponReceivedsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCouponReceivedsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/coupons": {
+      "get": {
+        "summary": "describe coupons",
+        "operationId": "DescribeCoupons",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeCouponsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "coupon_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete coupons",
+        "operationId": "DeleteCoupons",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCouponsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCouponsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/discount": {
+      "post": {
+        "summary": "create discount",
+        "operationId": "CreateDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateDiscountResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateDiscountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      },
+      "put": {
+        "summary": "modify discount",
+        "operationId": "ModifyDiscount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyDiscountResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyDiscountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/discounts": {
+      "get": {
+        "summary": "describe discounts",
+        "operationId": "DescribeDiscounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeDiscountsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "discount_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete discounts",
+        "operationId": "DeleteDiscounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteDiscountsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteDiscountsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/incomes": {
+      "get": {
+        "summary": "describe incomes",
+        "operationId": "DescribeIncomes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeIncomesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "income_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "contract_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/leased/contracts": {
+      "get": {
+        "summary": "describe leased_contract",
+        "operationId": "DescribeLeasedContracts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeLeasedContractsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "leasing_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "resource_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sku_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/leasing/contracts": {
+      "get": {
+        "summary": "describe leasing_contract",
+        "operationId": "DescribeLeasingContracts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeLeasingContractsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "leasing_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "resource_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sku_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/price": {
+      "post": {
+        "summary": "create price of the sku with metering_attribute",
+        "operationId": "CreatePrice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreatePriceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreatePriceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      },
+      "put": {
+        "summary": "modify price",
+        "operationId": "ModifyPrice",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyPriceResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyPriceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/prices": {
+      "get": {
+        "summary": "describe prices",
+        "operationId": "DescribePrices",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribePricesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "price_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sku_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "attribute_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete prices",
+        "operationId": "DeletePrices",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeletePricesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeletePricesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/probation": {
+      "post": {
+        "summary": "create probation of sku",
+        "operationId": "CreateProbation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateProbationResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateProbationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      },
+      "put": {
+        "summary": "modify probation",
+        "operationId": "ModifyProbation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyProbationResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyProbationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/probations": {
+      "get": {
+        "summary": "describe probations",
+        "operationId": "DescribeProbations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeProbationsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "probation_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sku_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete probations",
+        "operationId": "DeleteProbations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteProbationsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteProbationsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionManager"
+        ]
+      }
+    },
+    "/v1/billing/recharge": {
+      "post": {
+        "summary": "recharge for user",
+        "operationId": "CreateRecharge",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateRechargeResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateRechargeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/recharges": {
+      "get": {
+        "summary": "describe recharges",
+        "operationId": "DescribeRecharges",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeRechargesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "recharge_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/refunds": {
+      "get": {
+        "summary": "describe refunds",
+        "operationId": "DescribeRefunds",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeRefundsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "contract_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/withdraw": {
+      "post": {
+        "summary": "create withdraw",
+        "operationId": "CreateWithdraw",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateWithdrawResponse"
+            }
+          }
+        },
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
+    "/v1/billing/withdraws": {
+      "get": {
+        "summary": "describe withdraws",
+        "operationId": "DescribeWithdraws",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeWithdrawsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "withdraw_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BillingManager"
+        ]
+      }
+    },
     "/v1/categories": {
       "get": {
         "summary": "Get categories, support filter with these fields(category_id, status, locale, owner, name), default return all categories",
@@ -5181,6 +6690,1165 @@
         ],
         "tags": [
           "MarketManager"
+        ]
+      }
+    },
+    "/v1/metering": {
+      "delete": {
+        "summary": "terminate metering about the skus",
+        "operationId": "TerminateMeterings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCommonMeteringsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixTerminateMeteringsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MeteringManager"
+        ]
+      },
+      "post": {
+        "summary": "init metering about the skus",
+        "operationId": "InitMetering",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCommonMeteringResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixInitMeteringRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MeteringManager"
+        ]
+      },
+      "put": {
+        "summary": "update metering value about the sku",
+        "operationId": "UpdateMetering",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCommonMeteringResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixUpdateMeteringRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MeteringManager"
+        ]
+      }
+    },
+    "/v1/metering/attribute": {
+      "post": {
+        "summary": "create attribute",
+        "operationId": "CreateAttribute",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateAttributeResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateAttributeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "put": {
+        "summary": "modify attribute",
+        "operationId": "ModifyAttribute",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyAttributeResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyAttributeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/attribute/name": {
+      "post": {
+        "summary": "create attribute name",
+        "operationId": "CreateAttributeName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateAttributeNameResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateAttributeNameRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "put": {
+        "summary": "modify attribute_name",
+        "operationId": "ModifyAttributeName",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyAttributeNameResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyAttributeNameRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/attribute/names": {
+      "get": {
+        "summary": "describe attribute_names",
+        "operationId": "DescribeAttributeNames",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeAttributeNamesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attribute_name_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "NORMAL",
+              "METERING"
+            ],
+            "default": "NORMAL"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete attribute_names",
+        "operationId": "DeleteAttributeNames",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteAttributeNamesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteAttributeNamesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/attribute/unit": {
+      "post": {
+        "summary": "create attribute unit",
+        "operationId": "CreateAttributeUnit",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateAttributeUnitResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateAttributeUnitRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "put": {
+        "summary": "modify attribute_unit",
+        "operationId": "ModifyAttributeUnit",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyAttributeUnitResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyAttributeUnitRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/attribute/units": {
+      "get": {
+        "summary": "describe attribute_units",
+        "operationId": "DescribeAttributeUnits",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeAttributeUnitsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attribute_unit_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete attribute_units",
+        "operationId": "DeleteAttributeUnits",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteAttributeUnitsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteAttributeUnitsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/attributes": {
+      "get": {
+        "summary": "describe attributes",
+        "operationId": "DescribeAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeAttributesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attribute_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "attribute_name_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "attribute_unit_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete attributes",
+        "operationId": "DeleteAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteAttributesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteAttributesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/combination": {
+      "post": {
+        "summary": "create combination",
+        "operationId": "CreateCombination",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCombinationResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCombinationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionSkuManager"
+        ]
+      },
+      "put": {
+        "summary": "modify combination",
+        "operationId": "ModifyCombination",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyCombinationResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyCombinationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionSkuManager"
+        ]
+      }
+    },
+    "/v1/metering/combination/sku": {
+      "post": {
+        "summary": "create combination_sku",
+        "operationId": "CreateCombinationSku",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCombinationSkuResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateCombinationSkuRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionSkuManager"
+        ]
+      },
+      "put": {
+        "summary": "modify combination_sku",
+        "operationId": "ModifyCombinationSku",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyCombinationSkuResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifyCombinationSkuRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionSkuManager"
+        ]
+      }
+    },
+    "/v1/metering/combination/skus": {
+      "get": {
+        "summary": "describe combination_skus",
+        "operationId": "DescribeCombinationSkus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeCombinationSkusResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "combination_sku_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "combination_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sku_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PromotionSkuManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete combination_skus",
+        "operationId": "DeleteCombinationSkus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCombinationSkusResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCombinationSkusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionSkuManager"
+        ]
+      }
+    },
+    "/v1/metering/combinations": {
+      "get": {
+        "summary": "describe combinations",
+        "operationId": "DescribeCombinations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeCombinationsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "combination_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PromotionSkuManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete combinations",
+        "operationId": "DeleteCombinations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCombinationsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteCombinationsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PromotionSkuManager"
+        ]
+      }
+    },
+    "/v1/metering/sku": {
+      "post": {
+        "summary": "create sku of the product",
+        "operationId": "CreateSku",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateSkuResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateSkuRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "put": {
+        "summary": "modify sku",
+        "operationId": "ModifySku",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifySkuResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifySkuRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/skus": {
+      "get": {
+        "summary": "describe skus",
+        "operationId": "DescribeSkus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeSkusResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "sku_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "spu_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete skus",
+        "operationId": "DeleteSkus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteSkusResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteSkusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/spu": {
+      "post": {
+        "summary": "create spu",
+        "operationId": "CreateSpu",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateSpuResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixCreateSpuRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "put": {
+        "summary": "modify spu",
+        "operationId": "ModifySpu",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifySpuResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixModifySpuRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/spus": {
+      "get": {
+        "summary": "describe spus",
+        "operationId": "DescribeSpus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDescribeSpusResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "spu_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_key",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reverse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      },
+      "delete": {
+        "summary": "delete spus",
+        "operationId": "DeleteSpus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteSpusResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixDeleteSpusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkuManager"
+        ]
+      }
+    },
+    "/v1/metering/start": {
+      "put": {
+        "summary": "start metering about the skus",
+        "operationId": "StartMeterings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCommonMeteringsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixStartMeteringsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MeteringManager"
+        ]
+      }
+    },
+    "/v1/metering/stop": {
+      "put": {
+        "summary": "stop metering about the skus",
+        "operationId": "StopMeterings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/openpitrixCommonMeteringsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openpitrixStopMeteringsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MeteringManager"
         ]
       }
     },
@@ -8661,6 +11329,1480 @@
         }
       }
     },
+    "openpitrixAccount": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "user_type": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "income": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCharge": {
+      "type": "object",
+      "properties": {
+        "charge_id": {
+          "type": "string"
+        },
+        "contract_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixCombinationPrice": {
+      "type": "object",
+      "properties": {
+        "combination_price_id": {
+          "type": "string"
+        },
+        "combination_sku_id": {
+          "type": "string"
+        },
+        "attribute_id": {
+          "type": "string"
+        },
+        "prices": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "currency": {
+          "$ref": "#/definitions/openpitrixCurrency"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "*************************************************************************\n*************************** Promotion ***********************************\n*************************************************************************\ncombination_price"
+    },
+    "openpitrixContext": {
+      "type": "object"
+    },
+    "openpitrixCoupon": {
+      "type": "object",
+      "properties": {
+        "coupon_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "limit_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "remain": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "limit_num_per": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "status": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCouponReceived": {
+      "type": "object",
+      "properties": {
+        "coupon_received_id": {
+          "type": "string"
+        },
+        "coupon_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "remain": {
+          "type": "number",
+          "format": "double"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixCreateAccountRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "user_type": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "income": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateAccountResponse": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateCombinationPriceRequest": {
+      "type": "object",
+      "properties": {
+        "combination_sku_id": {
+          "type": "string"
+        },
+        "attribute_id": {
+          "type": "string"
+        },
+        "prices": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "currency": {
+          "$ref": "#/definitions/openpitrixCurrency"
+        }
+      }
+    },
+    "openpitrixCreateCombinationPriceResponse": {
+      "type": "object",
+      "properties": {
+        "combination_price_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateCouponReceivedRequest": {
+      "type": "object",
+      "properties": {
+        "coupon_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateCouponReceivedResponse": {
+      "type": "object",
+      "properties": {
+        "coupon_received_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateCouponRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "limit_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "limit_num_per": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateCouponResponse": {
+      "type": "object",
+      "properties": {
+        "coupon_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateDiscountRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "limit_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "discount_value": {
+          "type": "number",
+          "format": "double"
+        },
+        "discount_percent": {
+          "type": "number",
+          "format": "double"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateDiscountResponse": {
+      "type": "object",
+      "properties": {
+        "discount_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateLeasingContractResponse": {
+      "type": "object",
+      "properties": {
+        "leasing_contract": {
+          "$ref": "#/definitions/openpitrixLeasingContract"
+        }
+      }
+    },
+    "openpitrixCreatePriceRequest": {
+      "type": "object",
+      "properties": {
+        "sku_id": {
+          "type": "string"
+        },
+        "attribute_id": {
+          "type": "string"
+        },
+        "prices": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "currency": {
+          "$ref": "#/definitions/openpitrixCurrency"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixCreatePriceResponse": {
+      "type": "object",
+      "properties": {
+        "price_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateProbationRequest": {
+      "type": "object",
+      "properties": {
+        "sku_id": {
+          "type": "string"
+        },
+        "attribute_id": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixCreateProbationResponse": {
+      "type": "object",
+      "properties": {
+        "probation_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateRechargeRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateRechargeResponse": {
+      "type": "object",
+      "properties": {
+        "recharge_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateWithdrawResponse": {
+      "type": "object",
+      "properties": {
+        "withdraw_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCurrency": {
+      "type": "string",
+      "enum": [
+        "CNY",
+        "HKD",
+        "USD"
+      ],
+      "default": "CNY"
+    },
+    "openpitrixDeleteAccountsRequest": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteAccountsResponse": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCombinationPricesRequest": {
+      "type": "object",
+      "properties": {
+        "combination_sku_id": {
+          "type": "string"
+        },
+        "combination_price_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCombinationPricesResponse": {
+      "type": "object",
+      "properties": {
+        "combination_price_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCouponReceivedsRequest": {
+      "type": "object",
+      "properties": {
+        "coupon_received_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCouponReceivedsResponse": {
+      "type": "object",
+      "properties": {
+        "coupon_received_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCouponsRequest": {
+      "type": "object",
+      "properties": {
+        "coupon_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCouponsResponse": {
+      "type": "object",
+      "properties": {
+        "coupon_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteDiscountsRequest": {
+      "type": "object",
+      "properties": {
+        "discount_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteDiscountsResponse": {
+      "type": "object",
+      "properties": {
+        "discount_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeletePricesRequest": {
+      "type": "object",
+      "properties": {
+        "sku_id": {
+          "type": "string"
+        },
+        "price_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeletePricesResponse": {
+      "type": "object",
+      "properties": {
+        "price_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteProbationsRequest": {
+      "type": "object",
+      "properties": {
+        "probation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteProbationsResponse": {
+      "type": "object",
+      "properties": {
+        "probation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeAccountsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "account_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixAccount"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeChargesResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "charge_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixCharge"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeCombinationPricesResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "combination_price_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixCombinationPrice"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeCouponReceivedsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "coupon_received_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixCouponReceived"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeCouponsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "coupon_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixCoupon"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeDiscountsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "discount_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixDiscount"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeIncomesResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "income_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixIncome"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeLeasedContractsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "leased_contract_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixLeasedContract"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeLeasingContractsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "leasing_contract_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixLeasingContract"
+          }
+        }
+      }
+    },
+    "openpitrixDescribePricesResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "price_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixPrice"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeProbationsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "probation_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixProbation"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeRechargesResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "recharge_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixRecharge"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeRefundsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "refund_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixRefund"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeWithdrawsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "withdraw_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixWithdraw"
+          }
+        }
+      }
+    },
+    "openpitrixDiscount": {
+      "type": "object",
+      "properties": {
+        "discount_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "limit_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "discount_value": {
+          "type": "number",
+          "format": "double"
+        },
+        "discount_percent": {
+          "type": "number",
+          "format": "double"
+        },
+        "status": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "title": "Discount"
+    },
+    "openpitrixIncome": {
+      "type": "object",
+      "properties": {
+        "income_id": {
+          "type": "string"
+        },
+        "contract_id": {
+          "type": "string"
+        },
+        "owner_id": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixLeasedContract": {
+      "type": "object",
+      "properties": {
+        "contract_id": {
+          "type": "string"
+        },
+        "leasing_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "metering_values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "fee_info": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "due_fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "other_contract_fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "coupon_fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "real_fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixLeasingContract": {
+      "type": "object",
+      "properties": {
+        "contract_id": {
+          "type": "string"
+        },
+        "leasing_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "metering_values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "fee_info": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "due_fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "other_contract_fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "coupon_fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "real_fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixMetering": {
+      "type": "object",
+      "properties": {
+        "leasing_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "action_id": {
+          "type": "string"
+        },
+        "metering_values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "update_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixModifyAccountRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "user_type": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "income": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyAccountResponse": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyCombinationPriceRequest": {
+      "type": "object",
+      "properties": {
+        "combination_price_id": {
+          "type": "string"
+        },
+        "combination_sku_id": {
+          "type": "string"
+        },
+        "attribute_id": {
+          "type": "string"
+        },
+        "prices": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "currency": {
+          "$ref": "#/definitions/openpitrixCurrency"
+        }
+      }
+    },
+    "openpitrixModifyCombinationPriceResponse": {
+      "type": "object",
+      "properties": {
+        "combination_price_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyCouponRequest": {
+      "type": "object",
+      "properties": {
+        "coupon_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "limit_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "limit_num_per": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyCouponResponse": {
+      "type": "object",
+      "properties": {
+        "coupon_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyDiscountRequest": {
+      "type": "object",
+      "properties": {
+        "discount_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "limit_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "discount_value": {
+          "type": "number",
+          "format": "double"
+        },
+        "discount_percent": {
+          "type": "number",
+          "format": "double"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyDiscountResponse": {
+      "type": "object",
+      "properties": {
+        "discount_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyPriceRequest": {
+      "type": "object",
+      "properties": {
+        "price_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "attribute_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixModifyPriceResponse": {
+      "type": "object",
+      "properties": {
+        "price_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyProbationRequest": {
+      "type": "object",
+      "properties": {
+        "probation_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "attribute_id": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixModifyProbationResponse": {
+      "type": "object",
+      "properties": {
+        "probation_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixNIL": {
+      "type": "object"
+    },
+    "openpitrixPrice": {
+      "type": "object",
+      "properties": {
+        "price_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "attribute_id": {
+          "type": "string"
+        },
+        "prices": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "currency": {
+          "$ref": "#/definitions/openpitrixCurrency"
+        },
+        "status": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "*************************************************************\n*********************** Billing *****************************\n*************************************************************\nprice"
+    },
+    "openpitrixProbation": {
+      "type": "object",
+      "properties": {
+        "probation_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "attribute_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "probation"
+    },
+    "openpitrixRecharge": {
+      "type": "object",
+      "properties": {
+        "recharge_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixRefund": {
+      "type": "object",
+      "properties": {
+        "Refund_id": {
+          "type": "string"
+        },
+        "contract_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixWithdraw": {
+      "type": "object",
+      "properties": {
+        "withdraw_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number",
+          "format": "double"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
     "openpitrixCategory": {
       "type": "object",
       "properties": {
@@ -10778,6 +14920,949 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "UpdateMeteringValueUpdateValueTypes": {
+      "type": "string",
+      "enum": [
+        "INCREMENTAL",
+        "REPLACE"
+      ],
+      "default": "INCREMENTAL"
+    },
+    "openpitrixAttribute": {
+      "type": "object",
+      "properties": {
+        "attribute_id": {
+          "type": "string"
+        },
+        "attribute_name_id": {
+          "type": "string"
+        },
+        "attribute_unit_id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "title": "the types of value: single int value, scope of value (min_value, max_value], string value"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "attribute"
+    },
+    "openpitrixAttributeName": {
+      "type": "object",
+      "properties": {
+        "attribute_name_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/openpitrixAttributeType"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "***************************************************\n********************* Sku *************************\n***************************************************\nattribute_name"
+    },
+    "openpitrixAttributeType": {
+      "type": "string",
+      "enum": [
+        "NORMAL",
+        "METERING"
+      ],
+      "default": "NORMAL"
+    },
+    "openpitrixAttributeUnit": {
+      "type": "object",
+      "properties": {
+        "attribute_unit_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "attribute_unit"
+    },
+    "openpitrixCombination": {
+      "type": "object",
+      "properties": {
+        "combination_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "*************************************************************************\n*************************** Promotion ***********************************\n*************************************************************************\ncombination"
+    },
+    "openpitrixCombinationSku": {
+      "type": "object",
+      "properties": {
+        "combination_sku_id": {
+          "type": "string"
+        },
+        "combination_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "combination_sku"
+    },
+    "openpitrixCommonMeteringResponse": {
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCommonMeteringsResponse": {
+      "type": "object",
+      "properties": {
+        "resource_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixCreateAttributeNameRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/openpitrixAttributeType"
+        }
+      }
+    },
+    "openpitrixCreateAttributeNameResponse": {
+      "type": "object",
+      "properties": {
+        "attribute_name_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateAttributeRequest": {
+      "type": "object",
+      "properties": {
+        "attribute_name_id": {
+          "type": "string"
+        },
+        "attribute_unit_id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateAttributeResponse": {
+      "type": "object",
+      "properties": {
+        "attribute_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateAttributeUnitRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateAttributeUnitResponse": {
+      "type": "object",
+      "properties": {
+        "attribute_unit_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateCombinationRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixCreateCombinationResponse": {
+      "type": "object",
+      "properties": {
+        "combination_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateCombinationSkuRequest": {
+      "type": "object",
+      "properties": {
+        "combination_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateCombinationSkuResponse": {
+      "type": "object",
+      "properties": {
+        "combination_sku_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateSkuRequest": {
+      "type": "object",
+      "properties": {
+        "spu_id": {
+          "type": "string"
+        },
+        "attribute_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metering_attribute_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixCreateSkuResponse": {
+      "type": "object",
+      "properties": {
+        "sku_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateSpuRequest": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixCreateSpuResponse": {
+      "type": "object",
+      "properties": {
+        "spu_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixDeleteAttributeNamesRequest": {
+      "type": "object",
+      "properties": {
+        "attribute_name_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteAttributeNamesResponse": {
+      "type": "object",
+      "properties": {
+        "attribute_name_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteAttributeUnitsRequest": {
+      "type": "object",
+      "properties": {
+        "attribute_unit_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteAttributeUnitsResponse": {
+      "type": "object",
+      "properties": {
+        "attribute_unit_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteAttributesRequest": {
+      "type": "object",
+      "properties": {
+        "attribute_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteAttributesResponse": {
+      "type": "object",
+      "properties": {
+        "attribute_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCombinationSkusRequest": {
+      "type": "object",
+      "properties": {
+        "combination_sku_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCombinationSkusResponse": {
+      "type": "object",
+      "properties": {
+        "combination_sku_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCombinationsRequest": {
+      "type": "object",
+      "properties": {
+        "combination_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteCombinationsResponse": {
+      "type": "object",
+      "properties": {
+        "combination_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteSkusRequest": {
+      "type": "object",
+      "properties": {
+        "sku_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteSkusResponse": {
+      "type": "object",
+      "properties": {
+        "sku_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteSpusRequest": {
+      "type": "object",
+      "properties": {
+        "spu_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDeleteSpusResponse": {
+      "type": "object",
+      "properties": {
+        "spu_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeAttributeNamesResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "attribute_name_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixAttributeName"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeAttributeUnitsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "attribute_unit_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixAttributeUnit"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeAttributesResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "attribute_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixAttribute"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeCombinationSkusResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "combination_sku_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixCombinationSku"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeCombinationsResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "combination_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixCombination"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeSkusResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "sku_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixSku"
+          }
+        }
+      }
+    },
+    "openpitrixDescribeSpusResponse": {
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "spu_set": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixSpu"
+          }
+        }
+      }
+    },
+    "openpitrixInitMeteringRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "sku_meterings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixSkuMetering"
+          }
+        }
+      }
+    },
+    "openpitrixModifyAttributeNameRequest": {
+      "type": "object",
+      "properties": {
+        "attribute_name_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/openpitrixAttributeType"
+        }
+      }
+    },
+    "openpitrixModifyAttributeNameResponse": {
+      "type": "object",
+      "properties": {
+        "attribute_name_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyAttributeRequest": {
+      "type": "object",
+      "properties": {
+        "attribute_id": {
+          "type": "string"
+        },
+        "attribute_name_id": {
+          "type": "string"
+        },
+        "attribute_unit_id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyAttributeResponse": {
+      "type": "object",
+      "properties": {
+        "attribute_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyAttributeUnitRequest": {
+      "type": "object",
+      "properties": {
+        "attribute_unit_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyAttributeUnitResponse": {
+      "type": "object",
+      "properties": {
+        "attribute_unit_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyCombinationRequest": {
+      "type": "object",
+      "properties": {
+        "combination_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "openpitrixModifyCombinationResponse": {
+      "type": "object",
+      "properties": {
+        "combination_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyCombinationSkuRequest": {
+      "type": "object",
+      "properties": {
+        "combination_sku_id": {
+          "type": "string"
+        },
+        "combination_id": {
+          "type": "string"
+        },
+        "sku_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifyCombinationSkuResponse": {
+      "type": "object",
+      "properties": {
+        "combination_sku_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifySkuRequest": {
+      "type": "object",
+      "properties": {
+        "sku_id": {
+          "type": "string"
+        },
+        "spu_id": {
+          "type": "string"
+        },
+        "attribute_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metering_attribute_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixModifySkuResponse": {
+      "type": "object",
+      "properties": {
+        "sku_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifySpuRequest": {
+      "type": "object",
+      "properties": {
+        "spu_id": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixModifySpuResponse": {
+      "type": "object",
+      "properties": {
+        "spu_id": {
+          "type": "string"
+        }
+      }
+    },
+    "openpitrixSku": {
+      "type": "object",
+      "properties": {
+        "sku_id": {
+          "type": "string"
+        },
+        "spu_id": {
+          "type": "string"
+        },
+        "attribute_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metering_attribute_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Sku: stock keeping unit"
+    },
+    "openpitrixSkuMetering": {
+      "type": "object",
+      "properties": {
+        "sku_id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "title": "********************************************************************\n************************** metering ********************************\n********************************************************************"
+    },
+    "openpitrixSpu": {
+      "type": "object",
+      "properties": {
+        "spu_id": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "spu: standard product unit"
+    },
+    "openpitrixStartMeteringsRequest": {
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string"
+        },
+        "sku_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixStopMeteringsRequest": {
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string"
+        },
+        "sku_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixTerminateMeteringsRequest": {
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string"
+        },
+        "sku_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "openpitrixUpdateMeteringRequest": {
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string"
+        },
+        "update_sku_meterings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixUpdateSkuMetering"
+          }
+        }
+      }
+    },
+    "openpitrixUpdateMeteringValue": {
+      "type": "object",
+      "properties": {
+        "attribute_id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number",
+          "format": "double"
+        },
+        "type": {
+          "$ref": "#/definitions/UpdateMeteringValueUpdateValueTypes"
+        }
+      }
+    },
+    "openpitrixUpdateSkuMetering": {
+      "type": "object",
+      "properties": {
+        "sku_id": {
+          "type": "string"
+        },
+        "metering_values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openpitrixUpdateMeteringValue"
+          },
+          "title": "if the metering attributes of sku is only duration, this is nil"
         }
       }
     },

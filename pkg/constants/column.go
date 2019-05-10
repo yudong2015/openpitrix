@@ -105,6 +105,7 @@ const (
 	ColumnSubmitTime               = "submit_time"
 	ColumnApprover                 = "approver"
 	ColumnAttributeNameId          = "attribute_name_id"
+	ColumnAttributeUnitId          = "attribute_unit_id"
 	ColumnAttributeId              = "attribute_id"
 	ColumnValue                    = "value"
 	ColumnSpuId                    = "spu_id"
@@ -205,7 +206,7 @@ var IndexedColumns = map[string][]string{
 		ColumnAttributeId, ColumnAttributeNameId, ColumnAttributeUnitId, ColumnValue,
 	},
 	TableSpu: {
-		ColumnSpuId, ColumnResourceVersionId, ColumnAttributeNameIds,
+		ColumnSpuId, ColumnAttributeNameIds,
 		ColumnMeteringAttributeNameIds,
 	},
 	TableSku: {

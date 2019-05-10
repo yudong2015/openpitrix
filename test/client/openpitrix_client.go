@@ -15,15 +15,20 @@ import (
 	"openpitrix.io/openpitrix/test/client/account_manager"
 	"openpitrix.io/openpitrix/test/client/app_manager"
 	"openpitrix.io/openpitrix/test/client/attachment_service"
+	"openpitrix.io/openpitrix/test/client/billing_manager"
 	"openpitrix.io/openpitrix/test/client/category_manager"
 	"openpitrix.io/openpitrix/test/client/cluster_manager"
 	"openpitrix.io/openpitrix/test/client/isv_manager"
 	"openpitrix.io/openpitrix/test/client/job_manager"
 	"openpitrix.io/openpitrix/test/client/market_manager"
+	"openpitrix.io/openpitrix/test/client/metering_manager"
+	"openpitrix.io/openpitrix/test/client/promotion_manager"
+	"openpitrix.io/openpitrix/test/client/promotion_sku_manager"
 	"openpitrix.io/openpitrix/test/client/repo_indexer"
 	"openpitrix.io/openpitrix/test/client/repo_manager"
 	"openpitrix.io/openpitrix/test/client/runtime_manager"
 	"openpitrix.io/openpitrix/test/client/service_config"
+	"openpitrix.io/openpitrix/test/client/sku_manager"
 	"openpitrix.io/openpitrix/test/client/task_manager"
 	"openpitrix.io/openpitrix/test/client/token_manager"
 )
@@ -77,6 +82,8 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Openpitrix
 
 	cli.AttachmentService = attachment_service.New(transport, formats)
 
+	cli.BillingManager = billing_manager.New(transport, formats)
+
 	cli.CategoryManager = category_manager.New(transport, formats)
 
 	cli.ClusterManager = cluster_manager.New(transport, formats)
@@ -87,6 +94,12 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Openpitrix
 
 	cli.MarketManager = market_manager.New(transport, formats)
 
+	cli.MeteringManager = metering_manager.New(transport, formats)
+
+	cli.PromotionManager = promotion_manager.New(transport, formats)
+
+	cli.PromotionSkuManager = promotion_sku_manager.New(transport, formats)
+
 	cli.RepoIndexer = repo_indexer.New(transport, formats)
 
 	cli.RepoManager = repo_manager.New(transport, formats)
@@ -94,6 +107,8 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Openpitrix
 	cli.RuntimeManager = runtime_manager.New(transport, formats)
 
 	cli.ServiceConfig = service_config.New(transport, formats)
+
+	cli.SkuManager = sku_manager.New(transport, formats)
 
 	cli.TaskManager = task_manager.New(transport, formats)
 
@@ -151,6 +166,8 @@ type Openpitrix struct {
 
 	AttachmentService *attachment_service.Client
 
+	BillingManager *billing_manager.Client
+
 	CategoryManager *category_manager.Client
 
 	ClusterManager *cluster_manager.Client
@@ -161,6 +178,12 @@ type Openpitrix struct {
 
 	MarketManager *market_manager.Client
 
+	MeteringManager *metering_manager.Client
+
+	PromotionManager *promotion_manager.Client
+
+	PromotionSkuManager *promotion_sku_manager.Client
+
 	RepoIndexer *repo_indexer.Client
 
 	RepoManager *repo_manager.Client
@@ -168,6 +191,8 @@ type Openpitrix struct {
 	RuntimeManager *runtime_manager.Client
 
 	ServiceConfig *service_config.Client
+
+	SkuManager *sku_manager.Client
 
 	TaskManager *task_manager.Client
 
@@ -188,6 +213,8 @@ func (c *Openpitrix) SetTransport(transport runtime.ClientTransport) {
 
 	c.AttachmentService.SetTransport(transport)
 
+	c.BillingManager.SetTransport(transport)
+
 	c.CategoryManager.SetTransport(transport)
 
 	c.ClusterManager.SetTransport(transport)
@@ -198,6 +225,12 @@ func (c *Openpitrix) SetTransport(transport runtime.ClientTransport) {
 
 	c.MarketManager.SetTransport(transport)
 
+	c.MeteringManager.SetTransport(transport)
+
+	c.PromotionManager.SetTransport(transport)
+
+	c.PromotionSkuManager.SetTransport(transport)
+
 	c.RepoIndexer.SetTransport(transport)
 
 	c.RepoManager.SetTransport(transport)
@@ -205,6 +238,8 @@ func (c *Openpitrix) SetTransport(transport runtime.ClientTransport) {
 	c.RuntimeManager.SetTransport(transport)
 
 	c.ServiceConfig.SetTransport(transport)
+
+	c.SkuManager.SetTransport(transport)
 
 	c.TaskManager.SetTransport(transport)
 

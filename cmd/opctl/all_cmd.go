@@ -15,15 +15,20 @@ import (
 	"openpitrix.io/openpitrix/test/client/account_manager"
 	"openpitrix.io/openpitrix/test/client/app_manager"
 	"openpitrix.io/openpitrix/test/client/attachment_service"
+	"openpitrix.io/openpitrix/test/client/billing_manager"
 	"openpitrix.io/openpitrix/test/client/category_manager"
 	"openpitrix.io/openpitrix/test/client/cluster_manager"
 	"openpitrix.io/openpitrix/test/client/isv_manager"
 	"openpitrix.io/openpitrix/test/client/job_manager"
 	"openpitrix.io/openpitrix/test/client/market_manager"
+	"openpitrix.io/openpitrix/test/client/metering_manager"
+	"openpitrix.io/openpitrix/test/client/promotion_manager"
+	"openpitrix.io/openpitrix/test/client/promotion_sku_manager"
 	"openpitrix.io/openpitrix/test/client/repo_indexer"
 	"openpitrix.io/openpitrix/test/client/repo_manager"
 	"openpitrix.io/openpitrix/test/client/runtime_manager"
 	"openpitrix.io/openpitrix/test/client/service_config"
+	"openpitrix.io/openpitrix/test/client/sku_manager"
 	"openpitrix.io/openpitrix/test/client/task_manager"
 	"openpitrix.io/openpitrix/test/client/token_manager"
 	"openpitrix.io/openpitrix/test/models"
@@ -89,6 +94,18 @@ var AllCmd = []Cmd{
 	NewUploadAppAttachmentCmd(),
 	NewValidatePackageCmd(),
 	NewGetAttachmentCmd(),
+	NewCreateAccountCmd(),
+	NewCreateRechargeCmd(),
+	NewCreateWithdrawCmd(),
+	NewDescribeAccountsCmd(),
+	NewDescribeChargesCmd(),
+	NewDescribeIncomesCmd(),
+	NewDescribeLeasedContractsCmd(),
+	NewDescribeLeasingContractsCmd(),
+	NewDescribeRechargesCmd(),
+	NewDescribeRefundsCmd(),
+	NewDescribeWithdrawsCmd(),
+	NewModifyAccountCmd(),
 	NewCreateCategoryCmd(),
 	NewDeleteCategoriesCmd(),
 	NewDescribeCategoriesCmd(),
@@ -134,6 +151,15 @@ var AllCmd = []Cmd{
 	NewModifyMarketCmd(),
 	NewUserJoinMarketCmd(),
 	NewUserLeaveMarketCmd(),
+	NewInitMeteringCmd(),
+	NewUpdateMeteringCmd(),
+	NewCreateCouponReceivedCmd(),
+	NewDeleteCouponReceivedsCmd(),
+	NewDescribeCouponReceivedsCmd(),
+	NewCreateCombinationSkuCmd(),
+	NewDeleteCombinationSkusCmd(),
+	NewDescribeCombinationSkusCmd(),
+	NewModifyCombinationSkuCmd(),
 	NewDescribeRepoEventsCmd(),
 	NewIndexRepoCmd(),
 	NewCreateRepoCmd(),
@@ -159,6 +185,26 @@ var AllCmd = []Cmd{
 	NewGetServiceConfigCmd(),
 	NewSetServiceConfigCmd(),
 	NewValidateEmailServiceCmd(),
+	NewCreateAttributeCmd(),
+	NewCreateAttributeNameCmd(),
+	NewCreateAttributeUnitCmd(),
+	NewCreateSkuCmd(),
+	NewCreateSpuCmd(),
+	NewDeleteAttributeNamesCmd(),
+	NewDeleteAttributeUnitsCmd(),
+	NewDeleteAttributesCmd(),
+	NewDeleteSkusCmd(),
+	NewDeleteSpusCmd(),
+	NewDescribeAttributeNamesCmd(),
+	NewDescribeAttributeUnitsCmd(),
+	NewDescribeAttributesCmd(),
+	NewDescribeSkusCmd(),
+	NewDescribeSpusCmd(),
+	NewModifyAttributeCmd(),
+	NewModifyAttributeNameCmd(),
+	NewModifyAttributeUnitCmd(),
+	NewModifySkuCmd(),
+	NewModifySpuCmd(),
 	NewDescribeTasksCmd(),
 	NewRetryTasksCmd(),
 	NewCreateClientCmd(),
@@ -2504,6 +2550,532 @@ func (c *GetAttachmentCmd) Run(out Out) error {
 	return nil
 }
 
+type CreateAccountCmd struct {
+	*models.OpenpitrixCreateAccountRequest
+}
+
+func NewCreateAccountCmd() Cmd {
+	cmd := &CreateAccountCmd{}
+	cmd.OpenpitrixCreateAccountRequest = &models.OpenpitrixCreateAccountRequest{}
+	return cmd
+}
+
+func (*CreateAccountCmd) GetActionName() string {
+	return "CreateAccount"
+}
+
+func (c *CreateAccountCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.Currency, "currency", "", "", "")
+	f.StringVarP(&c.Description, "description", "", "", "")
+	f.StringVarP(&c.UserID, "user_id", "", "", "")
+	f.StringVarP(&c.UserType, "user_type", "", "", "")
+}
+
+func (c *CreateAccountCmd) Run(out Out) error {
+	params := billing_manager.NewCreateAccountParams()
+	params.WithBody(c.OpenpitrixCreateAccountRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.CreateAccount(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type CreateRechargeCmd struct {
+	*models.OpenpitrixCreateRechargeRequest
+}
+
+func NewCreateRechargeCmd() Cmd {
+	cmd := &CreateRechargeCmd{}
+	cmd.OpenpitrixCreateRechargeRequest = &models.OpenpitrixCreateRechargeRequest{}
+	return cmd
+}
+
+func (*CreateRechargeCmd) GetActionName() string {
+	return "CreateRecharge"
+}
+
+func (c *CreateRechargeCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.Currency, "currency", "", "", "")
+	f.StringVarP(&c.Description, "description", "", "", "")
+	f.StringVarP(&c.UserID, "user_id", "", "", "")
+}
+
+func (c *CreateRechargeCmd) Run(out Out) error {
+	params := billing_manager.NewCreateRechargeParams()
+	params.WithBody(c.OpenpitrixCreateRechargeRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.CreateRecharge(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type CreateWithdrawCmd struct {
+	*billing_manager.CreateWithdrawParams
+}
+
+func NewCreateWithdrawCmd() Cmd {
+	return &CreateWithdrawCmd{
+		billing_manager.NewCreateWithdrawParams(),
+	}
+}
+
+func (*CreateWithdrawCmd) GetActionName() string {
+	return "CreateWithdraw"
+}
+
+func (c *CreateWithdrawCmd) ParseFlag(f Flag) {
+}
+
+func (c *CreateWithdrawCmd) Run(out Out) error {
+	params := c.CreateWithdrawParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.CreateWithdraw(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeAccountsCmd struct {
+	*billing_manager.DescribeAccountsParams
+}
+
+func NewDescribeAccountsCmd() Cmd {
+	return &DescribeAccountsCmd{
+		billing_manager.NewDescribeAccountsParams(),
+	}
+}
+
+func (*DescribeAccountsCmd) GetActionName() string {
+	return "DescribeAccounts"
+}
+
+func (c *DescribeAccountsCmd) ParseFlag(f Flag) {
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.UserID = new(string)
+	f.StringVarP(c.UserID, "user_id", "", "", "")
+	c.UserType = new(string)
+	f.StringVarP(c.UserType, "user_type", "", "", "")
+}
+
+func (c *DescribeAccountsCmd) Run(out Out) error {
+	params := c.DescribeAccountsParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.DescribeAccounts(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeChargesCmd struct {
+	*billing_manager.DescribeChargesParams
+}
+
+func NewDescribeChargesCmd() Cmd {
+	return &DescribeChargesCmd{
+		billing_manager.NewDescribeChargesParams(),
+	}
+}
+
+func (*DescribeChargesCmd) GetActionName() string {
+	return "DescribeCharges"
+}
+
+func (c *DescribeChargesCmd) ParseFlag(f Flag) {
+	c.ChargeID = new(string)
+	f.StringVarP(c.ChargeID, "charge_id", "", "", "")
+	c.ContractID = new(string)
+	f.StringVarP(c.ContractID, "contract_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.UserID = new(string)
+	f.StringVarP(c.UserID, "user_id", "", "", "")
+}
+
+func (c *DescribeChargesCmd) Run(out Out) error {
+	params := c.DescribeChargesParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.DescribeCharges(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeIncomesCmd struct {
+	*billing_manager.DescribeIncomesParams
+}
+
+func NewDescribeIncomesCmd() Cmd {
+	return &DescribeIncomesCmd{
+		billing_manager.NewDescribeIncomesParams(),
+	}
+}
+
+func (*DescribeIncomesCmd) GetActionName() string {
+	return "DescribeIncomes"
+}
+
+func (c *DescribeIncomesCmd) ParseFlag(f Flag) {
+	c.ContractID = new(string)
+	f.StringVarP(c.ContractID, "contract_id", "", "", "")
+	c.IncomeID = new(string)
+	f.StringVarP(c.IncomeID, "income_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.OwnerID = new(string)
+	f.StringVarP(c.OwnerID, "owner_id", "", "", "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+}
+
+func (c *DescribeIncomesCmd) Run(out Out) error {
+	params := c.DescribeIncomesParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.DescribeIncomes(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeLeasedContractsCmd struct {
+	*billing_manager.DescribeLeasedContractsParams
+}
+
+func NewDescribeLeasedContractsCmd() Cmd {
+	return &DescribeLeasedContractsCmd{
+		billing_manager.NewDescribeLeasedContractsParams(),
+	}
+}
+
+func (*DescribeLeasedContractsCmd) GetActionName() string {
+	return "DescribeLeasedContracts"
+}
+
+func (c *DescribeLeasedContractsCmd) ParseFlag(f Flag) {
+	c.ContractID = new(string)
+	f.StringVarP(c.ContractID, "contract_id", "", "", "")
+	c.LeasingID = new(string)
+	f.StringVarP(c.LeasingID, "leasing_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.ResourceID = new(string)
+	f.StringVarP(c.ResourceID, "resource_id", "", "", "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SkuID = new(string)
+	f.StringVarP(c.SkuID, "sku_id", "", "", "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+	c.UserID = new(string)
+	f.StringVarP(c.UserID, "user_id", "", "", "")
+}
+
+func (c *DescribeLeasedContractsCmd) Run(out Out) error {
+	params := c.DescribeLeasedContractsParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.DescribeLeasedContracts(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeLeasingContractsCmd struct {
+	*billing_manager.DescribeLeasingContractsParams
+}
+
+func NewDescribeLeasingContractsCmd() Cmd {
+	return &DescribeLeasingContractsCmd{
+		billing_manager.NewDescribeLeasingContractsParams(),
+	}
+}
+
+func (*DescribeLeasingContractsCmd) GetActionName() string {
+	return "DescribeLeasingContracts"
+}
+
+func (c *DescribeLeasingContractsCmd) ParseFlag(f Flag) {
+	c.ContractID = new(string)
+	f.StringVarP(c.ContractID, "contract_id", "", "", "")
+	c.LeasingID = new(string)
+	f.StringVarP(c.LeasingID, "leasing_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.ResourceID = new(string)
+	f.StringVarP(c.ResourceID, "resource_id", "", "", "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SkuID = new(string)
+	f.StringVarP(c.SkuID, "sku_id", "", "", "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+	c.UserID = new(string)
+	f.StringVarP(c.UserID, "user_id", "", "", "")
+}
+
+func (c *DescribeLeasingContractsCmd) Run(out Out) error {
+	params := c.DescribeLeasingContractsParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.DescribeLeasingContracts(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeRechargesCmd struct {
+	*billing_manager.DescribeRechargesParams
+}
+
+func NewDescribeRechargesCmd() Cmd {
+	return &DescribeRechargesCmd{
+		billing_manager.NewDescribeRechargesParams(),
+	}
+}
+
+func (*DescribeRechargesCmd) GetActionName() string {
+	return "DescribeRecharges"
+}
+
+func (c *DescribeRechargesCmd) ParseFlag(f Flag) {
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.RechargeID = new(string)
+	f.StringVarP(c.RechargeID, "recharge_id", "", "", "")
+	c.UserID = new(string)
+	f.StringVarP(c.UserID, "user_id", "", "", "")
+}
+
+func (c *DescribeRechargesCmd) Run(out Out) error {
+	params := c.DescribeRechargesParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.DescribeRecharges(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeRefundsCmd struct {
+	*billing_manager.DescribeRefundsParams
+}
+
+func NewDescribeRefundsCmd() Cmd {
+	return &DescribeRefundsCmd{
+		billing_manager.NewDescribeRefundsParams(),
+	}
+}
+
+func (*DescribeRefundsCmd) GetActionName() string {
+	return "DescribeRefunds"
+}
+
+func (c *DescribeRefundsCmd) ParseFlag(f Flag) {
+	c.ContractID = new(string)
+	f.StringVarP(c.ContractID, "contract_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.RefundID = new(string)
+	f.StringVarP(c.RefundID, "refund_id", "", "", "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.UserID = new(string)
+	f.StringVarP(c.UserID, "user_id", "", "", "")
+}
+
+func (c *DescribeRefundsCmd) Run(out Out) error {
+	params := c.DescribeRefundsParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.DescribeRefunds(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeWithdrawsCmd struct {
+	*billing_manager.DescribeWithdrawsParams
+}
+
+func NewDescribeWithdrawsCmd() Cmd {
+	return &DescribeWithdrawsCmd{
+		billing_manager.NewDescribeWithdrawsParams(),
+	}
+}
+
+func (*DescribeWithdrawsCmd) GetActionName() string {
+	return "DescribeWithdraws"
+}
+
+func (c *DescribeWithdrawsCmd) ParseFlag(f Flag) {
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+	c.UserID = new(string)
+	f.StringVarP(c.UserID, "user_id", "", "", "")
+	c.WithdrawID = new(string)
+	f.StringVarP(c.WithdrawID, "withdraw_id", "", "", "")
+}
+
+func (c *DescribeWithdrawsCmd) Run(out Out) error {
+	params := c.DescribeWithdrawsParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.DescribeWithdraws(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type ModifyAccountCmd struct {
+	*models.OpenpitrixModifyAccountRequest
+}
+
+func NewModifyAccountCmd() Cmd {
+	cmd := &ModifyAccountCmd{}
+	cmd.OpenpitrixModifyAccountRequest = &models.OpenpitrixModifyAccountRequest{}
+	return cmd
+}
+
+func (*ModifyAccountCmd) GetActionName() string {
+	return "ModifyAccount"
+}
+
+func (c *ModifyAccountCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.Currency, "currency", "", "", "")
+	f.StringVarP(&c.Description, "description", "", "", "")
+	f.StringVarP(&c.UserID, "user_id", "", "", "")
+	f.StringVarP(&c.UserType, "user_type", "", "", "")
+}
+
+func (c *ModifyAccountCmd) Run(out Out) error {
+	params := billing_manager.NewModifyAccountParams()
+	params.WithBody(c.OpenpitrixModifyAccountRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.BillingManager.ModifyAccount(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
 type CreateCategoryCmd struct {
 	*models.OpenpitrixCreateCategoryRequest
 	IconPath string
@@ -4350,6 +4922,353 @@ func (c *UserLeaveMarketCmd) Run(out Out) error {
 	return nil
 }
 
+type InitMeteringCmd struct {
+	*models.OpenpitrixInitMeteringRequest
+}
+
+func NewInitMeteringCmd() Cmd {
+	cmd := &InitMeteringCmd{}
+	cmd.OpenpitrixInitMeteringRequest = &models.OpenpitrixInitMeteringRequest{}
+	return cmd
+}
+
+func (*InitMeteringCmd) GetActionName() string {
+	return "InitMetering"
+}
+
+func (c *InitMeteringCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.ResourceID, "resource_id", "", "", "")
+	f.StringVarP(&c.UserID, "user_id", "", "", "")
+}
+
+func (c *InitMeteringCmd) Run(out Out) error {
+	params := metering_manager.NewInitMeteringParams()
+	params.WithBody(c.OpenpitrixInitMeteringRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.MeteringManager.InitMetering(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type UpdateMeteringCmd struct {
+	*models.OpenpitrixUpdateMeteringRequest
+}
+
+func NewUpdateMeteringCmd() Cmd {
+	cmd := &UpdateMeteringCmd{}
+	cmd.OpenpitrixUpdateMeteringRequest = &models.OpenpitrixUpdateMeteringRequest{}
+	return cmd
+}
+
+func (*UpdateMeteringCmd) GetActionName() string {
+	return "UpdateMetering"
+}
+
+func (c *UpdateMeteringCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.ResourceID, "resource_id", "", "", "")
+}
+
+func (c *UpdateMeteringCmd) Run(out Out) error {
+	params := metering_manager.NewUpdateMeteringParams()
+	params.WithBody(c.OpenpitrixUpdateMeteringRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.MeteringManager.UpdateMetering(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type CreateCouponReceivedCmd struct {
+	*models.OpenpitrixCreateCouponReceivedRequest
+}
+
+func NewCreateCouponReceivedCmd() Cmd {
+	cmd := &CreateCouponReceivedCmd{}
+	cmd.OpenpitrixCreateCouponReceivedRequest = &models.OpenpitrixCreateCouponReceivedRequest{}
+	return cmd
+}
+
+func (*CreateCouponReceivedCmd) GetActionName() string {
+	return "CreateCouponReceived"
+}
+
+func (c *CreateCouponReceivedCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.CouponID, "coupon_id", "", "", "")
+}
+
+func (c *CreateCouponReceivedCmd) Run(out Out) error {
+	params := promotion_manager.NewCreateCouponReceivedParams()
+	params.WithBody(c.OpenpitrixCreateCouponReceivedRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.PromotionManager.CreateCouponReceived(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DeleteCouponReceivedsCmd struct {
+	*models.OpenpitrixDeleteCouponReceivedsRequest
+}
+
+func NewDeleteCouponReceivedsCmd() Cmd {
+	cmd := &DeleteCouponReceivedsCmd{}
+	cmd.OpenpitrixDeleteCouponReceivedsRequest = &models.OpenpitrixDeleteCouponReceivedsRequest{}
+	return cmd
+}
+
+func (*DeleteCouponReceivedsCmd) GetActionName() string {
+	return "DeleteCouponReceiveds"
+}
+
+func (c *DeleteCouponReceivedsCmd) ParseFlag(f Flag) {
+	f.StringSliceVarP(&c.CouponReceivedIds, "coupon_received_ids", "", []string{}, "")
+}
+
+func (c *DeleteCouponReceivedsCmd) Run(out Out) error {
+	params := promotion_manager.NewDeleteCouponReceivedsParams()
+	params.WithBody(c.OpenpitrixDeleteCouponReceivedsRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.PromotionManager.DeleteCouponReceiveds(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeCouponReceivedsCmd struct {
+	*promotion_manager.DescribeCouponReceivedsParams
+}
+
+func NewDescribeCouponReceivedsCmd() Cmd {
+	return &DescribeCouponReceivedsCmd{
+		promotion_manager.NewDescribeCouponReceivedsParams(),
+	}
+}
+
+func (*DescribeCouponReceivedsCmd) GetActionName() string {
+	return "DescribeCouponReceiveds"
+}
+
+func (c *DescribeCouponReceivedsCmd) ParseFlag(f Flag) {
+	c.CouponID = new(string)
+	f.StringVarP(c.CouponID, "coupon_id", "", "", "")
+	c.CouponReceivedID = new(string)
+	f.StringVarP(c.CouponReceivedID, "coupon_received_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+	c.UserID = new(string)
+	f.StringVarP(c.UserID, "user_id", "", "", "")
+}
+
+func (c *DescribeCouponReceivedsCmd) Run(out Out) error {
+	params := c.DescribeCouponReceivedsParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.PromotionManager.DescribeCouponReceiveds(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type CreateCombinationSkuCmd struct {
+	*models.OpenpitrixCreateCombinationSkuRequest
+}
+
+func NewCreateCombinationSkuCmd() Cmd {
+	cmd := &CreateCombinationSkuCmd{}
+	cmd.OpenpitrixCreateCombinationSkuRequest = &models.OpenpitrixCreateCombinationSkuRequest{}
+	return cmd
+}
+
+func (*CreateCombinationSkuCmd) GetActionName() string {
+	return "CreateCombinationSku"
+}
+
+func (c *CreateCombinationSkuCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.CombinationID, "combination_id", "", "", "")
+	f.StringVarP(&c.SkuID, "sku_id", "", "", "")
+}
+
+func (c *CreateCombinationSkuCmd) Run(out Out) error {
+	params := promotion_sku_manager.NewCreateCombinationSkuParams()
+	params.WithBody(c.OpenpitrixCreateCombinationSkuRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.PromotionSkuManager.CreateCombinationSku(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DeleteCombinationSkusCmd struct {
+	*models.OpenpitrixDeleteCombinationSkusRequest
+}
+
+func NewDeleteCombinationSkusCmd() Cmd {
+	cmd := &DeleteCombinationSkusCmd{}
+	cmd.OpenpitrixDeleteCombinationSkusRequest = &models.OpenpitrixDeleteCombinationSkusRequest{}
+	return cmd
+}
+
+func (*DeleteCombinationSkusCmd) GetActionName() string {
+	return "DeleteCombinationSkus"
+}
+
+func (c *DeleteCombinationSkusCmd) ParseFlag(f Flag) {
+	f.StringSliceVarP(&c.CombinationSkuIds, "combination_sku_ids", "", []string{}, "")
+}
+
+func (c *DeleteCombinationSkusCmd) Run(out Out) error {
+	params := promotion_sku_manager.NewDeleteCombinationSkusParams()
+	params.WithBody(c.OpenpitrixDeleteCombinationSkusRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.PromotionSkuManager.DeleteCombinationSkus(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeCombinationSkusCmd struct {
+	*promotion_sku_manager.DescribeCombinationSkusParams
+}
+
+func NewDescribeCombinationSkusCmd() Cmd {
+	return &DescribeCombinationSkusCmd{
+		promotion_sku_manager.NewDescribeCombinationSkusParams(),
+	}
+}
+
+func (*DescribeCombinationSkusCmd) GetActionName() string {
+	return "DescribeCombinationSkus"
+}
+
+func (c *DescribeCombinationSkusCmd) ParseFlag(f Flag) {
+	c.CombinationID = new(string)
+	f.StringVarP(c.CombinationID, "combination_id", "", "", "")
+	c.CombinationSkuID = new(string)
+	f.StringVarP(c.CombinationSkuID, "combination_sku_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SkuID = new(string)
+	f.StringVarP(c.SkuID, "sku_id", "", "", "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+}
+
+func (c *DescribeCombinationSkusCmd) Run(out Out) error {
+	params := c.DescribeCombinationSkusParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.PromotionSkuManager.DescribeCombinationSkus(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type ModifyCombinationSkuCmd struct {
+	*models.OpenpitrixModifyCombinationSkuRequest
+}
+
+func NewModifyCombinationSkuCmd() Cmd {
+	cmd := &ModifyCombinationSkuCmd{}
+	cmd.OpenpitrixModifyCombinationSkuRequest = &models.OpenpitrixModifyCombinationSkuRequest{}
+	return cmd
+}
+
+func (*ModifyCombinationSkuCmd) GetActionName() string {
+	return "ModifyCombinationSku"
+}
+
+func (c *ModifyCombinationSkuCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.CombinationID, "combination_id", "", "", "")
+	f.StringVarP(&c.CombinationSkuID, "combination_sku_id", "", "", "")
+	f.StringVarP(&c.SkuID, "sku_id", "", "", "")
+}
+
+func (c *ModifyCombinationSkuCmd) Run(out Out) error {
+	params := promotion_sku_manager.NewModifyCombinationSkuParams()
+	params.WithBody(c.OpenpitrixModifyCombinationSkuRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.PromotionSkuManager.ModifyCombinationSku(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
 type DescribeRepoEventsCmd struct {
 	*repo_indexer.DescribeRepoEventsParams
 }
@@ -5344,6 +6263,789 @@ func (c *ValidateEmailServiceCmd) Run(out Out) error {
 
 	client := getClient()
 	res, err := client.ServiceConfig.ValidateEmailService(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type CreateAttributeCmd struct {
+	*models.OpenpitrixCreateAttributeRequest
+}
+
+func NewCreateAttributeCmd() Cmd {
+	cmd := &CreateAttributeCmd{}
+	cmd.OpenpitrixCreateAttributeRequest = &models.OpenpitrixCreateAttributeRequest{}
+	return cmd
+}
+
+func (*CreateAttributeCmd) GetActionName() string {
+	return "CreateAttribute"
+}
+
+func (c *CreateAttributeCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.AttributeNameID, "attribute_name_id", "", "", "")
+	f.StringVarP(&c.AttributeUnitID, "attribute_unit_id", "", "", "")
+	f.StringVarP(&c.Value, "value", "", "", "")
+}
+
+func (c *CreateAttributeCmd) Run(out Out) error {
+	params := sku_manager.NewCreateAttributeParams()
+	params.WithBody(c.OpenpitrixCreateAttributeRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.CreateAttribute(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type CreateAttributeNameCmd struct {
+	*models.OpenpitrixCreateAttributeNameRequest
+}
+
+func NewCreateAttributeNameCmd() Cmd {
+	cmd := &CreateAttributeNameCmd{}
+	cmd.OpenpitrixCreateAttributeNameRequest = &models.OpenpitrixCreateAttributeNameRequest{}
+	return cmd
+}
+
+func (*CreateAttributeNameCmd) GetActionName() string {
+	return "CreateAttributeName"
+}
+
+func (c *CreateAttributeNameCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.Description, "description", "", "", "")
+	f.StringVarP(&c.Name, "name", "", "", "")
+}
+
+func (c *CreateAttributeNameCmd) Run(out Out) error {
+	params := sku_manager.NewCreateAttributeNameParams()
+	params.WithBody(c.OpenpitrixCreateAttributeNameRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.CreateAttributeName(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type CreateAttributeUnitCmd struct {
+	*models.OpenpitrixCreateAttributeUnitRequest
+}
+
+func NewCreateAttributeUnitCmd() Cmd {
+	cmd := &CreateAttributeUnitCmd{}
+	cmd.OpenpitrixCreateAttributeUnitRequest = &models.OpenpitrixCreateAttributeUnitRequest{}
+	return cmd
+}
+
+func (*CreateAttributeUnitCmd) GetActionName() string {
+	return "CreateAttributeUnit"
+}
+
+func (c *CreateAttributeUnitCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.Name, "name", "", "", "")
+}
+
+func (c *CreateAttributeUnitCmd) Run(out Out) error {
+	params := sku_manager.NewCreateAttributeUnitParams()
+	params.WithBody(c.OpenpitrixCreateAttributeUnitRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.CreateAttributeUnit(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type CreateSkuCmd struct {
+	*models.OpenpitrixCreateSkuRequest
+}
+
+func NewCreateSkuCmd() Cmd {
+	cmd := &CreateSkuCmd{}
+	cmd.OpenpitrixCreateSkuRequest = &models.OpenpitrixCreateSkuRequest{}
+	return cmd
+}
+
+func (*CreateSkuCmd) GetActionName() string {
+	return "CreateSku"
+}
+
+func (c *CreateSkuCmd) ParseFlag(f Flag) {
+	f.StringSliceVarP(&c.AttributeIds, "attribute_ids", "", []string{}, "")
+	f.StringSliceVarP(&c.MeteringAttributeIds, "metering_attribute_ids", "", []string{}, "")
+	f.StringVarP(&c.SpuID, "spu_id", "", "", "")
+}
+
+func (c *CreateSkuCmd) Run(out Out) error {
+	params := sku_manager.NewCreateSkuParams()
+	params.WithBody(c.OpenpitrixCreateSkuRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.CreateSku(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type CreateSpuCmd struct {
+	*models.OpenpitrixCreateSpuRequest
+}
+
+func NewCreateSpuCmd() Cmd {
+	cmd := &CreateSpuCmd{}
+	cmd.OpenpitrixCreateSpuRequest = &models.OpenpitrixCreateSpuRequest{}
+	return cmd
+}
+
+func (*CreateSpuCmd) GetActionName() string {
+	return "CreateSpu"
+}
+
+func (c *CreateSpuCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.ProductID, "product_id", "", "", "")
+}
+
+func (c *CreateSpuCmd) Run(out Out) error {
+	params := sku_manager.NewCreateSpuParams()
+	params.WithBody(c.OpenpitrixCreateSpuRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.CreateSpu(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DeleteAttributeNamesCmd struct {
+	*models.OpenpitrixDeleteAttributeNamesRequest
+}
+
+func NewDeleteAttributeNamesCmd() Cmd {
+	cmd := &DeleteAttributeNamesCmd{}
+	cmd.OpenpitrixDeleteAttributeNamesRequest = &models.OpenpitrixDeleteAttributeNamesRequest{}
+	return cmd
+}
+
+func (*DeleteAttributeNamesCmd) GetActionName() string {
+	return "DeleteAttributeNames"
+}
+
+func (c *DeleteAttributeNamesCmd) ParseFlag(f Flag) {
+	f.StringSliceVarP(&c.AttributeNameIds, "attribute_name_ids", "", []string{}, "")
+}
+
+func (c *DeleteAttributeNamesCmd) Run(out Out) error {
+	params := sku_manager.NewDeleteAttributeNamesParams()
+	params.WithBody(c.OpenpitrixDeleteAttributeNamesRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DeleteAttributeNames(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DeleteAttributeUnitsCmd struct {
+	*models.OpenpitrixDeleteAttributeUnitsRequest
+}
+
+func NewDeleteAttributeUnitsCmd() Cmd {
+	cmd := &DeleteAttributeUnitsCmd{}
+	cmd.OpenpitrixDeleteAttributeUnitsRequest = &models.OpenpitrixDeleteAttributeUnitsRequest{}
+	return cmd
+}
+
+func (*DeleteAttributeUnitsCmd) GetActionName() string {
+	return "DeleteAttributeUnits"
+}
+
+func (c *DeleteAttributeUnitsCmd) ParseFlag(f Flag) {
+	f.StringSliceVarP(&c.AttributeUnitIds, "attribute_unit_ids", "", []string{}, "")
+}
+
+func (c *DeleteAttributeUnitsCmd) Run(out Out) error {
+	params := sku_manager.NewDeleteAttributeUnitsParams()
+	params.WithBody(c.OpenpitrixDeleteAttributeUnitsRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DeleteAttributeUnits(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DeleteAttributesCmd struct {
+	*models.OpenpitrixDeleteAttributesRequest
+}
+
+func NewDeleteAttributesCmd() Cmd {
+	cmd := &DeleteAttributesCmd{}
+	cmd.OpenpitrixDeleteAttributesRequest = &models.OpenpitrixDeleteAttributesRequest{}
+	return cmd
+}
+
+func (*DeleteAttributesCmd) GetActionName() string {
+	return "DeleteAttributes"
+}
+
+func (c *DeleteAttributesCmd) ParseFlag(f Flag) {
+	f.StringSliceVarP(&c.AttributeIds, "attribute_ids", "", []string{}, "")
+}
+
+func (c *DeleteAttributesCmd) Run(out Out) error {
+	params := sku_manager.NewDeleteAttributesParams()
+	params.WithBody(c.OpenpitrixDeleteAttributesRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DeleteAttributes(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DeleteSkusCmd struct {
+	*models.OpenpitrixDeleteSkusRequest
+}
+
+func NewDeleteSkusCmd() Cmd {
+	cmd := &DeleteSkusCmd{}
+	cmd.OpenpitrixDeleteSkusRequest = &models.OpenpitrixDeleteSkusRequest{}
+	return cmd
+}
+
+func (*DeleteSkusCmd) GetActionName() string {
+	return "DeleteSkus"
+}
+
+func (c *DeleteSkusCmd) ParseFlag(f Flag) {
+	f.StringSliceVarP(&c.SkuIds, "sku_ids", "", []string{}, "")
+}
+
+func (c *DeleteSkusCmd) Run(out Out) error {
+	params := sku_manager.NewDeleteSkusParams()
+	params.WithBody(c.OpenpitrixDeleteSkusRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DeleteSkus(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DeleteSpusCmd struct {
+	*models.OpenpitrixDeleteSpusRequest
+}
+
+func NewDeleteSpusCmd() Cmd {
+	cmd := &DeleteSpusCmd{}
+	cmd.OpenpitrixDeleteSpusRequest = &models.OpenpitrixDeleteSpusRequest{}
+	return cmd
+}
+
+func (*DeleteSpusCmd) GetActionName() string {
+	return "DeleteSpus"
+}
+
+func (c *DeleteSpusCmd) ParseFlag(f Flag) {
+	f.StringSliceVarP(&c.SpuIds, "spu_ids", "", []string{}, "")
+}
+
+func (c *DeleteSpusCmd) Run(out Out) error {
+	params := sku_manager.NewDeleteSpusParams()
+	params.WithBody(c.OpenpitrixDeleteSpusRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DeleteSpus(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeAttributeNamesCmd struct {
+	*sku_manager.DescribeAttributeNamesParams
+}
+
+func NewDescribeAttributeNamesCmd() Cmd {
+	return &DescribeAttributeNamesCmd{
+		sku_manager.NewDescribeAttributeNamesParams(),
+	}
+}
+
+func (*DescribeAttributeNamesCmd) GetActionName() string {
+	return "DescribeAttributeNames"
+}
+
+func (c *DescribeAttributeNamesCmd) ParseFlag(f Flag) {
+	c.AttributeNameID = new(string)
+	f.StringVarP(c.AttributeNameID, "attribute_name_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Name = new(string)
+	f.StringVarP(c.Name, "name", "", "", "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+	c.Type = new(string)
+	f.StringVarP(c.Type, "type", "", "", "")
+}
+
+func (c *DescribeAttributeNamesCmd) Run(out Out) error {
+	params := c.DescribeAttributeNamesParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DescribeAttributeNames(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeAttributeUnitsCmd struct {
+	*sku_manager.DescribeAttributeUnitsParams
+}
+
+func NewDescribeAttributeUnitsCmd() Cmd {
+	return &DescribeAttributeUnitsCmd{
+		sku_manager.NewDescribeAttributeUnitsParams(),
+	}
+}
+
+func (*DescribeAttributeUnitsCmd) GetActionName() string {
+	return "DescribeAttributeUnits"
+}
+
+func (c *DescribeAttributeUnitsCmd) ParseFlag(f Flag) {
+	c.AttributeUnitID = new(string)
+	f.StringVarP(c.AttributeUnitID, "attribute_unit_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Name = new(string)
+	f.StringVarP(c.Name, "name", "", "", "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+}
+
+func (c *DescribeAttributeUnitsCmd) Run(out Out) error {
+	params := c.DescribeAttributeUnitsParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DescribeAttributeUnits(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeAttributesCmd struct {
+	*sku_manager.DescribeAttributesParams
+}
+
+func NewDescribeAttributesCmd() Cmd {
+	return &DescribeAttributesCmd{
+		sku_manager.NewDescribeAttributesParams(),
+	}
+}
+
+func (*DescribeAttributesCmd) GetActionName() string {
+	return "DescribeAttributes"
+}
+
+func (c *DescribeAttributesCmd) ParseFlag(f Flag) {
+	c.AttributeID = new(string)
+	f.StringVarP(c.AttributeID, "attribute_id", "", "", "")
+	c.AttributeNameID = new(string)
+	f.StringVarP(c.AttributeNameID, "attribute_name_id", "", "", "")
+	c.AttributeUnitID = new(string)
+	f.StringVarP(c.AttributeUnitID, "attribute_unit_id", "", "", "")
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Owner = new(string)
+	f.StringVarP(c.Owner, "owner", "", "", "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+}
+
+func (c *DescribeAttributesCmd) Run(out Out) error {
+	params := c.DescribeAttributesParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DescribeAttributes(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeSkusCmd struct {
+	*sku_manager.DescribeSkusParams
+}
+
+func NewDescribeSkusCmd() Cmd {
+	return &DescribeSkusCmd{
+		sku_manager.NewDescribeSkusParams(),
+	}
+}
+
+func (*DescribeSkusCmd) GetActionName() string {
+	return "DescribeSkus"
+}
+
+func (c *DescribeSkusCmd) ParseFlag(f Flag) {
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SkuID = new(string)
+	f.StringVarP(c.SkuID, "sku_id", "", "", "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.SpuID = new(string)
+	f.StringVarP(c.SpuID, "spu_id", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+}
+
+func (c *DescribeSkusCmd) Run(out Out) error {
+	params := c.DescribeSkusParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DescribeSkus(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type DescribeSpusCmd struct {
+	*sku_manager.DescribeSpusParams
+}
+
+func NewDescribeSpusCmd() Cmd {
+	return &DescribeSpusCmd{
+		sku_manager.NewDescribeSpusParams(),
+	}
+}
+
+func (*DescribeSpusCmd) GetActionName() string {
+	return "DescribeSpus"
+}
+
+func (c *DescribeSpusCmd) ParseFlag(f Flag) {
+	c.Limit = new(int64)
+	f.Int64VarP(c.Limit, "limit", "", 20, "")
+	c.Offset = new(int64)
+	f.Int64VarP(c.Offset, "offset", "", 0, "")
+	c.Owner = new(string)
+	f.StringVarP(c.Owner, "owner", "", "", "")
+	c.ProductID = new(string)
+	f.StringVarP(c.ProductID, "product_id", "", "", "")
+	c.Reverse = new(bool)
+	f.BoolVarP(c.Reverse, "reverse", "", false, "")
+	c.SortKey = new(string)
+	f.StringVarP(c.SortKey, "sort_key", "", "", "")
+	c.SpuID = new(string)
+	f.StringVarP(c.SpuID, "spu_id", "", "", "")
+	c.Status = new(string)
+	f.StringVarP(c.Status, "status", "", "", "")
+}
+
+func (c *DescribeSpusCmd) Run(out Out) error {
+	params := c.DescribeSpusParams
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.DescribeSpus(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type ModifyAttributeCmd struct {
+	*models.OpenpitrixModifyAttributeRequest
+}
+
+func NewModifyAttributeCmd() Cmd {
+	cmd := &ModifyAttributeCmd{}
+	cmd.OpenpitrixModifyAttributeRequest = &models.OpenpitrixModifyAttributeRequest{}
+	return cmd
+}
+
+func (*ModifyAttributeCmd) GetActionName() string {
+	return "ModifyAttribute"
+}
+
+func (c *ModifyAttributeCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.AttributeID, "attribute_id", "", "", "")
+	f.StringVarP(&c.AttributeNameID, "attribute_name_id", "", "", "")
+	f.StringVarP(&c.AttributeUnitID, "attribute_unit_id", "", "", "")
+	f.StringVarP(&c.Value, "value", "", "", "")
+}
+
+func (c *ModifyAttributeCmd) Run(out Out) error {
+	params := sku_manager.NewModifyAttributeParams()
+	params.WithBody(c.OpenpitrixModifyAttributeRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.ModifyAttribute(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type ModifyAttributeNameCmd struct {
+	*models.OpenpitrixModifyAttributeNameRequest
+}
+
+func NewModifyAttributeNameCmd() Cmd {
+	cmd := &ModifyAttributeNameCmd{}
+	cmd.OpenpitrixModifyAttributeNameRequest = &models.OpenpitrixModifyAttributeNameRequest{}
+	return cmd
+}
+
+func (*ModifyAttributeNameCmd) GetActionName() string {
+	return "ModifyAttributeName"
+}
+
+func (c *ModifyAttributeNameCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.AttributeNameID, "attribute_name_id", "", "", "")
+	f.StringVarP(&c.Description, "description", "", "", "")
+	f.StringVarP(&c.Name, "name", "", "", "")
+}
+
+func (c *ModifyAttributeNameCmd) Run(out Out) error {
+	params := sku_manager.NewModifyAttributeNameParams()
+	params.WithBody(c.OpenpitrixModifyAttributeNameRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.ModifyAttributeName(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type ModifyAttributeUnitCmd struct {
+	*models.OpenpitrixModifyAttributeUnitRequest
+}
+
+func NewModifyAttributeUnitCmd() Cmd {
+	cmd := &ModifyAttributeUnitCmd{}
+	cmd.OpenpitrixModifyAttributeUnitRequest = &models.OpenpitrixModifyAttributeUnitRequest{}
+	return cmd
+}
+
+func (*ModifyAttributeUnitCmd) GetActionName() string {
+	return "ModifyAttributeUnit"
+}
+
+func (c *ModifyAttributeUnitCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.AttributeUnitID, "attribute_unit_id", "", "", "")
+	f.StringVarP(&c.Name, "name", "", "", "")
+}
+
+func (c *ModifyAttributeUnitCmd) Run(out Out) error {
+	params := sku_manager.NewModifyAttributeUnitParams()
+	params.WithBody(c.OpenpitrixModifyAttributeUnitRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.ModifyAttributeUnit(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type ModifySkuCmd struct {
+	*models.OpenpitrixModifySkuRequest
+}
+
+func NewModifySkuCmd() Cmd {
+	cmd := &ModifySkuCmd{}
+	cmd.OpenpitrixModifySkuRequest = &models.OpenpitrixModifySkuRequest{}
+	return cmd
+}
+
+func (*ModifySkuCmd) GetActionName() string {
+	return "ModifySku"
+}
+
+func (c *ModifySkuCmd) ParseFlag(f Flag) {
+	f.StringSliceVarP(&c.AttributeIds, "attribute_ids", "", []string{}, "")
+	f.StringSliceVarP(&c.MeteringAttributeIds, "metering_attribute_ids", "", []string{}, "")
+	f.StringVarP(&c.SkuID, "sku_id", "", "", "")
+	f.StringVarP(&c.SpuID, "spu_id", "", "", "")
+}
+
+func (c *ModifySkuCmd) Run(out Out) error {
+	params := sku_manager.NewModifySkuParams()
+	params.WithBody(c.OpenpitrixModifySkuRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.ModifySku(params, nil)
+	if err != nil {
+		return err
+	}
+
+	out.WriteResponse(res.Payload)
+
+	return nil
+}
+
+type ModifySpuCmd struct {
+	*models.OpenpitrixModifySpuRequest
+}
+
+func NewModifySpuCmd() Cmd {
+	cmd := &ModifySpuCmd{}
+	cmd.OpenpitrixModifySpuRequest = &models.OpenpitrixModifySpuRequest{}
+	return cmd
+}
+
+func (*ModifySpuCmd) GetActionName() string {
+	return "ModifySpu"
+}
+
+func (c *ModifySpuCmd) ParseFlag(f Flag) {
+	f.StringVarP(&c.ProductID, "product_id", "", "", "")
+	f.StringVarP(&c.SpuID, "spu_id", "", "", "")
+}
+
+func (c *ModifySpuCmd) Run(out Out) error {
+	params := sku_manager.NewModifySpuParams()
+	params.WithBody(c.OpenpitrixModifySpuRequest)
+
+	out.WriteRequest(params)
+
+	client := getClient()
+	res, err := client.SkuManager.ModifySpu(params, nil)
 	if err != nil {
 		return err
 	}

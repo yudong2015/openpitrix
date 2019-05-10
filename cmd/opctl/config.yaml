@@ -1050,6 +1050,213 @@
     filename:
       help: filename, attachment contain one more file.
       type: string
+- action: CreateAccount
+  request: CreateAccountRequest
+  description: create account
+  service: BillingManager
+  body:
+    balance:
+      type: number
+    currency:
+      type: string
+    description:
+      type: string
+    income:
+      type: object
+    user_id:
+      type: string
+    user_type:
+      type: string
+- action: CreateRecharge
+  request: CreateRechargeRequest
+  description: recharge for user
+  service: BillingManager
+  body:
+    balance:
+      type: number
+    currency:
+      type: string
+    description:
+      type: string
+    user_id:
+      type: string
+- action: CreateWithdraw
+  request: CreateWithdrawRequest
+  description: create withdraw
+  service: BillingManager
+- action: DescribeAccounts
+  request: DescribeAccountsRequest
+  description: describe accounts
+  service: BillingManager
+  query:
+    limit:
+      type: int64
+    offset:
+      type: int64
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+    user_id:
+      type: string
+    user_type:
+      type: string
+- action: DescribeCharges
+  request: DescribeChargesRequest
+  description: describe charges
+  service: BillingManager
+  query:
+    charge_id:
+      type: string
+    contract_id:
+      type: string
+    limit:
+      type: int64
+    offset:
+      type: int64
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+    user_id:
+      type: string
+- action: DescribeIncomes
+  request: DescribeIncomesRequest
+  description: describe incomes
+  service: BillingManager
+  query:
+    contract_id:
+      type: string
+    income_id:
+      type: string
+    limit:
+      type: int64
+    offset:
+      type: int64
+    owner_id:
+      type: string
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+- action: DescribeLeasedContracts
+  request: DescribeLeasedContractsRequest
+  description: describe leased_contract
+  service: BillingManager
+  query:
+    contract_id:
+      type: string
+    leasing_id:
+      type: string
+    limit:
+      type: int64
+    offset:
+      type: int64
+    resource_id:
+      type: string
+    reverse:
+      type: boolean
+    sku_id:
+      type: string
+    sort_key:
+      type: string
+    status:
+      type: string
+    user_id:
+      type: string
+- action: DescribeLeasingContracts
+  request: DescribeLeasingContractsRequest
+  description: describe leasing_contract
+  service: BillingManager
+  query:
+    contract_id:
+      type: string
+    leasing_id:
+      type: string
+    limit:
+      type: int64
+    offset:
+      type: int64
+    resource_id:
+      type: string
+    reverse:
+      type: boolean
+    sku_id:
+      type: string
+    sort_key:
+      type: string
+    status:
+      type: string
+    user_id:
+      type: string
+- action: DescribeRecharges
+  request: DescribeRechargesRequest
+  description: describe recharges
+  service: BillingManager
+  query:
+    limit:
+      type: int64
+    offset:
+      type: int64
+    recharge_id:
+      type: string
+    user_id:
+      type: string
+- action: DescribeRefunds
+  request: DescribeRefundsRequest
+  description: describe refunds
+  service: BillingManager
+  query:
+    contract_id:
+      type: string
+    limit:
+      type: int64
+    offset:
+      type: int64
+    refund_id:
+      type: string
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+    user_id:
+      type: string
+- action: DescribeWithdraws
+  request: DescribeWithdrawsRequest
+  description: describe withdraws
+  service: BillingManager
+  query:
+    limit:
+      type: int64
+    offset:
+      type: int64
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+    status:
+      type: string
+    user_id:
+      type: string
+    withdraw_id:
+      type: string
+- action: ModifyAccount
+  request: ModifyAccountRequest
+  description: modify  account
+  service: BillingManager
+  body:
+    balance:
+      type: number
+    currency:
+      type: string
+    description:
+      type: string
+    income:
+      type: object
+    user_id:
+      type: string
+    user_type:
+      type: string
 - action: CreateCategory
   request: CreateCategoryRequest
   description: Create category
@@ -1963,6 +2170,109 @@
       type: '[]string'
     user_id:
       type: '[]string'
+- action: InitMetering
+  request: InitMeteringRequest
+  description: init metering about the skus
+  service: MeteringManager
+  body:
+    resource_id:
+      type: string
+    sku_meterings:
+      type: '[]'
+    user_id:
+      type: string
+- action: UpdateMetering
+  request: UpdateMeteringRequest
+  description: update metering value about the sku
+  service: MeteringManager
+  body:
+    resource_id:
+      type: string
+    update_sku_meterings:
+      type: '[]'
+- action: CreateCouponReceived
+  request: CreateCouponReceivedRequest
+  description: receive coupon
+  service: PromotionManager
+  body:
+    coupon_id:
+      type: string
+- action: DeleteCouponReceiveds
+  request: DeleteCouponReceivedsRequest
+  description: delete coupon_receiveds
+  service: PromotionManager
+  body:
+    coupon_received_ids:
+      type: '[]string'
+- action: DescribeCouponReceiveds
+  request: DescribeCouponReceivedsRequest
+  description: describe coupon_receiveds
+  service: PromotionManager
+  query:
+    coupon_id:
+      type: string
+    coupon_received_id:
+      type: string
+    limit:
+      type: int64
+    offset:
+      type: int64
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+    status:
+      type: string
+    user_id:
+      type: string
+- action: CreateCombinationSku
+  request: CreateCombinationSkuRequest
+  description: create combination_sku
+  service: PromotionSkuManager
+  body:
+    combination_id:
+      type: string
+    sku_id:
+      type: string
+- action: DeleteCombinationSkus
+  request: DeleteCombinationSkusRequest
+  description: delete combination_skus
+  service: PromotionSkuManager
+  body:
+    combination_sku_ids:
+      type: '[]string'
+- action: DescribeCombinationSkus
+  request: DescribeCombinationSkusRequest
+  description: describe combination_skus
+  service: PromotionSkuManager
+  query:
+    combination_id:
+      type: string
+    combination_sku_id:
+      type: string
+    limit:
+      type: int64
+    offset:
+      type: int64
+    reverse:
+      type: boolean
+    sku_id:
+      type: string
+    sort_key:
+      type: string
+    status:
+      type: string
+- action: ModifyCombinationSku
+  request: ModifyCombinationSkuRequest
+  description: modify combination_sku
+  service: PromotionSkuManager
+  body:
+    combination_id:
+      type: string
+    combination_sku_id:
+      type: string
+    sku_id:
+      type: string
 - action: DescribeRepoEvents
   request: DescribeRepoEventsRequest
   description: Get repository events
@@ -2482,6 +2792,247 @@
   body:
     email_service_config:
       help: email service config
+- action: CreateAttribute
+  request: CreateAttributeRequest
+  description: create attribute
+  service: SkuManager
+  body:
+    attribute_name_id:
+      type: string
+    attribute_unit_id:
+      type: string
+    value:
+      type: string
+- action: CreateAttributeName
+  request: CreateAttributeNameRequest
+  description: create attribute name
+  service: SkuManager
+  body:
+    description:
+      type: string
+    name:
+      type: string
+    type: {}
+- action: CreateAttributeUnit
+  request: CreateAttributeUnitRequest
+  description: create attribute unit
+  service: SkuManager
+  body:
+    name:
+      type: string
+- action: CreateSku
+  request: CreateSkuRequest
+  description: create sku of the product
+  service: SkuManager
+  body:
+    attribute_ids:
+      type: '[]string'
+    metering_attribute_ids:
+      type: '[]string'
+    spu_id:
+      type: string
+- action: CreateSpu
+  request: CreateSpuRequest
+  description: create spu
+  service: SkuManager
+  body:
+    product_id:
+      type: string
+- action: DeleteAttributeNames
+  request: DeleteAttributeNamesRequest
+  description: delete attribute_names
+  service: SkuManager
+  body:
+    attribute_name_ids:
+      type: '[]string'
+- action: DeleteAttributeUnits
+  request: DeleteAttributeUnitsRequest
+  description: delete attribute_units
+  service: SkuManager
+  body:
+    attribute_unit_ids:
+      type: '[]string'
+- action: DeleteAttributes
+  request: DeleteAttributesRequest
+  description: delete attributes
+  service: SkuManager
+  body:
+    attribute_ids:
+      type: '[]string'
+- action: DeleteSkus
+  request: DeleteSkusRequest
+  description: delete skus
+  service: SkuManager
+  body:
+    sku_ids:
+      type: '[]string'
+- action: DeleteSpus
+  request: DeleteSpusRequest
+  description: delete spus
+  service: SkuManager
+  body:
+    spu_ids:
+      type: '[]string'
+- action: DescribeAttributeNames
+  request: DescribeAttributeNamesRequest
+  description: describe attribute_names
+  service: SkuManager
+  query:
+    attribute_name_id:
+      type: string
+    limit:
+      type: int64
+    name:
+      type: string
+    offset:
+      type: int64
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+    status:
+      type: string
+    type:
+      type: string
+      default: NORMAL
+- action: DescribeAttributeUnits
+  request: DescribeAttributeUnitsRequest
+  description: describe attribute_units
+  service: SkuManager
+  query:
+    attribute_unit_id:
+      type: string
+    limit:
+      type: int64
+    name:
+      type: string
+    offset:
+      type: int64
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+    status:
+      type: string
+- action: DescribeAttributes
+  request: DescribeAttributesRequest
+  description: describe attributes
+  service: SkuManager
+  query:
+    attribute_id:
+      type: string
+    attribute_name_id:
+      type: string
+    attribute_unit_id:
+      type: string
+    limit:
+      type: int64
+    offset:
+      type: int64
+    owner:
+      type: string
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+    status:
+      type: string
+- action: DescribeSkus
+  request: DescribeSkusRequest
+  description: describe skus
+  service: SkuManager
+  query:
+    limit:
+      type: int64
+    offset:
+      type: int64
+    reverse:
+      type: boolean
+    sku_id:
+      type: string
+    sort_key:
+      type: string
+    spu_id:
+      type: string
+    status:
+      type: string
+- action: DescribeSpus
+  request: DescribeSpusRequest
+  description: describe spus
+  service: SkuManager
+  query:
+    limit:
+      type: int64
+    offset:
+      type: int64
+    owner:
+      type: string
+    product_id:
+      type: string
+    reverse:
+      type: boolean
+    sort_key:
+      type: string
+    spu_id:
+      type: string
+    status:
+      type: string
+- action: ModifyAttribute
+  request: ModifyAttributeRequest
+  description: modify attribute
+  service: SkuManager
+  body:
+    attribute_id:
+      type: string
+    attribute_name_id:
+      type: string
+    attribute_unit_id:
+      type: string
+    value:
+      type: string
+- action: ModifyAttributeName
+  request: ModifyAttributeNameRequest
+  description: modify attribute_name
+  service: SkuManager
+  body:
+    attribute_name_id:
+      type: string
+    description:
+      type: string
+    name:
+      type: string
+    type: {}
+- action: ModifyAttributeUnit
+  request: ModifyAttributeUnitRequest
+  description: modify attribute_unit
+  service: SkuManager
+  body:
+    attribute_unit_id:
+      type: string
+    name:
+      type: string
+- action: ModifySku
+  request: ModifySkuRequest
+  description: modify sku
+  service: SkuManager
+  body:
+    attribute_ids:
+      type: '[]string'
+    metering_attribute_ids:
+      type: '[]string'
+    sku_id:
+      type: string
+    spu_id:
+      type: string
+- action: ModifySpu
+  request: ModifySpuRequest
+  description: modify spu
+  service: SkuManager
+  body:
+    product_id:
+      type: string
+    spu_id:
+      type: string
 - action: DescribeTasks
   request: DescribeTasksRequest
   description: Get tasks, can filter with these fields(job_id, task_id, executor,
