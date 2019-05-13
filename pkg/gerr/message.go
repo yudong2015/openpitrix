@@ -31,22 +31,6 @@ func (em ErrorMessage) Message(locale string, err error, a ...interface{}) strin
 	}
 }
 
-func CreateFailed(enName, zhName string) ErrorMessage {
-	return ErrorMessage{
-		Name: fmt.Sprintf("create_%s_failed", enName),
-		en:   fmt.Sprintf("create %s failed", enName),
-		zhCN: fmt.Sprintf("创建%s失败", zhName),
-	}
-}
-
-func NotExistError(enName, zhName string) ErrorMessage {
-	return ErrorMessage{
-		Name: fmt.Sprintf("%s_not_exist", enName),
-		en:   fmt.Sprintf("%s not exist", enName),
-		zhCN: fmt.Sprintf("%s不存在", zhName),
-	}
-}
-
 var (
 	ErrorPermissionDenied = ErrorMessage{
 		Name: "permission_denied",
@@ -512,5 +496,15 @@ var (
 		Name: "unknown_error",
 		en:   "unknown error",
 		zhCN: "未知错误",
+	}
+	ErrorNotExist = ErrorMessage{
+		Name: "%s_not_exist",
+		en: "%s(%s) not exist",
+		zhCN: "%s(%s)不存在",
+	}
+	ErrorNotExistInOther = ErrorMessage{
+		Name: "%s_not_exist",
+		en: "%s not exist in %s",
+		zhCN: "%s里%s不存在",
 	}
 )

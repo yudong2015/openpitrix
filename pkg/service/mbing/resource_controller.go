@@ -8,7 +8,10 @@ import (
 	"context"
 
 	"openpitrix.io/openpitrix/pkg/db"
+	"openpitrix.io/openpitrix/pkg/manager"
 	"openpitrix.io/openpitrix/pkg/models"
+	"openpitrix.io/openpitrix/pkg/pb"
+	"openpitrix.io/openpitrix/pkg/util/pbutil"
 	"openpitrix.io/openpitrix/pkg/util/stringutil"
 
 	"openpitrix.io/openpitrix/pkg/constants"
@@ -18,26 +21,83 @@ import (
 
 func checkExistById(ctx context.Context, structName, idValue string) (bool, error) {
 	tableName := stringutil.CamelCaseToUnderscore(structName)
-	idName := stringutil.UnderscoreToCamelCase(tableName) + "Id"
+	idName := tableName + "_id"
 	count, err := pi.Global().DB(ctx).
 		Select(idName).
 		From(tableName).
 		Where(db.Eq(idName, idValue)).
 		Limit(1).Count()
 
-	exist := false
 	if err != nil {
 		logger.Error(ctx, "Failed to connect DB, Errors: [%+v]", err)
-		return exist, err
+		return false, err
 	}
 
 	if count > 0 {
-		exist = true
+		return true, nil
 	}
-	return exist, nil
+	return false, nil
 }
 
 //Sku
+func insertAttributeName(ctx context.Context, attributeName *models.AttributeName) error {
+	_, err := pi.Global().DB(ctx).
+		InsertInto(constants.TableAttributeName).
+		Record(attributeName).
+		Exec()
+	if err != nil {
+		logger.Error(ctx, "Failed to insert attributeName, Errors: [%+v]", err)
+	}
+	return err
+}
+
+func DescribeAttributeNames(ctx context.Context, req *pb.DescribeAttributeNamesRequest) ([]*models.AttributeName, error) {
+	var attributeNames []*models.AttributeName
+	_, err := pi.Global().DB(ctx).
+		Select(constants.IndexedColumns[constants.TableAttributeName]...).
+		From(constants.TableAttributeName).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(manager.BuildFilterConditions(req, constants.TableAttributeName)).
+		OrderDir(constants.ColumnCreateTime, false).
+		Offset(pbutil.GetOffsetFromRequest(req)).
+		Limit(pbutil.GetLimitFromRequest(req)).
+		Load(&attributeNames)
+
+	if err != nil {
+		logger.Error(ctx, "Failed to describe attribute_name, Errors: [%+v]", err)
+	}
+	return attributeNames, err
+}
+
+func insertAttributeUnit(ctx context.Context, attUnit *models.AttributeUnit) error {
+	_, err := pi.Global().DB(ctx).
+		InsertInto(constants.TableAttributeUnit).
+		Record(attUnit).
+		Exec()
+	if err != nil {
+		logger.Error(ctx, "Failed to insert attribute_unit, Errors: [%+v]", err)
+	}
+	return err
+}
+
+func DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsRequest) ([]*models.AttributeUnit, error) {
+	var attUnits []*models.AttributeUnit
+	_, err := pi.Global().DB(ctx).
+		Select(constants.IndexedColumns[constants.TableAttributeUnit]...).
+		From(constants.TableAttributeUnit).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(manager.BuildFilterConditions(req, constants.TableAttributeUnit)).
+		OrderDir(constants.ColumnCreateTime, false).
+		Offset(pbutil.GetOffsetFromRequest(req)).
+		Limit(pbutil.GetLimitFromRequest(req)).
+		Load(&attUnits)
+
+	if err != nil {
+		logger.Error(ctx, "Failed to describe attribute_unit, Errors: [%+v]", err)
+	}
+	return attUnits, err
+}
+
 func insertAttribute(ctx context.Context, attribute *models.Attribute) error {
 	_, err := pi.Global().DB(ctx).
 		InsertInto(constants.TableAttribute).
@@ -49,65 +109,67 @@ func insertAttribute(ctx context.Context, attribute *models.Attribute) error {
 	return err
 }
 
-func getAttributeById(ctx context.Context, attributeId string) (*models.Attribute, error) {
-	att := &models.Attribute{}
+func getAttribute(ctx context.Context, attributeId string) (*models.Attribute, error) {
+	attribute := &models.Attribute{}
 	err := pi.Global().DB(ctx).
 		Select(models.AttributeColumns...).
 		From(constants.TableAttribute).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
 		Where(db.Eq(constants.ColumnAttributeId, attributeId)).
-		LoadOne(&att)
-
+		LoadOne(&attribute)
 	if err != nil {
-		logger.Error(ctx, "Failed to get attribute, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to get attribute [%s], Errors: [%+v]", attributeId, err)
 	}
-	return att, err
+	if err == db.ErrNotFound {
+		return nil, nil
+	}
+	return attribute, err
 }
 
-func insertAttributeUnit(ctx context.Context, attUnit *models.AttributeUnit) error {
+func DescribeAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) ([]*models.Attribute, error) {
+	var attributes []*models.Attribute
 	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableAttUnit).
-		Record(attUnit).
+		Select(constants.IndexedColumns[constants.TableAttribute]...).
+		From(constants.TableAttribute).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(manager.BuildFilterConditions(req, constants.TableAttribute)).
+		OrderDir(constants.ColumnCreateTime, false).
+		Offset(pbutil.GetOffsetFromRequest(req)).
+		Limit(pbutil.GetLimitFromRequest(req)).
+		Load(&attributes)
+
+	if err != nil {
+		logger.Error(ctx, "Failed to describe attribute, Errors: [%+v]", err)
+	}
+	return attributes, err
+}
+
+func insertSpu(ctx context.Context, spu *models.Spu) error {
+	_, err := pi.Global().DB(ctx).
+		InsertInto(constants.TableSpu).
+		Record(spu).
 		Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert attribute_unit, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to insert spu, Errors: [%+v]", err)
 	}
 	return err
 }
 
-func getAttUnitById(ctx context.Context, attUnitId string) (*models.AttributeUnit, error) {
-	attUnit := &models.AttributeUnit{}
+func getSpu(ctx context.Context, spuId string) (*models.Spu, error) {
+	spu := &models.Spu{}
 	err := pi.Global().DB(ctx).
-		Select(models.AttributeUnitColumns...).
-		From(constants.TableAttUnit).
-		Where(db.Eq(constants.ColumnAttUnitId, attUnitId)).
-		LoadOne(&attUnit)
-
+		Select(constants.IndexedColumns[constants.TableSpu]...).
+		From(constants.TableSpu).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(constants.ColumnSpuId, spuId)).
+		LoadOne(&spu)
 	if err != nil {
-		logger.Error(ctx, "Failed to get attribuite_unit, Errors: [%+v]", err)
+		logger.Error(ctx, "Failed to get spu [%s], Errors: [%+v]", spuId, err)
 	}
-	return attUnit, err
-}
-
-func insertAttributeValue(ctx context.Context, attValue *models.AttributeValue) error {
-	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableAttValue).
-		Record(attValue).
-		Exec()
-	if err != nil {
-		logger.Error(ctx, "Failed to insert attribute_value, Errors: [%+v]", err)
+	if err == db.ErrNotFound {
+		return nil, nil
 	}
-	return err
-}
-
-func insertResourceAttribute(ctx context.Context, resAtt *models.ResourceAttribute) error {
-	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableResAtt).
-		Record(resAtt).
-		Exec()
-	if err != nil {
-		logger.Error(ctx, "Failed to insert resource_attribute, Errors: [%+v]", err)
-	}
-	return err
+	return spu, err
 }
 
 func insertSku(ctx context.Context, sku *models.Sku) error {
@@ -121,16 +183,20 @@ func insertSku(ctx context.Context, sku *models.Sku) error {
 	return err
 }
 
-func getSkuById(ctx context.Context, skuId string) (*models.Sku, error) {
+func getSku(ctx context.Context, skuId string) (*models.Sku, error) {
 	sku := &models.Sku{}
 	err := pi.Global().DB(ctx).
-		Select(models.SkuColumns...).
+		Select(constants.IndexedColumns[constants.TableSku]...).
 		From(constants.TableSku).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
 		Where(db.Eq(constants.ColumnSkuId, skuId)).
 		LoadOne(sku)
 
 	if err != nil {
 		logger.Error(ctx, "Failed to get sku, Errors: [%+v]", err)
+	}
+	if err == db.ErrNotFound {
+		return nil, nil
 	}
 	return sku, err
 }
@@ -161,22 +227,22 @@ func insertLeasings(ctx context.Context, leasings []*models.Leasing) error {
 }
 
 //promotion
-func insertCRA(ctx context.Context, cra *models.CombinationResourceAttribute) error {
+func insertCombinationSpu(ctx context.Context, comSpu *models.CombinationSpu) error {
 	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableCRA).
-		Record(cra).Exec()
+		InsertInto(constants.TableCombinationSpu).
+		Record(comSpu).Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert Combination_Resource_Attribute, Error: [%+v].", err)
+		logger.Error(ctx, "Failed to insert Combination_Spu, Error: [%+v].", err)
 	} else {
-		logger.Info(ctx, "Insert Combination_Resource_Attribute successfully.")
+		logger.Info(ctx, "Insert Combination_Spu successfully.")
 	}
 	return err
 }
 
-func insertComSku(ctx context.Context, cs *models.CombinationSku) error {
+func insertCombinationSku(ctx context.Context, comSku *models.CombinationSku) error {
 	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableCS).
-		Record(cs).Exec()
+		InsertInto(constants.TableCombinationSku).
+		Record(comSku).Exec()
 	if err != nil {
 		logger.Error(ctx, "Failed to insert Combination_Sku, Error: [%+v].", err)
 	} else {
@@ -185,9 +251,9 @@ func insertComSku(ctx context.Context, cs *models.CombinationSku) error {
 	return err
 }
 
-func insertComPrice(ctx context.Context, comPrice *models.CombinationPrice) error {
+func insertCombinationPrice(ctx context.Context, comPrice *models.CombinationPrice) error {
 	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableComPrice).
+		InsertInto(constants.TableCombinationPrice).
 		Record(comPrice).Exec()
 	if err != nil {
 		logger.Error(ctx, "Failed to insert Combination_Price, Error: [%+v].", err)
@@ -197,7 +263,7 @@ func insertComPrice(ctx context.Context, comPrice *models.CombinationPrice) erro
 	return err
 }
 
-func insertProSku(ctx context.Context, proSku *models.ProbationSku) error {
+func insertProbationSku(ctx context.Context, proSku *models.ProbationSku) error {
 	_, err := pi.Global().DB(ctx).
 		InsertInto(constants.TableProbationSku).
 		Record(proSku).Exec()

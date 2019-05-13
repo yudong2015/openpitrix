@@ -25,6 +25,7 @@ const (
 	RepoIndexerHost            = prefix + "repo-indexer"
 	CategoryManagerHost        = prefix + "category-manager"
 	RuntimeProviderManagerHost = prefix + "rp-manager"
+	MbingManagerHost           = prefix + "rp-manager"
 	NotificationHost           = prefix + "notification"
 	MarketManagerHost          = prefix + "market-manager"
 	AttachmentManagerHost      = prefix + "attachment-manager"
@@ -54,11 +55,9 @@ const (
 	EtcdServicePort            = 2379
 	AttachmentManagerPort      = 9120
 	RuntimeProviderManagerPort = 9121
+	MbingManagerPort           = 9122
 	NotificationPort           = 9201
 	ServiceConfigPort          = 9202
-
-	MeterbillingManagerPort    = 9300
-
 )
 
 const (
@@ -101,7 +100,6 @@ const (
 	StatusSuspended = "suspended"
 	StatusInReview  = "in-review"
 	StatusNew       = "new"
-	StatusOverTime  = "overtime"
 )
 
 var DeletedStatuses = []string{

@@ -26,6 +26,7 @@ const (
 	ColumnLocale                   = "locale"
 	ColumnMaintainers              = "maintainers"
 	ColumnName                     = "name"
+	ColumnDisplayName              = "display_name"
 	ColumnNodeId                   = "node_id"
 	ColumnKeyPairId                = "key_pair_id"
 	ColumnOwner                    = "owner"
@@ -103,20 +104,15 @@ const (
 	ColumnRejectMessage            = "reject_message"
 	ColumnSubmitTime               = "submit_time"
 	ColumnApprover                 = "approver"
-	ColumnAttributeId       = "attribute_id"
-	ColumnAttUnitId         = "attribute_unit_id"
-	ColumnAttValueId        = "attribute_value_id"
-	ColumnAttributeId = "attribute_id"
-	ColumnAttUnitId   = "attribute_unit_id"
-	ColumnAttValueId  = "attribute_value_id"
-	ColumnAttributeId 	= "attribute_id"
-	ColumnAttUnitId   	= "attribute_unit_id"
-	ColumnAttValueId  	= "attribute_value_id"
-	ColumnSkuId  	  	= "sku_id"
-	ColumnAttributeId 		= "attribute_id"
-	ColumnAttUnitId   		= "attribute_unit_id"
-	ColumnAttValueId  		= "attribute_value_id"
-	ColumnSkuId  	  		= "sku_id"
+	ColumnAttributeNameId          = "attribute_name_id"
+	ColumnAttributeId              = "attribute_id"
+	ColumnValue                    = "value"
+	ColumnSpuId                    = "spu_id"
+	ColumnAttributeNameIds         = "attribute_name_ids"
+	ColumnMeteringAttributeNameIds = "metering_attribute_name_ids"
+	ColumnSkuId                    = "sku_id"
+	ColumnAttributeIds             = "attribute_ids"
+	ColumnMeteringAttributeIds     = "metering_attribute_ids"
 )
 
 var PushEventTables = map[string][]string{
@@ -198,6 +194,22 @@ var IndexedColumns = map[string][]string{
 	},
 	TableVendorVerifyInfo: {
 		ColumnUserId, ColumnStatus,
+	},
+	TableAttributeName: {
+		ColumnAttributeNameId, ColumnName,
+	},
+	TableAttributeUnit: {
+		ColumnAttributeUnitId, ColumnName,
+	},
+	TableAttribute: {
+		ColumnAttributeId, ColumnAttributeNameId, ColumnAttributeUnitId, ColumnValue,
+	},
+	TableSpu: {
+		ColumnSpuId, ColumnResourceVersionId, ColumnAttributeNameIds,
+		ColumnMeteringAttributeNameIds,
+	},
+	TableSku: {
+		ColumnSkuId, ColumnSpuId, ColumnAttributeIds, ColumnMeteringAttributeIds,
 	},
 }
 
