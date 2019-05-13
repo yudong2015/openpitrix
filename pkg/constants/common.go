@@ -280,4 +280,3 @@ const (
 	CurrencyHKD = "HKD"
 	CurrencyUSD = "USD"
 )
-

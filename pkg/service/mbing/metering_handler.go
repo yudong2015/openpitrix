@@ -7,27 +7,43 @@ package mbing
 import (
 	"context"
 
+	"openpitrix.io/openpitrix/pkg/db"
+	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/util/pbutil"
 )
 
-func (s *Server) StartMetering(ctx context.Context, req *pb.MeteringRequest) (*pb.CommonResponse, error) {
-	skuAttribute := "in sku"
-	if "duration" == skuAttribute {
+func (s *Server) StartMetering(ctx context.Context, req *pb.MeteringRequest) (*pb.MeteringResponse, error) {
+	var leasings []*models.Leasing
+	//construct leasings
+	for _, mSku := range req.GetSkuSet() {
+		//check if sku exist and get renewalTime
+		renewalTime, err := renewalTimeFromSku(ctx, mSku.GetSkuId().GetValue(), pbutil.FromProtoTimestamp(mSku.GetActionTime()))
+		if err != nil {
+			if err == db.ErrNotFound {
+				return nil, commonInternalErr(ctx, models.Sku{}, NotExistCode)
+			} else {
+				return nil, commonInternalErr(ctx, models.Leasing{}, CreateFailedCode)
+			}
+		}
+		leasings = append(leasings, models.PbToLeasing(req, mSku, GetGroupId(), renewalTime))
 	}
-	return &pb.CommonResponse{Status: pbutil.ToProtoInt32(200), Message: pbutil.ToProtoString("success")}, nil
-}
 
-func (s *Server) StopMetering(ctx context.Context, req *pb.MeteringRequest) (*pb.CommonResponse, error) {
-	return &pb.CommonResponse{Status: pbutil.ToProtoInt32(200), Message: pbutil.ToProtoString("success")}, nil
-}
+	//insert leasings
+	err := insertLeasings(ctx, leasings)
+	if err != nil {
+		return nil, commonInternalErr(ctx, models.Leasing{}, CreateFailedCode)
+	}
 
-func (s *Server) UpdateMetering(ctx context.Context, req *pb.MeteringRequest) (*pb.CommonResponse, error) {
-	return &pb.CommonResponse{Status: pbutil.ToProtoInt32(200), Message: pbutil.ToProtoString("success")}, nil
-}
+	//TODO: Add leasing to REDIS if duration exist.
+	//TODO: Add leasing to ETCD.
 
-func (s *Server) CloseMetering(ctx context.Context, req *pb.MeteringRequest) (*pb.CommonResponse, error) {
-	return &pb.CommonResponse{Status: pbutil.ToProtoInt32(200), Message: pbutil.ToProtoString("success")}, nil
+	//MeteringResponse
+	var res pb.MeteringResponse
+	for _, l := range leasings {
+		res.LeasingIds = append(res.LeasingIds, pbutil.ToProtoString(l.LeasingId))
+	}
+	return &res, nil
 }
 
 func GetGroupId() string {

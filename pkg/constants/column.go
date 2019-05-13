@@ -103,6 +103,20 @@ const (
 	ColumnRejectMessage            = "reject_message"
 	ColumnSubmitTime               = "submit_time"
 	ColumnApprover                 = "approver"
+	ColumnAttributeId       = "attribute_id"
+	ColumnAttUnitId         = "attribute_unit_id"
+	ColumnAttValueId        = "attribute_value_id"
+	ColumnAttributeId = "attribute_id"
+	ColumnAttUnitId   = "attribute_unit_id"
+	ColumnAttValueId  = "attribute_value_id"
+	ColumnAttributeId 	= "attribute_id"
+	ColumnAttUnitId   	= "attribute_unit_id"
+	ColumnAttValueId  	= "attribute_value_id"
+	ColumnSkuId  	  	= "sku_id"
+	ColumnAttributeId 		= "attribute_id"
+	ColumnAttUnitId   		= "attribute_unit_id"
+	ColumnAttValueId  		= "attribute_value_id"
+	ColumnSkuId  	  		= "sku_id"
 )
 
 var PushEventTables = map[string][]string{
