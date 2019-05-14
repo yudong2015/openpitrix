@@ -13,6 +13,7 @@ import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
+import "metering.proto";
 
 
 enum Currency {
@@ -22,7 +23,7 @@ enum Currency {
 }
 
 //*************************************************************
-//*********************** Billing *****************************
+//******************** OperationManager ***********************
 //*************************************************************
 //price
 message Price {
@@ -368,7 +369,7 @@ message DescribeWithdrawsResponse {
 	repeated Withdraw withdraw_set = 2;
 }
 
-service BillingManager {
+service OperationManager {
 	rpc CreatePrice (CreatePriceRequest) returns (CreatePriceResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "create price of the sku with metering_attribute"
@@ -531,6 +532,67 @@ service BillingManager {
 }
 
 
+//*************************************************************************
+//*************************** BillingManager ******************************
+//*************************************************************************
+
+message CommonBillingResponse {
+	google.protobuf.StringValue contract_id = 1;
+}
+
+service BillingManager {
+	rpc InitBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "init billing about the leasing"
+		};
+		option (google.api.http) = {
+			post: "/v1/billing"
+			body: "*"
+		};
+	}
+
+	rpc UpdateBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "update billing about the leasing"
+		};
+		option (google.api.http) = {
+			put: "/v1/billing"
+			body: "*"
+		};
+	}
+
+	rpc StopBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "stop billing about the leasing"
+		};
+		option (google.api.http) = {
+			put: "/v1/billing/stop"
+			body: "*"
+		};
+	}
+
+	rpc StartBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "start billing that stoped befor"
+		};
+		option (google.api.http) = {
+			put: "/v1/billing/start"
+			body: "*"
+		};
+	}
+
+	rpc TerminateBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "stop billing about the leasing"
+		};
+		option (google.api.http) = {
+			delete: "/v1/billing"
+			body: "*"
+		};
+	}
+
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// Billing Backend APIs //////////////////////////////////////
@@ -540,23 +602,6 @@ service BillingManager {
 message Context {
 	//context.Context
 }
-
-message Metering {
-    google.protobuf.StringValue leasing_id = 1;
-    google.protobuf.StringValue resource_id = 2;
-    google.protobuf.StringValue sku_id = 3;
-    google.protobuf.StringValue user_id = 4;
-    google.protobuf.StringValue action_id = 5;
-    map<string, double> metering_values = 6;
-	google.protobuf.Timestamp update_time = 7;
-}
-
-message BillingRequest {
-	Context context = 1;
-	Metering metering = 2;
-}
-
-message NIL {} //there is no response
 
 message CreateLeasingContractRequest {
 	google.protobuf.StringValue leasing_id = 1;
@@ -568,12 +613,12 @@ message CreateLeasingContractRequest {
 }
 
 message CreateLeasingContractResponse {
-	LeasingContract leasing_contract = 1;
+	google.protobuf.StringValue contract_id = 1;
 }
 
 message CalculateRequest {
 	Context ctx = 1;
-	Metering metering = 2;
+	Leasing leasing = 2;
 	LeasingContract leaing_contract = 3;
 }
 
@@ -582,20 +627,7 @@ message LeasingContractOperationRequest {
 	LeasingContract leaing_contract = 2;
 }
 
-
 service BillingBackendManager {
-	rpc Billing (BillingRequest) returns (NIL) {
-		// CreateLeasingContract() or get LeasingContract
-
-		// Calculate()
-
-		// DuductCoupon() if due_fee > 0
-		// RefundCoupon() if due_fee < 0
-
-		//CreateCharge() if due_fee > 0
-		//CreateRefund() if due_fee < 0
-
-	}
 
 	rpc CreateLeasingContract (CreateLeasingContractRequest) returns (CreateLeasingContractResponse) {}
 
@@ -615,6 +647,17 @@ service BillingBackendManager {
 ////////////////////////// 			End         //////////////////////////////////////
 ////////////////////////// Billing Backend APIs //////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
+
+
+//*************************************************************
+//******************** ChargeManager ***********************
+//*************************************************************
+
+service ChargingManager {
+	rpc CreateCharge (LeasingContract) returns (LeasingContract) {}
+
+	rpc CreateRefund (LeasingContract) returns (LeasingContract) {}
+}
 
 
 //*************************************************************************
@@ -1107,4 +1150,64 @@ service PromotionManager {
 			body: "*"
 		};
 	}
+}
+
+
+//*************************************************************************
+//*************************** MbingTaskManager ****************************
+//*************************************************************************
+
+service MbingTaskManager {
+	rpc InitBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "init billing about the leasing"
+		};
+		option (google.api.http) = {
+			post: "/v1/billing"
+			body: "*"
+		};
+	}
+
+	rpc UpdateBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "update billing about the leasing"
+		};
+		option (google.api.http) = {
+			put: "/v1/billing"
+			body: "*"
+		};
+	}
+
+	rpc StopBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "stop billing about the leasing"
+		};
+		option (google.api.http) = {
+			put: "/v1/billing/stop"
+			body: "*"
+		};
+	}
+
+	rpc StartBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "start billing that stoped befor"
+		};
+		option (google.api.http) = {
+			put: "/v1/billing/start"
+			body: "*"
+		};
+	}
+
+	rpc TerminateBilling (Leasing) returns (CommonBillingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "stop billing about the leasing"
+		};
+		option (google.api.http) = {
+			delete: "/v1/billing"
+			body: "*"
+		};
+	}
+
+	rpc Charge(LeasingContract) returns (MbingTaskResponse) {}
+	rpc Refund(LeasingContract) returns (MbingTaskResponse) {}
 }

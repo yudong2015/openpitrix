@@ -831,3 +831,65 @@ service PromotionSkuManager {
 	}
 
 }
+
+
+//*************************************************************************
+//********************* MbingTaskManager(Task Service) ********************
+//*************************************************************************
+
+message MbingTaskResponse {
+	google.protobuf.StringValue task_id = 1;
+}
+
+service MbingTaskManager {
+	rpc InitMetering (InitMeteringRequest) returns (MbingTaskResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "init metering about the skus"
+		};
+		option (google.api.http) = {
+			post: "/v1/metering"
+			body: "*"
+		};
+	}
+
+	rpc UpdateMetering (UpdateMeteringRequest) returns (MbingTaskResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "update metering value about the sku"
+		};
+		option (google.api.http) = {
+			put: "/v1/metering"
+			body: "*"
+		};
+	}
+
+	rpc StopMeterings (StopMeteringsRequest) returns (MbingTaskResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "stop metering about the skus"
+		};
+		option (google.api.http) = {
+			put: "/v1/metering/stop"
+			body: "*"
+		};
+	}
+
+	//start for stopped metering
+	rpc StartMeterings (StartMeteringsRequest) returns (MbingTaskResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "start metering about the skus"
+		};
+		option (google.api.http) = {
+			put: "/v1/metering/start"
+			body: "*"
+		};
+	}
+
+	rpc TerminateMeterings (TerminateMeteringsRequest) returns (MbingTaskResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "terminate metering about the skus"
+        };
+		option (google.api.http) = {
+            delete: "/v1/metering"
+            body: "*"
+        };
+	}
+}
