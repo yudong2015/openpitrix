@@ -658,7 +658,7 @@ message CommonChargingResponse {
 }
 
 service ChargingManager {
-	rpc CreateCharge (LeasingContract) returns (CommonChargingResponse) {
+	rpc Charge (LeasingContract) returns (CommonChargingResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "charging about the leasing_contract"
 		};
@@ -668,7 +668,7 @@ service ChargingManager {
 		};
 	}
 
-	rpc CreateRefund (LeasingContract) returns (CommonChargingResponse) {
+	rpc Refund (LeasingContract) returns (CommonChargingResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "refund about the leasing_contract"
 		};
@@ -1181,7 +1181,7 @@ message BillingTaskResponse {
 	google.protobuf.StringValue task_id = 1;
 }
 
-service MbingTaskManager {
+service BillingTaskManager {
 	rpc InitBillingTask (Leasing) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "init billing about the leasing"

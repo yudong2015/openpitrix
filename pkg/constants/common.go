@@ -27,6 +27,7 @@ const (
 	RuntimeProviderManagerHost = prefix + "rp-manager"
 	MeteringManagerHost        = prefix + "metering-manager"
 	BillingManagerHost         = prefix + "billing-manager"
+	MbingTaskManagerHost       = prefix + "billing-manager"
 	NotificationHost           = prefix + "notification"
 	MarketManagerHost          = prefix + "market-manager"
 	AttachmentManagerHost      = prefix + "attachment-manager"
@@ -58,6 +59,7 @@ const (
 	RuntimeProviderManagerPort = 9121
 	MeteringManagerPort        = 9122
 	BillingManagerPort         = 9123
+	MbingTaskManagerPort       = 9124
 	NotificationPort           = 9201
 	ServiceConfigPort          = 9202
 )
