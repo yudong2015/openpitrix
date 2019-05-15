@@ -24,11 +24,12 @@ func NewServer() (*Server, error) {
 
 func Serve(cfg *config.Config) {
 	pi.SetGlobal(cfg)
-	s := Server{}
+	s, _ := NewServer()
 	manager.NewGrpcServer(constants.BillingManagerHost, constants.BillingManagerPort).
 		ShowErrorCause(cfg.Grpc.ShowErrorCause).
 		Serve(func(server *grpc.Server) {
-			pb.RegisterBillingManagerServer(server, &s)
-			pb.RegisterPromotionManagerServer(server, &s)
+			pb.RegisterBillingManagerServer(server, s)
+			pb.RegisterOperationManagerServer(server, s)
+			pb.RegisterPromotionManagerServer(server, s)
 		})
 }

@@ -92,66 +92,6 @@ message DeletePricesResponse {
 	repeated string price_ids = 1;
 }
 
-message Account {
-	google.protobuf.StringValue user_id = 1;
-	google.protobuf.StringValue user_type = 2;
-	google.protobuf.DoubleValue balance = 3;
-	google.protobuf.StringValue currency = 4;
-	map<string, double> income = 5;
-	google.protobuf.StringValue status = 6;
-	google.protobuf.Timestamp create_time = 7;
-	google.protobuf.Timestamp status_time = 8;
-	google.protobuf.StringValue description = 9;
-}
-
-message CreateAccountRequest {
-	google.protobuf.StringValue user_id = 1;
-	google.protobuf.StringValue user_type = 2;
-	google.protobuf.DoubleValue balance = 3;
-	google.protobuf.StringValue currency = 4;
-	map<string, double> income = 5;
-	google.protobuf.StringValue description = 6;
-}
-
-message CreateAccountResponse {
-	google.protobuf.StringValue user_id = 1;
-}
-
-message DescribeAccountsRequest {
-	google.protobuf.StringValue user_id = 1;
-	google.protobuf.StringValue user_type = 2;
-	google.protobuf.StringValue sort_key = 3;
-	google.protobuf.BoolValue reverse = 4;
-	uint32 offset = 5;
-	uint32 limit = 6;
-}
-
-message DescribeAccountsResponse {
-	uint32 total_count = 1;
-	repeated Account account_set = 2;
-}
-
-message ModifyAccountRequest {
-	google.protobuf.StringValue user_id = 1;
-	google.protobuf.StringValue user_type = 2;
-	google.protobuf.DoubleValue balance = 3;
-	google.protobuf.StringValue currency = 4;
-	map<string, double> income = 5;
-	google.protobuf.StringValue description = 6;
-}
-
-message ModifyAccountResponse {
-	google.protobuf.StringValue user_id = 1;
-}
-
-message DeleteAccountsRequest {
-	repeated string user_ids = 1;
-}
-
-message DeleteAccountsResponse {
-	repeated string user_ids = 1;
-}
-
 message LeasingContract {
 	google.protobuf.StringValue contract_id = 1;
 	google.protobuf.StringValue leasing_id = 2;
@@ -227,39 +167,68 @@ message DescribeLeasedContractsResponse {
 	repeated LeasedContract leased_contract_set = 2;
 }
 
-message Recharge {
-	google.protobuf.StringValue recharge_id = 1;
-	google.protobuf.StringValue user_id = 2;
-	google.protobuf.DoubleValue balance = 3;
-	google.protobuf.StringValue currency = 4;
-	google.protobuf.StringValue status = 5;
-	google.protobuf.Timestamp create_time = 6;
-	google.protobuf.StringValue description = 7;
+service OperationManager {
+	rpc CreatePrice (CreatePriceRequest) returns (CreatePriceResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "create price of the sku with metering_attribute"
+        };
+		option (google.api.http) = {
+            post: "/v1/billing/price"
+            body: "*"
+        };
+	}
+
+	rpc DescribePrices (DescribePricesRequest) returns (DescribePricesResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "describe prices"
+		};
+		option (google.api.http) = {
+			get: "/v1/billing/prices"
+		};
+	}
+
+	rpc ModifyPrice (ModifyPriceRequest) returns (ModifyPriceResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "modify price"
+		};
+		option (google.api.http) = {
+			put: "/v1/billing/price"
+			body: "*"
+		};
+	}
+
+	rpc DeletePrices (DeletePricesRequest) returns (DeletePricesResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "delete prices"
+		};
+		option (google.api.http) = {
+			delete: "/v1/billing/prices"
+			body: "*"
+		};
+	}
+
+	rpc DescribeLeasingContracts (DescribeLeasingContractsRequest) returns (DescribeLeasingContractsResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "describe leasing_contract"
+		};
+		option (google.api.http) = {
+			get: "/v1/billing/leasing/contracts"
+		};
+	}
+
+	rpc DescribeLeasedContracts (DescribeLeasedContractsRequest) returns (DescribeLeasedContractsResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "describe leased_contract"
+		};
+		option (google.api.http) = {
+			get: "/v1/billing/leased/contracts"
+		};
+	}
 }
 
-message CreateRechargeRequest {
-	google.protobuf.StringValue user_id = 1;
-	google.protobuf.DoubleValue balance = 2;
-	google.protobuf.StringValue currency = 3;
-	google.protobuf.StringValue description = 4;
-}
-
-message CreateRechargeResponse {
-	google.protobuf.StringValue recharge_id = 1;
-}
-
-message DescribeRechargesRequest {
-	google.protobuf.StringValue recharge_id = 1;
-	google.protobuf.StringValue user_id = 2;
-	uint32 offset = 3;
-	uint32 limit = 4;
-}
-
-message DescribeRechargesResponse {
-	uint32 total_count = 1;
-	repeated Recharge recharge_set = 2;
-}
-
+//*************************************************************
+//******************** ChargingManager ************************
+//*************************************************************
 message Charge {
 	google.protobuf.StringValue charge_id = 1;
 	google.protobuf.StringValue contract_id = 2;
@@ -309,6 +278,103 @@ message DescribeRefundsRequest {
 message DescribeRefundsResponse {
 	uint32 total_count = 1;
 	repeated Refund refund_set = 2;
+}
+
+message CommonChargingResponse {
+	google.protobuf.StringValue contract_id = 1;
+}
+
+message Account {
+	google.protobuf.StringValue user_id = 1;
+	google.protobuf.StringValue user_type = 2;
+	google.protobuf.DoubleValue balance = 3;
+	google.protobuf.StringValue currency = 4;
+	map<string, double> income = 5;
+	google.protobuf.StringValue status = 6;
+	google.protobuf.Timestamp create_time = 7;
+	google.protobuf.Timestamp status_time = 8;
+	google.protobuf.StringValue description = 9;
+}
+
+message CreateAccountRequest {
+	google.protobuf.StringValue user_id = 1;
+	google.protobuf.StringValue user_type = 2;
+	google.protobuf.DoubleValue balance = 3;
+	google.protobuf.StringValue currency = 4;
+	map<string, double> income = 5;
+	google.protobuf.StringValue description = 6;
+}
+
+message CreateAccountResponse {
+	google.protobuf.StringValue user_id = 1;
+}
+
+message DescribeAccountsRequest {
+	google.protobuf.StringValue user_id = 1;
+	google.protobuf.StringValue user_type = 2;
+	google.protobuf.StringValue sort_key = 3;
+	google.protobuf.BoolValue reverse = 4;
+	uint32 offset = 5;
+	uint32 limit = 6;
+}
+
+message DescribeAccountsResponse {
+	uint32 total_count = 1;
+	repeated Account account_set = 2;
+}
+
+message ModifyAccountRequest {
+	google.protobuf.StringValue user_id = 1;
+	google.protobuf.StringValue user_type = 2;
+	google.protobuf.DoubleValue balance = 3;
+	google.protobuf.StringValue currency = 4;
+	map<string, double> income = 5;
+	google.protobuf.StringValue description = 6;
+}
+
+message ModifyAccountResponse {
+	google.protobuf.StringValue user_id = 1;
+}
+
+message DeleteAccountsRequest {
+	repeated string user_ids = 1;
+}
+
+message DeleteAccountsResponse {
+	repeated string user_ids = 1;
+}
+
+message Recharge {
+	google.protobuf.StringValue recharge_id = 1;
+	google.protobuf.StringValue user_id = 2;
+	google.protobuf.DoubleValue balance = 3;
+	google.protobuf.StringValue currency = 4;
+	google.protobuf.StringValue status = 5;
+	google.protobuf.Timestamp create_time = 6;
+	google.protobuf.StringValue description = 7;
+}
+
+message CreateRechargeRequest {
+	google.protobuf.StringValue user_id = 1;
+	google.protobuf.DoubleValue balance = 2;
+	google.protobuf.StringValue currency = 3;
+	google.protobuf.StringValue description = 4;
+}
+
+message CreateRechargeResponse {
+	google.protobuf.StringValue recharge_id = 1;
+}
+
+message DescribeRechargesRequest {
+	google.protobuf.StringValue recharge_id = 1;
+	google.protobuf.StringValue user_id = 2;
+	uint32 offset = 3;
+	uint32 limit = 4;
+}
+
+message DescribeRechargesResponse {
+	uint32 total_count = 1;
+	repeated Recharge recharge_set = 2;
 }
 
 message Income {
@@ -369,43 +435,42 @@ message DescribeWithdrawsResponse {
 	repeated Withdraw withdraw_set = 2;
 }
 
-service OperationManager {
-	rpc CreatePrice (CreatePriceRequest) returns (CreatePriceResponse) {
+service ChargingManager {
+	rpc Charge (LeasingContract) returns (CommonChargingResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "create price of the sku with metering_attribute"
-        };
-		option (google.api.http) = {
-            post: "/v1/billing/price"
-            body: "*"
-        };
-	}
-
-	rpc DescribePrices (DescribePricesRequest) returns (DescribePricesResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "describe prices"
+			summary: "charging about the leasing_contract"
 		};
 		option (google.api.http) = {
-			get: "/v1/billing/prices"
-		};
-	}
-
-	rpc ModifyPrice (ModifyPriceRequest) returns (ModifyPriceResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "modify price"
-		};
-		option (google.api.http) = {
-			put: "/v1/billing/price"
+			post: "/v1/charging/charging"
 			body: "*"
 		};
 	}
 
-	rpc DeletePrices (DeletePricesRequest) returns (DeletePricesResponse) {
+	rpc DescribeChargings (DescribeChargesRequest) returns (DescribeChargesResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "delete prices"
+			summary: "describe chargings"
 		};
 		option (google.api.http) = {
-			delete: "/v1/billing/prices"
+			get: "/v1/charging/chargings"
+		};
+	}
+
+	rpc Refund (LeasingContract) returns (CommonChargingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "refund about the leasing_contract"
+		};
+		option (google.api.http) = {
+			post: "/v1/charging/refund"
 			body: "*"
+		};
+	}
+
+	rpc DescribeRefunds (DescribeRefundsRequest) returns (DescribeRefundsResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "describe refunds"
+		};
+		option (google.api.http) = {
+			get: "/v1/charging/refunds"
 		};
 	}
 
@@ -414,7 +479,7 @@ service OperationManager {
 			summary: "create account"
 		};
 		option (google.api.http) = {
-			post: "/v1/billing/account"
+			post: "/v1/charging/account"
 			body: "*"
 		};
 	}
@@ -424,16 +489,16 @@ service OperationManager {
 			summary: "describe accounts"
 		};
 		option (google.api.http) = {
-			get: "/v1/billing/accounts"
+			get: "/v1/charging/accounts"
 		};
 	}
 
 	rpc ModifyAccount (ModifyAccountRequest) returns (ModifyAccountResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "modify  account"
+			summary: "modify account"
 		};
 		option (google.api.http) = {
-			put: "/v1/billing/account"
+			put: "/v1/charging/account"
 			body: "*"
 		};
 	}
@@ -443,26 +508,8 @@ service OperationManager {
 			summary: "delete accounts"
 		};
 		option (google.api.http) = {
-			delete: "/v1/billing/accounts"
+			delete: "/v1/charging/accounts"
 			body: "*"
-		};
-	}
-
-	rpc DescribeLeasingContracts (DescribeLeasingContractsRequest) returns (DescribeLeasingContractsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "describe leasing_contract"
-		};
-		option (google.api.http) = {
-			get: "/v1/billing/leasing/contracts"
-		};
-	}
-
-	rpc DescribeLeasedContracts (DescribeLeasedContractsRequest) returns (DescribeLeasedContractsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "describe leased_contract"
-		};
-		option (google.api.http) = {
-			get: "/v1/billing/leased/contracts"
 		};
 	}
 
@@ -471,7 +518,7 @@ service OperationManager {
 			summary: "recharge for user"
 		};
 		option (google.api.http) = {
-			post: "/v1/billing/recharge"
+			post: "/v1/charging/recharge"
 			body: "*"
 		};
 	}
@@ -481,25 +528,7 @@ service OperationManager {
 			summary: "describe recharges"
 		};
 		option (google.api.http) = {
-			get: "/v1/billing/recharges"
-		};
-	}
-
-	rpc DescribeCharges (DescribeChargesRequest) returns (DescribeChargesResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "describe charges"
-		};
-		option (google.api.http) = {
-			get: "/v1/billing/charges"
-		};
-	}
-
-	rpc DescribeRefunds (DescribeRefundsRequest) returns (DescribeRefundsResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "describe refunds"
-		};
-		option (google.api.http) = {
-			get: "/v1/billing/refunds"
+			get: "/v1/charging/recharges"
 		};
 	}
 
@@ -508,7 +537,7 @@ service OperationManager {
 			summary: "describe incomes"
 		};
 		option (google.api.http) = {
-			get: "/v1/billing/incomes"
+			get: "/v1/charging/incomes"
 		};
 	}
 
@@ -517,7 +546,7 @@ service OperationManager {
 			summary: "create withdraw"
 		};
 		option (google.api.http) = {
-			post: "/v1/billing/withdraw"
+			post: "/v1/charging/withdraw"
 		};
 	}
 
@@ -526,7 +555,7 @@ service OperationManager {
 			summary: "describe withdraws"
 		};
 		option (google.api.http) = {
-			get: "/v1/billing/withdraws"
+			get: "/v1/charging/withdraws"
 		};
 	}
 }
@@ -593,101 +622,14 @@ service BillingManager {
 
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////
-////////////////////////// Billing Backend APIs //////////////////////////////////////
-//////////////////////////        Start         //////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
-
-message Context {
-	//context.Context
-}
-
-message CreateLeasingContractRequest {
-	google.protobuf.StringValue leasing_id = 1;
-	google.protobuf.StringValue resource_id = 2;
-	google.protobuf.StringValue sku_id = 3;
-	google.protobuf.StringValue user_id = 4;
-	map<string, double> metering_values = 5;
-	google.protobuf.Timestamp start_time = 6;
-}
-
-message CreateLeasingContractResponse {
-	google.protobuf.StringValue contract_id = 1;
-}
-
-message CalculateRequest {
-	Context ctx = 1;
-	Leasing leasing = 2;
-	LeasingContract leaing_contract = 3;
-}
-
-message LeasingContractOperationRequest {
-	Context ctx = 1;
-	LeasingContract leaing_contract = 2;
-}
-
-service BillingBackendManager {
-
-	rpc CreateLeasingContract (CreateLeasingContractRequest) returns (CreateLeasingContractResponse) {}
-
-	rpc Calculate (CalculateRequest) returns (LeasingContract) {}
-
-	rpc DeductCoupon (LeasingContractOperationRequest) returns (LeasingContract) {}
-
-	rpc RefundCoupon (LeasingContractOperationRequest) returns (LeasingContract) {}
-
-	rpc CreateCharge (LeasingContractOperationRequest) returns (LeasingContract) {}
-
-	rpc CreateRefund (LeasingContractOperationRequest) returns (LeasingContract) {}
-
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-////////////////////////// 			End         //////////////////////////////////////
-////////////////////////// Billing Backend APIs //////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
-
-
-//*************************************************************
-//******************** ChargeManager ***********************
-//*************************************************************
-
-message CommonChargingResponse {
-    google.protobuf.StringValue contract_id = 1;
-}
-
-service ChargingManager {
-	rpc Charge (LeasingContract) returns (CommonChargingResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "charging about the leasing_contract"
-		};
-		option (google.api.http) = {
-			post: "/v1/charging"
-			body: "*"
-		};
-	}
-
-	rpc Refund (LeasingContract) returns (CommonChargingResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "refund about the leasing_contract"
-		};
-		option (google.api.http) = {
-			post: "/v1/refund"
-			body: "*"
-		};
-	}
-}
-
-
 //*************************************************************************
-//*************************** Promotion ***********************************
+//*************************** Promotion Operation *************************
 //*************************************************************************
 //combination_price
 message CombinationPrice {
-    google.protobuf.StringValue combination_price_id = 1;
-    google.protobuf.StringValue combination_sku_id = 2;
-    google.protobuf.StringValue attribute_id = 3;
+	google.protobuf.StringValue combination_price_id = 1;
+	google.protobuf.StringValue combination_sku_id = 2;
+	google.protobuf.StringValue attribute_id = 3;
 	map<int64, double> prices = 4;
 	Currency currency = 5;
 	google.protobuf.StringValue status = 6;
@@ -803,18 +745,18 @@ message DeleteProbationsResponse {
 
 //Discount
 message Discount {
-    google.protobuf.StringValue discount_id = 1;
-    google.protobuf.StringValue name = 2;
+	google.protobuf.StringValue discount_id = 1;
+	google.protobuf.StringValue name = 2;
 	repeated string limit_ids = 3; //the ids of limit spu/sku/price, distinguish them by prefix.
-    google.protobuf.DoubleValue discount_value = 4; //cut down value
-    google.protobuf.DoubleValue discount_percent = 5; //cut down percent
+	google.protobuf.DoubleValue discount_value = 4; //cut down value
+	google.protobuf.DoubleValue discount_percent = 5; //cut down percent
 	google.protobuf.StringValue status = 6;
 	google.protobuf.StringValue owner = 7;
-    google.protobuf.Timestamp start_time = 8;
-    google.protobuf.Timestamp end_time = 9;
-    google.protobuf.Timestamp create_time = 10;
-    google.protobuf.Timestamp status_time = 11;
-    google.protobuf.StringValue description = 12;
+	google.protobuf.Timestamp start_time = 8;
+	google.protobuf.Timestamp end_time = 9;
+	google.protobuf.Timestamp create_time = 10;
+	google.protobuf.Timestamp status_time = 11;
+	google.protobuf.StringValue description = 12;
 
 }
 
@@ -872,20 +814,20 @@ message DeleteDiscountsResponse {
 }
 
 message Coupon {
-    google.protobuf.StringValue coupon_id = 1;
-    google.protobuf.StringValue name = 2;
-    google.protobuf.StringValue owner = 3;
+	google.protobuf.StringValue coupon_id = 1;
+	google.protobuf.StringValue name = 2;
+	google.protobuf.StringValue owner = 3;
 	repeated string limit_ids = 4; //the ids of limit spu/sku/price, distinguish them by prefix.
-    google.protobuf.DoubleValue balance = 5;
-    google.protobuf.UInt32Value count = 6;
-    google.protobuf.UInt32Value remain = 7; //remain num of coupon
-    google.protobuf.UInt32Value limit_num_per = 8;
+	google.protobuf.DoubleValue balance = 5;
+	google.protobuf.UInt32Value count = 6;
+	google.protobuf.UInt32Value remain = 7; //remain num of coupon
+	google.protobuf.UInt32Value limit_num_per = 8;
 	google.protobuf.StringValue status = 9;
 	google.protobuf.Timestamp start_time = 10;
 	google.protobuf.Timestamp end_time = 11;
 	google.protobuf.Timestamp create_time = 12;
 	google.protobuf.Timestamp status_time = 13;
-    google.protobuf.StringValue description = 14;
+	google.protobuf.StringValue description = 14;
 }
 
 message CreateCouponRequest {
@@ -944,9 +886,9 @@ message DeleteCouponsResponse {
 }
 
 message CouponReceived {
-    google.protobuf.StringValue coupon_received_id = 1;
-    google.protobuf.StringValue coupon_id = 2;
-    google.protobuf.StringValue user_id = 3;
+	google.protobuf.StringValue coupon_received_id = 1;
+	google.protobuf.StringValue coupon_id = 2;
+	google.protobuf.StringValue user_id = 3;
 	google.protobuf.DoubleValue remain = 4; //remain balance of coupon
 	google.protobuf.StringValue status = 5;
 	google.protobuf.Timestamp create_time = 6;
@@ -985,7 +927,7 @@ message DeleteCouponReceivedsResponse {
 	repeated string coupon_received_ids = 1;
 }
 
-service PromotionManager {
+service PromotionOperationManager {
 	rpc CreateCombinationPrice (CreateCombinationPriceRequest) returns (CreateCombinationPriceResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "create combination price of combination sku"
@@ -1181,6 +1123,10 @@ message BillingTaskResponse {
 	google.protobuf.StringValue task_id = 1;
 }
 
+message ChargingTaskResponse {
+	google.protobuf.StringValue task_id = 1;
+}
+
 service BillingTaskManager {
 	rpc InitBillingTask (Leasing) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -1251,5 +1197,81 @@ service BillingTaskManager {
 			body: "*"
 		};
 	}
+}
+
+service ChargingTaskManager {
+	rpc CreateChargingTask(LeasingContract) returns (ChargingTaskResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "charging about the leasing_contract"
+		};
+		option (google.api.http) = {
+			delete: "/v1/task/charging"
+			body: "*"
+		};
+	}
+
+	rpc CreateRefundTask(LeasingContract) returns (ChargingTaskResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "refund about the leasing_contract"
+		};
+		option (google.api.http) = {
+			delete: "/v1/task/refund"
+			body: "*"
+		};
+	}
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////// Billing Backend APIs //////////////////////////////////////
+//////////////////////////        Start         //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
+message Context {
+	//context.Context
+}
+
+message CreateLeasingContractRequest {
+	google.protobuf.StringValue leasing_id = 1;
+	google.protobuf.StringValue resource_id = 2;
+	google.protobuf.StringValue sku_id = 3;
+	google.protobuf.StringValue user_id = 4;
+	map<string, double> metering_values = 5;
+	google.protobuf.Timestamp start_time = 6;
+}
+
+message CreateLeasingContractResponse {
+	google.protobuf.StringValue contract_id = 1;
+}
+
+message CalculateRequest {
+	Context ctx = 1;
+	Leasing leasing = 2;
+	LeasingContract leaing_contract = 3;
+}
+
+message LeasingContractOperationRequest {
+	Context ctx = 1;
+	LeasingContract leaing_contract = 2;
+}
+
+service BillingBackendManager {
+
+	rpc CreateLeasingContract (CreateLeasingContractRequest) returns (CreateLeasingContractResponse) {}
+
+	rpc Calculate (CalculateRequest) returns (LeasingContract) {}
+
+	rpc DeductCoupon (LeasingContractOperationRequest) returns (LeasingContract) {}
+
+	rpc RefundCoupon (LeasingContractOperationRequest) returns (LeasingContract) {}
+
+	rpc CreateCharge (LeasingContractOperationRequest) returns (LeasingContract) {}
+
+	rpc CreateRefund (LeasingContractOperationRequest) returns (LeasingContract) {}
 
 }
+
+//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////// 			End         //////////////////////////////////////
+////////////////////////// Billing Backend APIs //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////

@@ -10,37 +10,30 @@ import (
 
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
-	"openpitrix.io/openpitrix/pkg/util/pbutil"
 )
 
-func (s *Server) CreatePrice(ctx context.Context, req *pb.CreatePriceRequest) (*pb.CreatePriceResponse, error) {
-	price := models.PbToPrice(req)
-
-	//TODO: how to check skuId and attributeId
-
-	//insert price
-	err := insertPrice(ctx, price)
-	if err != nil {
-		return nil, internalError(ctx, err)
-	}
-	return &pb.CreatePriceResponse{PriceId: pbutil.ToProtoString(price.PriceId)}, nil
+func (s *Server) UpdateBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+	//TODO: impl
+	return &pb.CommonBillingResponse{}, nil
+}
+func (s *Server) StopBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+	//TODO: impl
+	return &pb.CommonBillingResponse{}, nil
+}
+func (s *Server) InitBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+	//TODO: impl
+	return &pb.CommonBillingResponse{}, nil
+}
+func (s *Server) StartBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+	//TODO: impl
+	return &pb.CommonBillingResponse{}, nil
+}
+func (s *Server) TerminateBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+	//TODO: impl
+	return &pb.CommonBillingResponse{}, nil
 }
 
-func (s *Server) DescribePrices(ctx context.Context, req *pb.DescribePricesRequest) (*pb.DescribePricesResponse, error) {
-	//TODO: impl DescribePrices
-	return &pb.DescribePricesResponse{}, nil
-}
-
-func (s *Server) ModifyPrice(ctx context.Context, req *pb.ModifyPriceRequest) (*pb.ModifyPriceResponse, error) {
-	//TODO: impl ModifyPrice
-	return &pb.ModifyPriceResponse{}, nil
-}
-
-func (s *Server) DeletePrices(ctx context.Context, req *pb.DeletePricesRequest) (*pb.DeletePricesResponse, error) {
-	//TODO: impl DeletePrices
-	return &pb.DeletePricesResponse{}, nil
-}
-
+////////////////// BillingBackendService //////////////////////////////
 type Metering struct {
 	LeasingId      string
 	ReourceId      string
