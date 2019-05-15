@@ -28,6 +28,6 @@ func TaskServe(cfg *config.Config) {
 	manager.NewGrpcServer(constants.MbingTaskManagerHost, constants.MbingTaskManagerPort).
 		ShowErrorCause(cfg.Grpc.ShowErrorCause).
 		Serve(func(server *grpc.Server) {
-			pb.RegisterMbingTaskManagerServer(server, &s)
+			pb.RegisterMeteringTaskManagerServer(server, s)
 		})
 }

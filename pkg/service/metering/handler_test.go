@@ -115,8 +115,8 @@ func TestDescribeAttributeNames(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	} else {
-		t.Logf("Describe %d AttributeNames: ", len(res.AttributeNames))
-		for _, attName := range res.AttributeNames {
+		t.Logf("Describe %d AttributeNames: ", len(res.AttributeNameSet))
+		for _, attName := range res.AttributeNameSet {
 			t.Logf("attribute_name_id: %s, name: %s",
 				attName.GetAttributeNameId().GetValue(),
 				attName.GetName().GetValue())
@@ -157,8 +157,8 @@ func TestDescribeAttributeUnits(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	} else {
-		t.Logf("List %d Attribute_units: ", len(res.AttributeUnits))
-		for _, attUnit := range res.AttributeUnits {
+		t.Logf("List %d Attribute_units: ", len(res.AttributeUnitSet))
+		for _, attUnit := range res.AttributeUnitSet {
 			t.Logf("attribute_unit_id: %s, unit_name: %s",
 				attUnit.GetAttributeUnitId().GetValue(),
 				attUnit.GetName().GetValue())
@@ -194,8 +194,8 @@ func TestCreateAttribute(t *testing.T) {
 		t.Run("CreateAttribute", testCreateAttributeFunc(tAtt[ATTRIBUTE_NAME],
 			tAtt[UNIT_NAME],
 			tAtt[VALUE],
-			attNames.AttributeNames,
-			attUnits.AttributeUnits))
+			attNames.AttributeNameSet,
+			attUnits.AttributeUnitSet))
 	}
 	t.Logf("Create %d attributes Successfully.", len(test_attributes))
 
@@ -253,8 +253,8 @@ func TestDescribeAttributes(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	} else {
-		t.Logf("List %d Attributes: ", len(res.Attributes))
-		for _, att := range res.Attributes {
+		t.Logf("List %d Attributes: ", len(res.AttributeSet))
+		for _, att := range res.AttributeSet {
 			t.Logf("attribute_id: %s, attribute_name_id: %s, "+
 				"attribute_unit_id: %s, value: %s",
 				att.GetAttributeId().GetValue(),

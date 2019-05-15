@@ -6,15 +6,31 @@ package metering
 
 import (
 	"context"
-	"fmt"
-	"time"
 
-	"openpitrix.io/openpitrix/pkg/constants"
-	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 )
 
-func (s *TaskServer) InitMeteringTask(ctx context.Context, req *pb.) (*pb.CommonMeteringResponse, error) {
+func (ts *TaskServer) InitMeteringTask(ctx context.Context, req *pb.InitMeteringRequest) (*pb.MeteringTaskResponse, error) {
 	///TODO: impl
+	return &pb.MeteringTaskResponse{}, nil
 }
 
+func (ts *TaskServer) UpdateMeteringTask(ctx context.Context, req *pb.UpdateMeteringRequest) (*pb.MeteringTaskResponse, error) {
+	///TODO: impl
+	return &pb.MeteringTaskResponse{}, nil
+}
+
+func (ts *TaskServer) StopMeteringsTask(ctx context.Context, req *pb.StopMeteringsRequest) (*pb.MeteringTaskResponse, error) {
+	///TODO: impl
+	return &pb.MeteringTaskResponse{}, nil
+}
+
+func (ts *TaskServer) StartMeteringsTask(ctx context.Context, req *pb.StartMeteringsRequest) (*pb.MeteringTaskResponse, error) {
+	///TODO: impl
+	return &pb.MeteringTaskResponse{}, nil
+}
+
+func (ts *TaskServer) TerminateMeteringsTask(ctx context.Context, req *pb.TerminateMeteringsRequest) (*pb.MeteringTaskResponse, error) {
+	///TODO: impl
+	return &pb.MeteringTaskResponse{}, nil
+}

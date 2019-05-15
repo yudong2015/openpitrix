@@ -1232,7 +1232,7 @@ service BillingTaskManager {
 		};
 	}
 
-	rpc ChargingTask(LeasingContract) returns (BillingTaskResponse) {
+	rpc CreateChargingTask(LeasingContract) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "charging about the leasing_contract"
 		};
@@ -1242,7 +1242,7 @@ service BillingTaskManager {
 		};
 	}
 
-	rpc RefundTask(LeasingContract) returns (BillingTaskResponse) {
+	rpc CreateRefundTask(LeasingContract) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "refund about the leasing_contract"
 		};

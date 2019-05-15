@@ -2,15 +2,15 @@
 // Use of this source code is governed by a Apache license
 // that can be found in the LICENSE file.
 
-//openpitrix mbing task manager
+//openpitrix metering manager
 package main
 
 import (
 	"openpitrix.io/openpitrix/pkg/config"
-	"openpitrix.io/openpitrix/pkg/service/billing"
+	"openpitrix.io/openpitrix/pkg/service/metering"
 )
 
 func main() {
 	cfg := config.LoadConf()
-	billing.TaskServe(cfg)
+	metering.Serve(cfg)
 }
