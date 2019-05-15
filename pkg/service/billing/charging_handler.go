@@ -11,9 +11,19 @@ import (
 	"openpitrix.io/openpitrix/pkg/pb"
 )
 
+func (s *Server) Charge(ctx context.Context, req *pb.LeasingContract) (*pb.ChargeResponse, error) {
+	//TODO: impl
+	return &pb.ChargeResponse{}, nil
+}
+
 func (s *Server) DescribeCharges(ctx context.Context, req *pb.DescribeChargesRequest) (*pb.DescribeChargesResponse, error) {
 	//TODO: impl DescribeCharges
 	return &pb.DescribeChargesResponse{}, nil
+}
+
+func (s *Server) Refund(ctx context.Context, req *pb.LeasingContract) (*pb.RefundResponse, error) {
+	//TODO: impl
+	return &pb.RefundResponse{}, nil
 }
 
 func (s *Server) DescribeRefunds(ctx context.Context, req *pb.DescribeRefundsRequest) (*pb.DescribeRefundsResponse, error) {
@@ -41,11 +51,6 @@ func (s *Server) DeleteAccounts(ctx context.Context, req *pb.DeleteAccountsReque
 	return &pb.DeleteAccountsResponse{}, nil
 }
 
-func (s *Server) DescribeIncomes(ctx context.Context, req *pb.DescribeIncomesRequest) (*pb.DescribeIncomesResponse, error) {
-	//TODO: impl DescribeIncomes
-	return &pb.DescribeIncomesResponse{}, nil
-}
-
 func (s *Server) CreateRecharge(ctx context.Context, req *pb.CreateRechargeRequest) (*pb.CreateRechargeResponse, error) {
 	//TODO: impl CreateRecharge
 	return &pb.CreateRechargeResponse{}, nil
@@ -54,6 +59,11 @@ func (s *Server) CreateRecharge(ctx context.Context, req *pb.CreateRechargeReque
 func (s *Server) DescribeRecharges(ctx context.Context, req *pb.DescribeRechargesRequest) (*pb.DescribeRechargesResponse, error) {
 	//TODO: impl DescribeRecharges
 	return &pb.DescribeRechargesResponse{}, nil
+}
+
+func (s *Server) DescribeIncomes(ctx context.Context, req *pb.DescribeIncomesRequest) (*pb.DescribeIncomesResponse, error) {
+	//TODO: impl DescribeIncomes
+	return &pb.DescribeIncomesResponse{}, nil
 }
 
 func (s *Server) CreateWithdraw(ctx context.Context, req *pb.CreateWithdrawRequest) (*pb.CreateWithdrawResponse, error) {

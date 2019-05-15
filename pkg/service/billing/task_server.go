@@ -32,5 +32,6 @@ func TaskServe(cfg *config.Config) {
 		Serve(func(server *grpc.Server) {
 			pb.RegisterMeteringTaskManagerServer(server, s.TaskServer)
 			pb.RegisterBillingTaskManagerServer(server, s)
+			pb.RegisterChargingTaskManagerServer(server, s)
 		})
 }

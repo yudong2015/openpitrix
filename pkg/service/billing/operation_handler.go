@@ -40,55 +40,13 @@ func (s *Server) DeletePrices(ctx context.Context, req *pb.DeletePricesRequest) 
 	return &pb.DeletePricesResponse{}, nil
 }
 
-func (s *Server) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest) (*pb.CreateAccountResponse, error){
-	//TODO: impl
-	return &pb.CreateAccountResponse{UserId: pbutil.ToProtoString("init_user")}, nil
-}
-
-func (s *Server) DescribeAccounts(ctx context.Context, req *pb.DescribeAccountsRequest) (*pb.DescribeAccountsResponse, error){
-	//TODO: impl
-}
-
-func (s *Server) ModifyAccount(ctx context.Context, req *pb.ModifyAccountRequest) (*pb.ModifyAccountResponse, error){
-	//TODO: impl
-}
-
-func (s *Server) DeleteAccounts(ctx context.Context, req *pb.DeleteAccountsRequest) (*pb.DeleteAccountsResponse, error){
-	//TODO: impl
-}
-
 func (s *Server) DescribeLeasingContracts(ctx context.Context, req *pb.DescribeLeasingContractsRequest) (*pb.DescribeLeasingContractsResponse, error){
 	//TODO: impl
+	return &pb.DescribeLeasingContractsResponse{}, nil
 }
 
 func (s *Server) DescribeLeasedContracts(ctx context.Context, req *pb.DescribeLeasedContractsRequest) (*pb.DescribeLeasedContractsResponse, error){
 	//TODO: impl
+	return &pb.DescribeLeasedContractsResponse{}, nil
 }
 
-func (s *Server) CreateRecharge(ctx context.Context, req *pb.CreateRechargeRequest) (*pb.CreateRechargeResponse, error){
-	//TODO: impl
-}
-
-func (s *Server) DescribeRecharges(ctx context.Context, req *pb.DescribeRechargesRequest) (*pb.DescribeRechargesResponse, error){
-	//TODO: impl
-}
-
-func (s *Server) DescribeCharges(ctx context.Context, req *pb.DescribeChargesRequest) (*pb.DescribeChargesResponse, error){
-	//TODO: impl
-}
-
-func (s *Server) DescribeRefunds(ctx context.Context, req *pb.DescribeRefundsRequest) (*pb.DescribeRefundsResponse, error){
-	//TODO: impl
-}
-
-func (s *Server) DescribeIncomes(ctx context.Context, req *pb.DescribeIncomesRequest) (*pb.DescribeIncomesResponse, error){
-	//TODO: impl
-}
-
-func (s *Server) CreateWithdraw(ctx context.Context, req *pb.CreateWithdrawRequest) (*pb.CreateWithdrawResponse, error){
-	//TODO: impl
-}
-
-func (s *Server) DescribeWithdraws(ctx context.Context, req *pb.DescribeWithdrawsRequest) (*pb.DescribeWithdrawsResponse, error){
-	//TODO: impl
-}

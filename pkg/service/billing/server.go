@@ -28,8 +28,9 @@ func Serve(cfg *config.Config) {
 	manager.NewGrpcServer(constants.BillingManagerHost, constants.BillingManagerPort).
 		ShowErrorCause(cfg.Grpc.ShowErrorCause).
 		Serve(func(server *grpc.Server) {
-			pb.RegisterBillingManagerServer(server, s)
 			pb.RegisterOperationManagerServer(server, s)
-			pb.RegisterPromotionManagerServer(server, s)
+			pb.RegisterBillingManagerServer(server,s)
+			pb.RegisterChargingManagerServer(server, s)
+			pb.RegisterPromotionOperationManagerServer(server, s)
 		})
 }

@@ -10,6 +10,7 @@ import (
 	"openpitrix.io/openpitrix/pkg/pb"
 )
 
+//billing task impl
 func (ts TaskServer) InitBillingTask(ctx context.Context, req *pb.Leasing) (*pb.BillingTaskResponse, error) {
 	//TODO: impl
 	return &pb.BillingTaskResponse{}, nil
@@ -35,12 +36,14 @@ func (ts TaskServer) TerminateBillingTask(ctx context.Context, req *pb.Leasing) 
 	return &pb.BillingTaskResponse{}, nil
 }
 
-func (ts TaskServer) ChargingTask(ctx context.Context, req *pb.LeasingContract) (*pb.BillingTaskResponse, error) {
+
+//charging task impl
+func (ts TaskServer) CreateChargingTask(ctx context.Context, req *pb.LeasingContract) (*pb.ChargingTaskResponse, error) {
 	//TODO: impl
-	return &pb.BillingTaskResponse{}, nil
+	return &pb.ChargingTaskResponse{}, nil
 }
 
-func (ts TaskServer) RefundTask(ctx context.Context, req *pb.LeasingContract) (*pb.BillingTaskResponse, error) {
+func (ts TaskServer) CreateRefundTask(ctx context.Context, req *pb.LeasingContract) (*pb.ChargingTaskResponse, error) {
 	//TODO: impl
-	return &pb.BillingTaskResponse{}, nil
+	return &pb.ChargingTaskResponse{}, nil
 }

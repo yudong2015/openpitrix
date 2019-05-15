@@ -240,6 +240,11 @@ message Charge {
 	google.protobuf.Timestamp status_time = 8;
 }
 
+message ChargeResponse {
+	google.protobuf.StringValue charge_id = 1;
+}
+
+
 message DescribeChargesRequest {
 	google.protobuf.StringValue charge_id = 1;
 	google.protobuf.StringValue contract_id = 2;
@@ -265,6 +270,10 @@ message Refund {
 	google.protobuf.Timestamp create_time = 7;
 }
 
+message RefundResponse {
+	google.protobuf.StringValue refund_id = 1;
+}
+
 message DescribeRefundsRequest {
 	google.protobuf.StringValue refund_id = 1;
 	google.protobuf.StringValue contract_id = 2;
@@ -278,10 +287,6 @@ message DescribeRefundsRequest {
 message DescribeRefundsResponse {
 	uint32 total_count = 1;
 	repeated Refund refund_set = 2;
-}
-
-message CommonChargingResponse {
-	google.protobuf.StringValue contract_id = 1;
 }
 
 message Account {
@@ -436,7 +441,7 @@ message DescribeWithdrawsResponse {
 }
 
 service ChargingManager {
-	rpc Charge (LeasingContract) returns (CommonChargingResponse) {
+	rpc Charge (LeasingContract) returns (ChargeResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "charging about the leasing_contract"
 		};
@@ -446,7 +451,7 @@ service ChargingManager {
 		};
 	}
 
-	rpc DescribeChargings (DescribeChargesRequest) returns (DescribeChargesResponse) {
+	rpc DescribeCharges (DescribeChargesRequest) returns (DescribeChargesResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "describe chargings"
 		};
@@ -455,7 +460,7 @@ service ChargingManager {
 		};
 	}
 
-	rpc Refund (LeasingContract) returns (CommonChargingResponse) {
+	rpc Refund (LeasingContract) returns (RefundResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "refund about the leasing_contract"
 		};
@@ -1174,26 +1179,6 @@ service BillingTaskManager {
 		};
 		option (google.api.http) = {
 			delete: "/v1/task/billing"
-			body: "*"
-		};
-	}
-
-	rpc CreateChargingTask(LeasingContract) returns (BillingTaskResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "charging about the leasing_contract"
-		};
-		option (google.api.http) = {
-			delete: "/v1/task/charging"
-			body: "*"
-		};
-	}
-
-	rpc CreateRefundTask(LeasingContract) returns (BillingTaskResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "refund about the leasing_contract"
-		};
-		option (google.api.http) = {
-			delete: "/v1/task/refund"
 			body: "*"
 		};
 	}
