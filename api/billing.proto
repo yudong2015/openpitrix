@@ -653,10 +653,30 @@ service BillingBackendManager {
 //******************** ChargeManager ***********************
 //*************************************************************
 
-service ChargingManager {
-	rpc CreateCharge (LeasingContract) returns (LeasingContract) {}
+message CommonChargingResponse {
+    google.protobuf.StringValue contract_id = 1;
+}
 
-	rpc CreateRefund (LeasingContract) returns (LeasingContract) {}
+service ChargingManager {
+	rpc CreateCharge (LeasingContract) returns (CommonChargingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "charging about the leasing_contract"
+		};
+		option (google.api.http) = {
+			post: "/v1/charging"
+			body: "*"
+		};
+	}
+
+	rpc CreateRefund (LeasingContract) returns (CommonChargingResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "refund about the leasing_contract"
+		};
+		option (google.api.http) = {
+			post: "/v1/refund"
+			body: "*"
+		};
+	}
 }
 
 
@@ -1157,57 +1177,79 @@ service PromotionManager {
 //*************************** MbingTaskManager ****************************
 //*************************************************************************
 
+message BillingTaskResponse {
+	google.protobuf.StringValue task_id = 1;
+}
+
 service MbingTaskManager {
-	rpc InitBilling (Leasing) returns (CommonBillingResponse) {
+	rpc InitBillingTask (Leasing) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "init billing about the leasing"
 		};
 		option (google.api.http) = {
-			post: "/v1/billing"
+			post: "/v1/task/billing"
 			body: "*"
 		};
 	}
 
-	rpc UpdateBilling (Leasing) returns (CommonBillingResponse) {
+	rpc UpdateBillingTask (Leasing) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "update billing about the leasing"
 		};
 		option (google.api.http) = {
-			put: "/v1/billing"
+			put: "/v1/task/billing"
 			body: "*"
 		};
 	}
 
-	rpc StopBilling (Leasing) returns (CommonBillingResponse) {
+	rpc StopBillingTask (Leasing) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "stop billing about the leasing"
 		};
 		option (google.api.http) = {
-			put: "/v1/billing/stop"
+			put: "/v1/task/billing/stop"
 			body: "*"
 		};
 	}
 
-	rpc StartBilling (Leasing) returns (CommonBillingResponse) {
+	rpc StartBillingTask (Leasing) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "start billing that stoped befor"
 		};
 		option (google.api.http) = {
-			put: "/v1/billing/start"
+			put: "/v1/task/billing/start"
 			body: "*"
 		};
 	}
 
-	rpc TerminateBilling (Leasing) returns (CommonBillingResponse) {
+	rpc TerminateBillingTask (Leasing) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "stop billing about the leasing"
 		};
 		option (google.api.http) = {
-			delete: "/v1/billing"
+			delete: "/v1/task/billing"
 			body: "*"
 		};
 	}
 
-	rpc Charge(LeasingContract) returns (MbingTaskResponse) {}
-	rpc Refund(LeasingContract) returns (MbingTaskResponse) {}
+	rpc ChargingTask(LeasingContract) returns (BillingTaskResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "charging about the leasing_contract"
+		};
+		option (google.api.http) = {
+			delete: "/v1/task/charging"
+			body: "*"
+		};
+	}
+
+	rpc RefundTask(LeasingContract) returns (BillingTaskResponse) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			summary: "refund about the leasing_contract"
+		};
+		option (google.api.http) = {
+			delete: "/v1/task/refund"
+			body: "*"
+		};
+	}
+
 }

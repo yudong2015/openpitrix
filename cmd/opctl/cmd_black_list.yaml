@@ -26,3 +26,10 @@
 - DescribeCombinationPrices
 - ModifyCombinationPrice
 - DeleteCombinationPrices
+- InitBillingTask
+- UpdateBillingTask
+- StopBillingTask
+- StartBillingTask
+- TerminateBillingTask
+- ChargingTask
+- RefundTask
