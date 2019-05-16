@@ -7,7 +7,6 @@ package metering
 import (
 	"context"
 
-	"openpitrix.io/openpitrix/pkg/etcd"
 	"openpitrix.io/openpitrix/pkg/pb"
 )
 
@@ -34,18 +33,4 @@ func (ts *TaskServer) StartMeteringsTask(ctx context.Context, req *pb.StartMeter
 func (ts *TaskServer) TerminateMeteringsTask(ctx context.Context, req *pb.TerminateMeteringsRequest) (*pb.MeteringTaskResponse, error) {
 	//TODO: impl
 	return &pb.MeteringTaskResponse{}, nil
-}
-
-type MultiQueue struct {
-	Queues []*etcd.Queue
-	Topic string
-	Size int
-}
-
-func (mq *MultiQueue) MutilEnqueue(val string, ) error {
-	return nil
-}
-
-func (mq *MultiQueue) MutilDequeue(val string, ) error {
-	return nil
 }
