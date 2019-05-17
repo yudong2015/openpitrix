@@ -836,7 +836,6 @@ service PromotionSkuManager {
 //*************************************************************************
 //********************* MbingTaskManager(Task Service) ********************
 //*************************************************************************
-
 message MeteringTaskResponse {
 	google.protobuf.StringValue task_id = 1;
 }
@@ -893,3 +892,21 @@ service MeteringTaskManager {
         };
 	}
 }
+
+//*************************************************************************
+//********************* TaskRunnerManager(Task Runner) ********************
+//*************************************************************************
+
+message RunTaskRequest {
+	google.protobuf.StringValue task_id = 1;
+	google.protobuf.StringValue params = 2;
+}
+
+message RunTaskResponse {
+	google.protobuf.StringValue task_id = 1;
+}
+
+service TaskRunnerProviderManager {
+	rpc RunTask(RunTaskRequest) returns (RunTaskResponse);
+}
+

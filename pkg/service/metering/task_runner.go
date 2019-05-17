@@ -9,14 +9,20 @@ import (
 	"time"
 
 	"openpitrix.io/logger"
+	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/etcd"
+	"openpitrix.io/openpitrix/pkg/pi"
+	"openpitrix.io/openpitrix/pkg/util/jsonutil"
 	"openpitrix.io/openpitrix/pkg/util/yamlutil"
 )
 
 const (
 	TaskQueueNum   = 100
 	TaskQueueTopic = "/task/ids"
+	TaskQueueTopicFmt = TaskQueueTopic + "/%d"
 	TaskInfoDir    = "/task/infos"
+	TaskInfoFmt = TaskInfoDir + "/%s"
+	Runner = "node_01"
 )
 
 type TaskRunner struct {
@@ -33,11 +39,30 @@ type Task struct {
 	RetryTimes int
 }
 
+func NewTaskRunner() *TaskRunner {
+	e := pi.Global().Etcd(nil)
+	queques := []*etcd.Queue{}
+	for i := 0; i<TaskQueueNum; i++{
+		queques = append(queques, e.NewQueue(fmt.Sprintf(TaskQueueTopicFmt, i)))
+	}
+	return &TaskRunner{
+		etcd: e,
+		queues: queques,
+	}
+}
+
+func (t *Task) update() (string, error){
+	t.Runner = Runner
+	t.Status = constants.StatusRunning
+	b, err := jsonutil.Encode(t)
+	return string(b), err
+}
+
 func (tr *TaskRunner) getTaskInfo(taskId string) (*Task, error) {
 	task := &Task{}
 	//get task info
-	key := fmt.Sprintf("%s/%s", TaskInfoDir, taskId)
-	err := tr.etcd.DlockWithTimeout(key, 30*time.Second, func() error {
+	key := fmt.Sprintf(TaskInfoFmt, taskId)
+	err := tr.etcd.DlockWithTimeout(key, 60*time.Second, func() error {
 		get, e := tr.etcd.Get(nil, key)
 		if e != nil {
 			return e
@@ -47,6 +72,18 @@ func (tr *TaskRunner) getTaskInfo(taskId string) (*Task, error) {
 			logger.Debugf(nil, "The task info of %s is null!", taskId)
 		} else {
 			e = yamlutil.Decode(get.Kvs[0].Value, task)
+			if e != nil {
+				return e
+			}
+			//update task info to running
+			taskStr, e := task.update()
+			if e != nil {
+				return e
+			}
+			_, e = tr.etcd.Put(nil, key, string(taskStr))
+			if e != nil {
+				return e
+			}
 		}
 		return e
 	})
@@ -75,23 +112,34 @@ func (tr *TaskRunner) consumeTask(num int) (*Task, error) {
 	return tr.getTaskInfo(taskId)
 }
 
-func (tr *TaskRunner) running(task Task) error {
-	//TODO: curl
+func (tr *TaskRunner) run(task Task) error {
 	return nil
 }
 
-func (tr *TaskRunner) Run(num int) {
+func (tr *TaskRunner) done(task Task) {
+	key := fmt.Sprintf(TaskInfoFmt, task.Id)
+	tr.etcd.DlockWithTimeout(key, 60*time.Second, func() error {
+		_, err := tr.etcd.Delete(nil, key)
+		if err != nil {
+			logger.Errorf(nil, "Failed to update task[%s] to done: %+v", task.Id, err)
+		}
+		return err
+	})
+}
+
+func (tr *TaskRunner) Serve(num int) {
 	for {
 		task, err := tr.consumeTask(num)
 		if err != nil {
 			logger.Errorf(nil, "Failed to consume task: %+v", err)
 			//TODO: send alert email
 		}
-		err = tr.running(*task)
+		err = tr.run(*task)
 		if err != nil {
 			logger.Errorf(nil, "Failed to run task: %+v", err)
 			//TODO: send alert email
 		}
+		tr.done(*task)
 	}
 }
 
