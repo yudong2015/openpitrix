@@ -499,12 +499,22 @@ var (
 	}
 	ErrorNotExist = ErrorMessage{
 		Name: "%s_not_exist",
-		en: "%s(%s) not exist",
+		en:   "%s(%s) not exist",
 		zhCN: "%s(%s)不存在",
 	}
 	ErrorNotExistInOther = ErrorMessage{
 		Name: "%s_not_exist",
-		en: "%s not exist in %s",
+		en:   "%s not exist in %s",
 		zhCN: "%s里%s不存在",
+	}
+	ErrorCreateMbingTask = ErrorMessage{
+		Name: "Failed_create_mbing_task",
+		en:   "Failed to create mbing task",
+		zhCN: "创建计量计费任务失败",
+	}
+	ErrorPublishMbingTask = ErrorMessage{
+		Name: "Failed_publish_mbing_task",
+		en:   "Failed to publish mbing task",
+		zhCN: "创建计量计费任务失败",
 	}
 )

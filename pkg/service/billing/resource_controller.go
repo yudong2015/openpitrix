@@ -77,7 +77,7 @@ func insertLeasingContract(ctx context.Context, contract *models.LeasingContract
 	return nil
 }
 
-func getLeasingContract(ctx context.Context, contractId, leasingId string) (*models.LeasingContract, error){
+func getLeasingContract(ctx context.Context, contractId, leasingId string) (*models.LeasingContract, error) {
 	//TODO: impl
 	return &models.LeasingContract{}, nil
 }

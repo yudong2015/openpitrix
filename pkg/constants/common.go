@@ -27,7 +27,7 @@ const (
 	RuntimeProviderManagerHost = prefix + "rp-manager"
 	MeteringManagerHost        = prefix + "metering-manager"
 	BillingManagerHost         = prefix + "billing-manager"
-	MbingTaskManagerHost       = prefix + "billing-manager"
+	MbingExecutorManagerHost   = prefix + "mbing-executor-manager"
 	NotificationHost           = prefix + "notification"
 	MarketManagerHost          = prefix + "market-manager"
 	AttachmentManagerHost      = prefix + "attachment-manager"
@@ -59,7 +59,7 @@ const (
 	RuntimeProviderManagerPort = 9121
 	MeteringManagerPort        = 9122
 	BillingManagerPort         = 9123
-	MbingTaskManagerPort       = 9124
+	MbingExecutorManagerPort   = 9124
 	NotificationPort           = 9201
 	ServiceConfigPort          = 9202
 )
@@ -88,22 +88,19 @@ const (
 	StatusPending     = "pending"
 	StatusSuccessful  = "successful"
 	StatusFailed      = "failed"
-
-	StatusRunning    = "running"
-	StatusTerminated = "terminated"
-
-	StatusAvailable = "available"
-	StatusInUse     = "in-use"
-
-	StatusInUse2 = "in_use"
-
-	StatusDraft     = "draft"
-	StatusSubmitted = "submitted"
-	StatusPassed    = "passed"
-	StatusRejected  = "rejected"
-	StatusSuspended = "suspended"
-	StatusInReview  = "in-review"
-	StatusNew       = "new"
+	StatusRunning     = "running"
+	StatusTerminated  = "terminated"
+	StatusAvailable   = "available"
+	StatusInUse       = "in-use"
+	StatusInUse2      = "in_use"
+	StatusDraft       = "draft"
+	StatusSubmitted   = "submitted"
+	StatusPassed      = "passed"
+	StatusRejected    = "rejected"
+	StatusSuspended   = "suspended"
+	StatusInReview    = "in-review"
+	StatusNew         = "new"
+	StatusReady       = "ready"
 )
 
 var DeletedStatuses = []string{

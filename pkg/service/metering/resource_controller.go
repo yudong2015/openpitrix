@@ -5,19 +5,17 @@
 package metering
 
 import (
+	"context"
 
-"context"
-
-"openpitrix.io/openpitrix/pkg/db"
-"openpitrix.io/openpitrix/pkg/manager"
-"openpitrix.io/openpitrix/pkg/models"
-"openpitrix.io/openpitrix/pkg/pb"
-"openpitrix.io/openpitrix/pkg/util/pbutil"
-"openpitrix.io/openpitrix/pkg/util/stringutil"
-"openpitrix.io/openpitrix/pkg/constants"
-"openpitrix.io/openpitrix/pkg/logger"
-"openpitrix.io/openpitrix/pkg/pi"
-
+	"openpitrix.io/openpitrix/pkg/constants"
+	"openpitrix.io/openpitrix/pkg/db"
+	"openpitrix.io/openpitrix/pkg/logger"
+	"openpitrix.io/openpitrix/pkg/manager"
+	"openpitrix.io/openpitrix/pkg/models"
+	"openpitrix.io/openpitrix/pkg/pb"
+	"openpitrix.io/openpitrix/pkg/pi"
+	"openpitrix.io/openpitrix/pkg/util/pbutil"
+	"openpitrix.io/openpitrix/pkg/util/stringutil"
 )
 
 func checkExistById(ctx context.Context, structName, idValue string) (bool, error) {

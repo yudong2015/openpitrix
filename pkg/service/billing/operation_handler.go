@@ -40,13 +40,12 @@ func (s *Server) DeletePrices(ctx context.Context, req *pb.DeletePricesRequest) 
 	return &pb.DeletePricesResponse{}, nil
 }
 
-func (s *Server) DescribeLeasingContracts(ctx context.Context, req *pb.DescribeLeasingContractsRequest) (*pb.DescribeLeasingContractsResponse, error){
+func (s *Server) DescribeLeasingContracts(ctx context.Context, req *pb.DescribeLeasingContractsRequest) (*pb.DescribeLeasingContractsResponse, error) {
 	//TODO: impl
 	return &pb.DescribeLeasingContractsResponse{}, nil
 }
 
-func (s *Server) DescribeLeasedContracts(ctx context.Context, req *pb.DescribeLeasedContractsRequest) (*pb.DescribeLeasedContractsResponse, error){
+func (s *Server) DescribeLeasedContracts(ctx context.Context, req *pb.DescribeLeasedContractsRequest) (*pb.DescribeLeasedContractsResponse, error) {
 	//TODO: impl
 	return &pb.DescribeLeasedContractsResponse{}, nil
 }
-

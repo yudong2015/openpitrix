@@ -12,5 +12,5 @@ import (
 
 func main() {
 	cfg := config.LoadConf()
-	billing.TaskServe(cfg)
+	billing.ExecutorServe(cfg)
 }

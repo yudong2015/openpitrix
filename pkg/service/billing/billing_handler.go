@@ -12,27 +12,27 @@ import (
 	"openpitrix.io/openpitrix/pkg/pb"
 )
 
-func (s *Server) InitBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+func (s *Server) InitBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error) {
 	//TODO: impl
 	return &pb.CommonBillingResponse{}, nil
 }
 
-func (s *Server) UpdateBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+func (s *Server) UpdateBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error) {
 	//TODO: impl
 	return &pb.CommonBillingResponse{}, nil
 }
 
-func (s *Server) StopBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+func (s *Server) StopBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error) {
 	//TODO: impl
 	return &pb.CommonBillingResponse{}, nil
 }
 
-func (s *Server) StartBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+func (s *Server) StartBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error) {
 	//TODO: impl
 	return &pb.CommonBillingResponse{}, nil
 }
 
-func (s *Server) TerminateBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error){
+func (s *Server) TerminateBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error) {
 	//TODO: impl
 	return &pb.CommonBillingResponse{}, nil
 }

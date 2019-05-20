@@ -29,7 +29,7 @@ func Serve(cfg *config.Config) {
 		ShowErrorCause(cfg.Grpc.ShowErrorCause).
 		Serve(func(server *grpc.Server) {
 			pb.RegisterOperationManagerServer(server, s)
-			pb.RegisterBillingManagerServer(server,s)
+			pb.RegisterBillingManagerServer(server, s)
 			pb.RegisterChargingManagerServer(server, s)
 			pb.RegisterPromotionOperationManagerServer(server, s)
 		})
