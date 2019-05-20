@@ -1121,7 +1121,7 @@ service PromotionOperationManager {
 
 
 //*************************************************************************
-//*************************** MbingTaskManager ****************************
+//******************** MbingTaskManager(TaskService) *********************
 //*************************************************************************
 
 message BillingTaskResponse {
@@ -1132,7 +1132,7 @@ message ChargingTaskResponse {
 	google.protobuf.StringValue task_id = 1;
 }
 
-service BillingTaskManager {
+service BillingTaskServiceManager {
 	rpc InitBillingTask (Leasing) returns (BillingTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "init billing about the leasing"
@@ -1148,7 +1148,7 @@ service BillingTaskManager {
 			summary: "update billing about the leasing"
 		};
 		option (google.api.http) = {
-			put: "/v1/task/billing"
+			put: "/v1/task/billing:update"
 			body: "*"
 		};
 	}
@@ -1158,7 +1158,7 @@ service BillingTaskManager {
 			summary: "stop billing about the leasing"
 		};
 		option (google.api.http) = {
-			put: "/v1/task/billing/stop"
+			put: "/v1/task/billing:stop"
 			body: "*"
 		};
 	}
@@ -1168,7 +1168,7 @@ service BillingTaskManager {
 			summary: "start billing that stoped befor"
 		};
 		option (google.api.http) = {
-			put: "/v1/task/billing/start"
+			put: "/v1/task/billing:start"
 			body: "*"
 		};
 	}

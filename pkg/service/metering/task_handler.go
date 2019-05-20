@@ -6,9 +6,13 @@ package metering
 
 import (
 	"context"
+	"fmt"
 
+	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/pb"
 )
+
+var MeteringTaskRunner = fmt.Sprintf("%s:%d", constants.MeteringManagerHost, constants.MeteringManagerPort)
 
 func (ts *TaskServer) InitMeteringTask(ctx context.Context, req *pb.InitMeteringRequest) (*pb.MeteringTaskResponse, error) {
 	//TODO: impl

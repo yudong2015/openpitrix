@@ -834,13 +834,13 @@ service PromotionSkuManager {
 
 
 //*************************************************************************
-//********************* MbingTaskManager(Task Service) ********************
+//********************* MbingTaskServiceManager(TaskService) ********************
 //*************************************************************************
 message MeteringTaskResponse {
 	google.protobuf.StringValue task_id = 1;
 }
 
-service MeteringTaskManager {
+service MeteringTaskServiceManager {
 	rpc InitMeteringTask (InitMeteringRequest) returns (MeteringTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "init metering about the skus"
@@ -856,7 +856,7 @@ service MeteringTaskManager {
 			summary: "update metering value about the sku"
 		};
 		option (google.api.http) = {
-			put: "/v1/task/metering"
+			put: "/v1/task/metering:update"
 			body: "*"
 		};
 	}
@@ -866,7 +866,7 @@ service MeteringTaskManager {
 			summary: "stop metering about the skus"
 		};
 		option (google.api.http) = {
-			put: "/v1/task/metering/stop"
+			put: "/v1/task/metering:stop"
 			body: "*"
 		};
 	}
@@ -877,7 +877,7 @@ service MeteringTaskManager {
 			summary: "start metering about the skus"
 		};
 		option (google.api.http) = {
-			put: "/v1/task/metering/start"
+			put: "/v1/task/metering:start"
 			body: "*"
 		};
 	}
@@ -892,21 +892,3 @@ service MeteringTaskManager {
         };
 	}
 }
-
-//*************************************************************************
-//********************* TaskRunnerManager(Task Runner) ********************
-//*************************************************************************
-
-message RunTaskRequest {
-	google.protobuf.StringValue task_id = 1;
-	google.protobuf.StringValue params = 2;
-}
-
-message RunTaskResponse {
-	google.protobuf.StringValue task_id = 1;
-}
-
-service TaskRunnerProviderManager {
-	rpc RunTask(RunTaskRequest) returns (RunTaskResponse);
-}
-

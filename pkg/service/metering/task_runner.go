@@ -17,12 +17,12 @@ import (
 )
 
 const (
-	TaskQueueNum   = 100
-	TaskQueueTopic = "/task/ids"
+	TaskQueueNum      = 100
+	TaskQueueTopic    = "/task/ids"
 	TaskQueueTopicFmt = TaskQueueTopic + "/%d"
-	TaskInfoDir    = "/task/infos"
-	TaskInfoFmt = TaskInfoDir + "/%s"
-	Runner = "node_01"
+	TaskInfoDir       = "/task/infos"
+	TaskInfoFmt       = TaskInfoDir + "/%s"
+	Executor          = "node_01"
 )
 
 type TaskRunner struct {
@@ -32,9 +32,10 @@ type TaskRunner struct {
 
 type Task struct {
 	Id         string
-	Type       string
-	Params     map[string]interface{}
 	Runner     string
+	Action     string
+	Conf       string
+	Exector    string
 	Status     string
 	RetryTimes int
 }
@@ -42,18 +43,24 @@ type Task struct {
 func NewTaskRunner() *TaskRunner {
 	e := pi.Global().Etcd(nil)
 	queques := []*etcd.Queue{}
-	for i := 0; i<TaskQueueNum; i++{
+	for i := 0; i < TaskQueueNum; i++ {
 		queques = append(queques, e.NewQueue(fmt.Sprintf(TaskQueueTopicFmt, i)))
 	}
 	return &TaskRunner{
-		etcd: e,
+		etcd:   e,
 		queues: queques,
 	}
 }
 
-func (t *Task) update() (string, error){
-	t.Runner = Runner
+func (t *Task) updateToRun() (string, error) {
+	t.Exector = Executor
 	t.Status = constants.StatusRunning
+	b, err := jsonutil.Encode(t)
+	return string(b), err
+}
+
+func (t *Task) fail() (string, error) {
+	t.Status = constants.StatusFailed
 	b, err := jsonutil.Encode(t)
 	return string(b), err
 }
@@ -76,7 +83,7 @@ func (tr *TaskRunner) getTaskInfo(taskId string) (*Task, error) {
 				return e
 			}
 			//update task info to running
-			taskStr, e := task.update()
+			taskStr, e := task.updateToRun()
 			if e != nil {
 				return e
 			}
@@ -92,7 +99,6 @@ func (tr *TaskRunner) getTaskInfo(taskId string) (*Task, error) {
 	}
 	return task, err
 }
-
 
 func (tr *TaskRunner) consumeTask(num int) (*Task, error) {
 	var taskId string
@@ -116,6 +122,35 @@ func (tr *TaskRunner) run(task Task) error {
 	return nil
 }
 
+func (tr *TaskRunner) fail(task Task) {
+	key := fmt.Sprintf(TaskInfoFmt, task.Id)
+	tr.etcd.DlockWithTimeout(key, 60*time.Second, func() error {
+		get, e := tr.etcd.Get(nil, key)
+		if e != nil {
+			return e
+		}
+		// parse value
+		if get.Count == 0 {
+			logger.Debugf(nil, "The task info of %s is null!", task.Id)
+		} else {
+			e = yamlutil.Decode(get.Kvs[0].Value, task)
+			if e != nil {
+				return e
+			}
+			//update task info to running
+			taskStr, e := task.fail()
+			if e != nil {
+				return e
+			}
+			_, e = tr.etcd.Put(nil, key, string(taskStr))
+			if e != nil {
+				return e
+			}
+		}
+		return e
+	})
+}
+
 func (tr *TaskRunner) done(task Task) {
 	key := fmt.Sprintf(TaskInfoFmt, task.Id)
 	tr.etcd.DlockWithTimeout(key, 60*time.Second, func() error {
@@ -137,9 +172,9 @@ func (tr *TaskRunner) Serve(num int) {
 		err = tr.run(*task)
 		if err != nil {
 			logger.Errorf(nil, "Failed to run task: %+v", err)
+			tr.fail(*task)
 			//TODO: send alert email
 		}
 		tr.done(*task)
 	}
 }
-
