@@ -112,7 +112,7 @@ func PbToMbingTask(ctx context.Context, req interface{}, runner, action, executo
 }
 
 func (t *MbingTask) UpdateToRun(executor string) (string, error) {
-	t.Exector = executor
+	t.Exector = ""executor
 	t.Status = constants.StatusRunning
 	return t.String()
 }

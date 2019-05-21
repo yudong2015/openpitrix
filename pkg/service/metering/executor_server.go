@@ -16,12 +16,12 @@ import (
 )
 
 type ExecutorServer struct {
-	Runner *TaskRunner
+	RunnerManager *TaskRunnerManager
 }
 
 func NewExecutorServer() *ExecutorServer {
 	return &ExecutorServer{
-		Runner: NewTaskRunner(),
+		RunnerManager: NewTaskRunnerManager(),
 	}
 }
 
@@ -33,10 +33,10 @@ func ExecutorServe(cfg *config.Config) {
 	** start task runner **
 	**********************************************************/
 	logger.Infof(nil, "[%s]", "/**********************************************************")
-	logger.Infof(nil, "[%s]", "** start start task runner **")
+	logger.Infof(nil, "[%s]", "** start TaskRunnerManager **")
 	logger.Infof(nil, "[%s]", "**********************************************************/")
 	logger.Infof(nil, "[%s]", "")
-	go s.Runner.Serve()
+	go s.RunnerManager.Serve()
 
 	manager.NewGrpcServer(constants.MbingExecutorManagerHost, constants.MbingExecutorManagerPort).
 		ShowErrorCause(cfg.Grpc.ShowErrorCause).

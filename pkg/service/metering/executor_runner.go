@@ -5,13 +5,18 @@
 package metering
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
+	"go.etcd.io/etcd/clientv3"
 	"openpitrix.io/logger"
 	"openpitrix.io/openpitrix/pkg/etcd"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pi"
+	"openpitrix.io/openpitrix/pkg/service/app"
 	"openpitrix.io/openpitrix/pkg/util/yamlutil"
 )
 
@@ -21,26 +26,40 @@ const (
 	TaskInfoDir    = "/task/infos"
 	TaskInfoFmt    = TaskInfoDir + "/%s"
 	Executor       = "node_01"
+	LeaseTimeout = 60
+	AliveReportInterval = 30*time.Second
 )
 
+type TaskRunnerManager struct {
+	runners []*TaskRunner
+}
+
 type TaskRunner struct {
+	index int //the index of runner
 	etcd  *etcd.Etcd
 	queue *etcd.Queue
 }
 
-func NewTaskRunner() *TaskRunner {
+func NewTaskRunnerManager() *TaskRunnerManager {
 	e := pi.Global().Etcd(nil)
 	//queques := []*etcd.Queue{}
 	//for i := 0; i < TaskQueueNum; i++ {
 	//	queques = append(queques, e.NewQueue(fmt.Sprintf(TaskQueueTopicFmt, i)))
 	//}
-	return &TaskRunner{
-		etcd:  e,
-		queue: e.NewQueue(TaskQueueTopic),
+
+	queue := e.NewQueue(TaskQueueTopic)
+	runners := make([]*TaskRunner, TaskRunnerNum)
+	for i:=0;i<TaskRunnerNum;i++{
+		runners = append(runners, &TaskRunner{
+			index: i,
+			etcd:  e,
+			queue: queue,
+		})
 	}
+	return &TaskRunnerManager{runners}
 }
 
-func (tr *TaskRunner) getTaskInfo(taskId string, index int) (*models.MbingTask, error) {
+func (tr *TaskRunner) GetTaskInfo(taskId string) (*models.MbingTask, error) {
 	task := &models.MbingTask{}
 	//get task info
 	key := fmt.Sprintf(TaskInfoFmt, taskId)
@@ -51,7 +70,7 @@ func (tr *TaskRunner) getTaskInfo(taskId string, index int) (*models.MbingTask, 
 		}
 		// parse value
 		if get.Count == 0 {
-			logger.Debugf(nil, "[TaskRunner-%d]The task info of %s is null!", index, taskId)
+			logger.Debugf(nil, "[TaskRunner-%d]The task info of %s is null!", tr.index, taskId)
 		} else {
 			e = yamlutil.Decode(get.Kvs[0].Value, task)
 			if e != nil {
@@ -70,12 +89,12 @@ func (tr *TaskRunner) getTaskInfo(taskId string, index int) (*models.MbingTask, 
 		return e
 	})
 	if err != nil {
-		logger.Errorf(nil, "[TaskRunner-%d]Failed to get task(%s) info: %+v", index, taskId, err)
+		logger.Errorf(nil, "[TaskRunner-%d]Failed to get task(%s) info: %+v", tr.index, taskId, err)
 	}
 	return task, err
 }
 
-func (tr *TaskRunner) consumeTask(index int) (*models.MbingTask, error) {
+func (tr *TaskRunner) ConsumeTask() (*models.MbingTask, error) {
 	var taskId string
 	//consume task id
 	for {
@@ -90,14 +109,14 @@ func (tr *TaskRunner) consumeTask(index int) (*models.MbingTask, error) {
 	}
 
 	//get task info
-	return tr.getTaskInfo(taskId, index)
+	return tr.GetTaskInfo(taskId)
 }
 
 func (tr *TaskRunner) run(task models.MbingTask) error {
 	return nil
 }
 
-func (tr *TaskRunner) fail(task models.MbingTask) {
+func (tr *TaskRunner) Fail(task models.MbingTask) {
 	key := fmt.Sprintf(TaskInfoFmt, task.Id)
 	tr.etcd.DlockWithTimeout(key, 60*time.Second, func() error {
 		get, e := tr.etcd.Get(nil, key)
@@ -126,7 +145,7 @@ func (tr *TaskRunner) fail(task models.MbingTask) {
 	})
 }
 
-func (tr *TaskRunner) done(task models.MbingTask) {
+func (tr *TaskRunner) Done(task models.MbingTask) {
 	key := fmt.Sprintf(TaskInfoFmt, task.Id)
 	tr.etcd.DlockWithTimeout(key, 60*time.Second, func() error {
 		_, err := tr.etcd.Delete(nil, key)
@@ -137,15 +156,37 @@ func (tr *TaskRunner) done(task models.MbingTask) {
 	})
 }
 
-func (tr *TaskRunner) registToEtcd(index int) error {
-	//TODO: regist
+func (tr *TaskRunner) RegistToEtcd(ctx context.Context) error {
+	grantRes, err := tr.etcd.Lease.Grant(ctx, LeaseTimeout)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to grant a lease: %+v", err)
+		return err
+	}
+	_, err = tr.etcd.Put(ctx, Executor, strconv.Itoa(tr.index), clientv3.WithLease(grantRes.ID))
+	if err != nil {
+		logger.Errorf(ctx, "Failed to put: %+v", err)
+		return err
+	}
+	//heartBeat
+	cancelCtx, cancel := context.WithCancel(ctx)
+	go tr.alive(cancelCtx, grantRes.ID)
 	return nil
 }
 
-func (tr *TaskRunner) Start(index int) {
-	tr.registToEtcd(index)
+func (tr *TaskRunner) alive(ctx context.Context, ID clientv3.LeaseID){
 	for {
-		task, err := tr.consumeTask(index)
+		_, err := tr.etcd.Lease.KeepAliveOnce(ctx, ID)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to KeepAliveOnce: %+v", err)
+		}
+		time.Sleep(AliveReportInterval)
+	}
+}
+
+func (tr *TaskRunner) Start() {
+
+	for {
+		task, err := tr.ConsumeTask()
 		if err != nil {
 			logger.Errorf(nil, "Failed to consume task: %+v", err)
 			//TODO: send alert email
@@ -153,16 +194,17 @@ func (tr *TaskRunner) Start(index int) {
 		err = tr.run(*task)
 		if err != nil {
 			logger.Errorf(nil, "Failed to run task: %+v", err)
-			tr.fail(*task)
+			tr.Fail(*task)
 			//TODO: send alert email
 		}
-		tr.done(*task)
+		tr.Done(*task)
 	}
 }
 
-
-func (tr *TaskRunner) Serve() {
-	for i:=0;i<TaskRunnerNum;i++{
-		go tr.Start(i)
+func (manager *TaskRunnerManager) Serve() {
+	ctx := context.Background()
+	for i := 0; i < TaskRunnerNum; i++ {
+		//TODO: goroutine report themself to TaskRunner
+		go manager.runners[i].Start()
 	}
 }
