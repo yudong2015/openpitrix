@@ -6,6 +6,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"openpitrix.io/logger"
@@ -85,15 +86,15 @@ func (l *Leasing) ToLeased() *Leased {
 
 type MbingTask struct {
 	Id         string
-	Runner     string
+	Handler    string
 	Action     string
 	Conf       string
-	Exector    string
+	Runner     string
 	Status     string
 	RetryTimes int
 }
 
-func PbToMbingTask(ctx context.Context, req interface{}, runner, action, executor string) (*MbingTask, error) {
+func PbToMbingTask(ctx context.Context, req interface{}, handler, action string) (*MbingTask, error) {
 	b, err := yamlutil.Encode(req)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to encode struct to bytes: %+v", err)
@@ -101,18 +102,17 @@ func PbToMbingTask(ctx context.Context, req interface{}, runner, action, executo
 	}
 	mbingTask := &MbingTask{
 		Id:         NewMbingTaskId(),
-		Runner:     runner,
+		Handler:    handler,
 		Action:     action,
 		Conf:       string(b),
-		Exector:    executor,
 		Status:     constants.StatusReady,
 		RetryTimes: 0,
 	}
 	return mbingTask, nil
 }
 
-func (t *MbingTask) UpdateToRun(executor string) (string, error) {
-	t.Exector = ""executor
+func (t *MbingTask) UpdateToRun(executor, runner string) (string, error) {
+	t.Runner = fmt.Sprintf("%s-%s", executor, runner)
 	t.Status = constants.StatusRunning
 	return t.String()
 }

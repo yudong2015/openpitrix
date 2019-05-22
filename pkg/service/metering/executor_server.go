@@ -5,7 +5,10 @@
 package metering
 
 import (
+	"time"
+
 	"google.golang.org/grpc"
+	"openpitrix.io/openpitrix/pkg/etcd"
 
 	"openpitrix.io/logger"
 	"openpitrix.io/openpitrix/pkg/config"
@@ -15,12 +18,26 @@ import (
 	"openpitrix.io/openpitrix/pkg/pi"
 )
 
+const (
+	TaskRunnerNum  = 10
+	TaskQueueTopic = "/mbing/task/ids"
+	TaskInfoDir    = "/mbing/task/infos"
+	TaskInfoFmt    = TaskInfoDir + "/%s"
+	Executor       = "node_01"
+	RunnerLeaseTimeout = 60
+	HeartBeatInterval = 30*time.Second
+	RunnerRegisterDir = "/mbing/runners"
+	RunnerRegisterFmt = RunnerRegisterDir + "/%s/%d"
+)
+
 type ExecutorServer struct {
+	TaskQueue         *etcd.Queue
 	RunnerManager *TaskRunnerManager
 }
 
 func NewExecutorServer() *ExecutorServer {
 	return &ExecutorServer{
+		TaskQueue: pi.Global().Etcd(nil).NewQueue(TaskQueueTopic),
 		RunnerManager: NewTaskRunnerManager(),
 	}
 }

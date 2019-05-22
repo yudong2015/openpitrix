@@ -8,12 +8,13 @@ import (
 	"context"
 	"fmt"
 
+	"openpitrix.io/logger"
 	"openpitrix.io/openpitrix/pkg/constants"
-	"openpitrix.io/openpitrix/pkg/etcd"
 	"openpitrix.io/openpitrix/pkg/gerr"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/pi"
+	"openpitrix.io/openpitrix/pkg/util/pbutil"
 )
 
 const (
@@ -24,64 +25,47 @@ const (
 	ActionTerminateMetering = "TerminateMetering"
 )
 
-var MeteringTaskRunner = fmt.Sprintf("%s:%d", constants.MeteringManagerHost, constants.MeteringManagerPort)
+var MeteringTaskHandler = fmt.Sprintf("%s:%d", constants.MeteringManagerHost, constants.MeteringManagerPort)
 
-func publishTask(ctx context.Context, etcd *etcd.Etcd, task models.MbingTask) error {
-	key := fmt.Sprintf(TaskInfoFmt, task.Id)
-	return etcd.Dlock(ctx, key, func() error {
-		taskStr, err := task.String()
-		if err != nil {
-			return err
-		}
-		_, err = etcd.Put(ctx, key, taskStr)
-		return err
-	})
-}
-
-func EnquequeMbingTask(ctx context.Context, etcd *etcd.Etcd, task models.MbingTask) error {
-	key := fmt.Sprintf(TaskInfoFmt, task.Id)
-	return etcd.Dlock(ctx, key, func() error {
-		taskStr, err := task.String()
-		if err != nil {
-			return err
-		}
-		_, err = etcd.Put(ctx, key, taskStr)
-		return err
-	})
-
-	return etcd.NewQueue()
-}
-
-func (ts *ExecutorServer) InitMeteringTask(ctx context.Context, req *pb.InitMeteringRequest) (*pb.MeteringTaskResponse, error) {
-	//TODO: impl
-	task, err := models.PbToMbingTask(ctx, req, MeteringTaskRunner, ActionInitMetering, Executor)
+func (es *ExecutorServer) InitMeteringTask(ctx context.Context, req *pb.InitMeteringRequest) (*pb.MeteringTaskResponse, error) {
+	task, err := models.PbToMbingTask(ctx, req, MeteringTaskHandler, ActionInitMetering)
 	if err != nil {
-		return nil, gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorCreateMbingTask)
-	}
-	err = publishTask(ctx, pi.Global().Etcd(ctx), *task)
-	if err != nil {
+		logger.Errorf(ctx, "Failed to convert [%+v] to MbingTask: %+v", req.String(), err)
 		return nil, gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorCreateMbingTask)
 	}
 
+	err = PublishTask(ctx, pi.Global().Etcd(ctx), *task)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to publish MbingTask: %+v", err)
+		return nil, gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorCreateMbingTask)
+	}
+
+	err = EnquequeTask(es.TaskQueue, task.Id)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to enqueue task to queue: %+v", err)
+		return nil, gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorCreateMbingTask)
+	}
+
+	return &pb.MeteringTaskResponse{TaskId: pbutil.ToProtoString(task.Id)}, nil
+}
+
+func (es *ExecutorServer) UpdateMeteringTask(ctx context.Context, req *pb.UpdateMeteringRequest) (*pb.MeteringTaskResponse, error) {
+	//TODO: impl
+	task, err := models.PbToMbingTask(ctx, req, MeteringTaskHandler, ActionUpdateMetering)
 	return &pb.MeteringTaskResponse{}, nil
 }
 
-func (ts *ExecutorServer) UpdateMeteringTask(ctx context.Context, req *pb.UpdateMeteringRequest) (*pb.MeteringTaskResponse, error) {
+func (es *ExecutorServer) StopMeteringsTask(ctx context.Context, req *pb.StopMeteringsRequest) (*pb.MeteringTaskResponse, error) {
 	//TODO: impl
 	return &pb.MeteringTaskResponse{}, nil
 }
 
-func (ts *ExecutorServer) StopMeteringsTask(ctx context.Context, req *pb.StopMeteringsRequest) (*pb.MeteringTaskResponse, error) {
+func (es *ExecutorServer) StartMeteringsTask(ctx context.Context, req *pb.StartMeteringsRequest) (*pb.MeteringTaskResponse, error) {
 	//TODO: impl
 	return &pb.MeteringTaskResponse{}, nil
 }
 
-func (ts *ExecutorServer) StartMeteringsTask(ctx context.Context, req *pb.StartMeteringsRequest) (*pb.MeteringTaskResponse, error) {
-	//TODO: impl
-	return &pb.MeteringTaskResponse{}, nil
-}
-
-func (ts *ExecutorServer) TerminateMeteringsTask(ctx context.Context, req *pb.TerminateMeteringsRequest) (*pb.MeteringTaskResponse, error) {
+func (es *ExecutorServer) TerminateMeteringsTask(ctx context.Context, req *pb.TerminateMeteringsRequest) (*pb.MeteringTaskResponse, error) {
 	//TODO: impl
 	return &pb.MeteringTaskResponse{}, nil
 }

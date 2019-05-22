@@ -7,7 +7,6 @@ package metering
 import (
 	"context"
 	"fmt"
-	"os"
 	"strconv"
 	"time"
 
@@ -16,18 +15,7 @@ import (
 	"openpitrix.io/openpitrix/pkg/etcd"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pi"
-	"openpitrix.io/openpitrix/pkg/service/app"
 	"openpitrix.io/openpitrix/pkg/util/yamlutil"
-)
-
-const (
-	TaskRunnerNum  = 10
-	TaskQueueTopic = "/task/ids"
-	TaskInfoDir    = "/task/infos"
-	TaskInfoFmt    = TaskInfoDir + "/%s"
-	Executor       = "node_01"
-	LeaseTimeout = 60
-	AliveReportInterval = 30*time.Second
 )
 
 type TaskRunnerManager struct {
@@ -77,7 +65,7 @@ func (tr *TaskRunner) GetTaskInfo(taskId string) (*models.MbingTask, error) {
 				return e
 			}
 			//update task info to running
-			taskStr, e := task.UpdateToRun(Executor)
+			taskStr, e := task.UpdateToRun(Executor, strconv.Itoa(tr.index))
 			if e != nil {
 				return e
 			}
@@ -100,11 +88,11 @@ func (tr *TaskRunner) ConsumeTask() (*models.MbingTask, error) {
 	for {
 		taskId, err := tr.queue.Dequeue()
 		if err != nil {
-			logger.Errorf(nil, "[TaskRunner-%d]Failed to dequeue task id from etcd queue: %+v", index, err)
+			logger.Errorf(nil, "[TaskRunner-%d]Failed to dequeue task id from etcd queue: %+v", tr.index, err)
 			time.Sleep(3 * time.Second)
 			continue
 		}
-		logger.Debugf(nil, "[TaskRunner-%d]Dequeue task id [%s] from etcd queue succeed", index, taskId)
+		logger.Debugf(nil, "[TaskRunner-%d]Dequeue task id [%s] from etcd queue succeed", tr.index, taskId)
 		break
 	}
 
@@ -156,55 +144,83 @@ func (tr *TaskRunner) Done(task models.MbingTask) {
 	})
 }
 
-func (tr *TaskRunner) RegistToEtcd(ctx context.Context) error {
-	grantRes, err := tr.etcd.Lease.Grant(ctx, LeaseTimeout)
+func (tr *TaskRunner) Register(ctx context.Context) (clientv3.LeaseID, error) {
+	grantRes, err := tr.etcd.Lease.Grant(ctx, RunnerLeaseTimeout)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to grant a lease: %+v", err)
-		return err
+		logger.Errorf(ctx, "Runner-%d failed to grant a lease: %+v", tr.index, err)
+		return 0, err
 	}
-	_, err = tr.etcd.Put(ctx, Executor, strconv.Itoa(tr.index), clientv3.WithLease(grantRes.ID))
+	key := fmt.Sprintf(RunnerRegisterFmt, Executor, tr.index)
+	_, err = tr.etcd.Put(ctx, key, strconv.Itoa(tr.index), clientv3.WithLease(grantRes.ID))
 	if err != nil {
-		logger.Errorf(ctx, "Failed to put: %+v", err)
-		return err
+		logger.Errorf(ctx, "Runner-%d failed to put: %+v", tr.index, err)
+		return 0, err
 	}
-	//heartBeat
-	cancelCtx, cancel := context.WithCancel(ctx)
-	go tr.alive(cancelCtx, grantRes.ID)
-	return nil
+	return grantRes.ID, nil
 }
 
-func (tr *TaskRunner) alive(ctx context.Context, ID clientv3.LeaseID){
+func (tr *TaskRunner) HeartBeat(ctx context.Context, ID clientv3.LeaseID){
 	for {
 		_, err := tr.etcd.Lease.KeepAliveOnce(ctx, ID)
 		if err != nil {
-			logger.Errorf(ctx, "Failed to KeepAliveOnce: %+v", err)
+			logger.Errorf(ctx, "Runner-%d failed to KeepAliveOnce: %+v", tr.index, err)
 		}
-		time.Sleep(AliveReportInterval)
+		time.Sleep(HeartBeatInterval)
+		select {
+		case <-ctx.Done():
+			break
+		}
 	}
 }
 
-func (tr *TaskRunner) Start() {
+func (tr *TaskRunner) Start(ctx context.Context) error {
+	cancelCtx, cancel := context.WithCancel(ctx)
+	defer tr.etcd.Close()
+	defer cancel()
 
-	for {
-		task, err := tr.ConsumeTask()
-		if err != nil {
-			logger.Errorf(nil, "Failed to consume task: %+v", err)
-			//TODO: send alert email
-		}
-		err = tr.run(*task)
-		if err != nil {
-			logger.Errorf(nil, "Failed to run task: %+v", err)
-			tr.Fail(*task)
-			//TODO: send alert email
-		}
-		tr.Done(*task)
+	//register to etcd
+	leaseId, err := tr.Register(cancelCtx)
+	if err != nil {
+		logger.Errorf(ctx, "Runner-%d failed to register to etcd: %+v", tr.index, err)
+		return err
 	}
+	go tr.HeartBeat(ctx, leaseId)
+
+	//
+	go func() {
+		for {
+			task, err := tr.ConsumeTask()
+			if err != nil {
+				logger.Errorf(nil, "Failed to consume task: %+v", err)
+				//TODO: send alert email
+			}
+			err = tr.run(*task)
+			if err != nil {
+				logger.Errorf(nil, "Failed to run task: %+v", err)
+				tr.Fail(*task)
+				//TODO: send alert email
+			}
+			tr.Done(*task)
+
+			//check if need to exit
+			select {
+			case <-ctx.Done():
+				logger.Errorf(ctx,"Runner-%d exit.", tr.index)
+			break
+			}
+		}
+	}()
+	return nil
 }
 
 func (manager *TaskRunnerManager) Serve() {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	for i := 0; i < TaskRunnerNum; i++ {
-		//TODO: goroutine report themself to TaskRunner
-		go manager.runners[i].Start()
+		 err := manager.runners[i].Start(ctx)
+		 if err != nil {
+		 	logger.Errorf(ctx,"Runner-%d failed to start: %+v", i, err)
+		 	//TODO: handle err
+		 }
 	}
 }
