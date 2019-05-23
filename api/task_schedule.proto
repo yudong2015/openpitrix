@@ -10,6 +10,7 @@ package openpitrix;
 option go_package = "pb";
 
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
@@ -23,6 +24,9 @@ message ScheduleTask {
 	google.protobuf.StringValue handler = 2;
 	google.protobuf.StringValue action = 3;
 	google.protobuf.StringValue conf = 4;
+	google.protobuf.StringValue status = 5;
+	google.protobuf.UInt32Value retry_times = 6;
+	google.protobuf.Timestamp create_time = 7;
 }
 
 message CreateScheduleTaskRequest {
@@ -38,4 +42,16 @@ message CreateScheduleTaskResponse {
 
 service TaskScheduleManager {
 	rpc CreateTask (CreateScheduleTaskRequest) returns (CreateScheduleTaskResponse){}
+}
+
+message HandleTaskRequest {
+	ScheduleTask task = 1;
+}
+
+message HandleTaskResponse {
+	google.protobuf.BoolValue succ = 1;
+}
+
+service TaskHandlerManager {
+	rpc HandleTask (HandleTaskRequest) returns (HandleTaskResponse){}
 }

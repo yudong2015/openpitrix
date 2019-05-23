@@ -16,15 +16,14 @@ import (
 	"openpitrix.io/openpitrix/pkg/pi"
 )
 
-
 type ExecutorServer struct {
-	TaskQueue         *etcd.Queue
+	TaskQueue     *etcd.Queue
 	RunnerManager *TaskRunnerManager
 }
 
 func NewExecutorServer() *ExecutorServer {
 	return &ExecutorServer{
-		TaskQueue: pi.Global().Etcd(nil).NewQueue(TaskQueueTopic),
+		TaskQueue:     pi.Global().Etcd(nil).NewQueue(TaskQueueTopic),
 		RunnerManager: NewTaskRunnerManager(),
 	}
 }

@@ -12,6 +12,8 @@ import (
 	"openpitrix.io/openpitrix/pkg/pb"
 )
 
+const BillingHandler = "billing"
+
 func (s *Server) InitBilling(ctx context.Context, req *pb.Leasing) (*pb.CommonBillingResponse, error) {
 	//TODO: impl
 	return &pb.CommonBillingResponse{}, nil

@@ -15,14 +15,13 @@ import (
 )
 
 const (
+	MeterHandler            = "metering"
 	ActionInitMetering      = "InitMetering"
 	ActionUpdateMetering    = "UpdateMetering"
 	ActionStopMetering      = "StopMetering"
 	ActionStartMetering     = "StartMetering"
 	ActionTerminateMetering = "TerminateMetering"
 )
-
-var MeteringTaskHandler = fmt.Sprintf("%s:%d", constants.MeteringManagerHost, constants.MeteringManagerPort)
 
 func (s *Server) InitMetering(ctx context.Context, req *pb.InitMeteringRequest) (*pb.CommonMeteringResponse, error) {
 	var leasings []*models.Leasing

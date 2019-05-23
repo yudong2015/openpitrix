@@ -12,6 +12,7 @@ import (
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/util/idutil"
+	"openpitrix.io/openpitrix/pkg/util/pbutil"
 	"openpitrix.io/openpitrix/pkg/util/yamlutil"
 )
 
@@ -20,25 +21,37 @@ func NewScheduleTaskId() string {
 }
 
 type ScheduleTask struct {
-	Id     string
+	Id         string
 	Handler    string
 	Action     string
 	Conf       string
 	Runner     string
 	Status     string
-	RetryTimes int
+	RetryTimes uint32
 	CreateTime time.Time
 }
 
 func PbToScheduleTask(req *pb.CreateScheduleTaskRequest) *ScheduleTask {
 	return &ScheduleTask{
-		Id:     NewScheduleTaskId(),
+		Id:         NewScheduleTaskId(),
 		Handler:    req.Handler.GetValue(),
 		Action:     req.Action.GetValue(),
 		Conf:       req.Conf.GetValue(),
 		Status:     constants.StatusReady,
 		RetryTimes: 0,
 		CreateTime: time.Now(),
+	}
+}
+
+func ToPbScheduleTask(task ScheduleTask) *pb.ScheduleTask {
+	return &pb.ScheduleTask{
+		TaskId:     pbutil.ToProtoString(task.Id),
+		Handler:    pbutil.ToProtoString(task.Handler),
+		Action:     pbutil.ToProtoString(task.Action),
+		Conf:       pbutil.ToProtoString(task.Conf),
+		Status:     pbutil.ToProtoString(task.Status),
+		RetryTimes: pbutil.ToProtoUInt32(task.RetryTimes),
+		CreateTime: pbutil.ToProtoTimestamp(task.CreateTime),
 	}
 }
 
