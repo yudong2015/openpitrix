@@ -1,0 +1,41 @@
+// Copyright 2018 The OpenPitrix Authors. All rights reserved.
+// Use of this source code is governed by a Apache license
+// that can be found in the LICENSE file.
+
+syntax = "proto3";
+
+package openpitrix;
+
+// set go package name to pb
+option go_package = "pb";
+
+import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+
+//*************************************************************************
+//*********************** TaskScheduleManager *****************************
+//*************************************************************************
+
+message ScheduleTask {
+	google.protobuf.StringValue task_id = 1;
+	google.protobuf.StringValue handler = 2;
+	google.protobuf.StringValue action = 3;
+	google.protobuf.StringValue conf = 4;
+}
+
+message CreateScheduleTaskRequest {
+	google.protobuf.StringValue handler = 2;
+	google.protobuf.StringValue action = 3;
+	google.protobuf.StringValue conf = 4;
+}
+
+
+message CreateScheduleTaskResponse {
+	google.protobuf.StringValue task_id = 1;
+}
+
+service TaskScheduleManager {
+	rpc CreateTask (CreateScheduleTaskRequest) returns (CreateScheduleTaskResponse){}
+}

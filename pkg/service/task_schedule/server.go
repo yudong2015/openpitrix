@@ -2,11 +2,9 @@
 // Use of this source code is governed by a Apache license
 // that can be found in the LICENSE file.
 
-package metering
+package task_schedule
 
 import (
-	"time"
-
 	"google.golang.org/grpc"
 	"openpitrix.io/openpitrix/pkg/etcd"
 
@@ -18,17 +16,6 @@ import (
 	"openpitrix.io/openpitrix/pkg/pi"
 )
 
-const (
-	TaskRunnerNum  = 10
-	TaskQueueTopic = "/mbing/task/ids"
-	TaskInfoDir    = "/mbing/task/infos"
-	TaskInfoFmt    = TaskInfoDir + "/%s"
-	Executor       = "node_01"
-	RunnerLeaseTimeout = 60
-	HeartBeatInterval = 30*time.Second
-	RunnerRegisterDir = "/mbing/runners"
-	RunnerRegisterFmt = RunnerRegisterDir + "/%s/%d"
-)
 
 type ExecutorServer struct {
 	TaskQueue         *etcd.Queue
@@ -46,18 +33,14 @@ func ExecutorServe(cfg *config.Config) {
 	pi.SetGlobal(cfg)
 	s := NewExecutorServer()
 
-	/**********************************************************
-	** start task runner **
-	**********************************************************/
-	logger.Infof(nil, "[%s]", "/**********************************************************")
+	//** start task runner **
 	logger.Infof(nil, "[%s]", "** start TaskRunnerManager **")
-	logger.Infof(nil, "[%s]", "**********************************************************/")
-	logger.Infof(nil, "[%s]", "")
 	go s.RunnerManager.Serve()
 
+	logger.Infof(nil, "[%s]", "** start TaskScheduleService **")
 	manager.NewGrpcServer(constants.MbingExecutorManagerHost, constants.MbingExecutorManagerPort).
 		ShowErrorCause(cfg.Grpc.ShowErrorCause).
 		Serve(func(server *grpc.Server) {
-			pb.RegisterMeteringTaskManagerServer(server, s)
+			pb.RegisterTaskScheduleManagerServer(server, s)
 		})
 }

@@ -840,7 +840,7 @@ message MeteringTaskResponse {
 	google.protobuf.StringValue task_id = 1;
 }
 
-service MeteringTaskServiceManager {
+service MeteringTaskManager {
 	rpc InitMeteringTask (InitMeteringRequest) returns (MeteringTaskResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			summary: "init metering about the skus"

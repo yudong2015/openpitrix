@@ -5,24 +5,16 @@
 package models
 
 import (
-	"context"
-	"fmt"
 	"time"
 
-	"openpitrix.io/logger"
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/db"
 
 	"openpitrix.io/openpitrix/pkg/util/idutil"
-	"openpitrix.io/openpitrix/pkg/util/yamlutil"
 )
 
 func NewLeasingId() string {
 	return idutil.GetUuid("leasing-")
-}
-
-func NewMbingTaskId() string {
-	return idutil.GetUuid("mbt-")
 }
 
 //SkuMetering
@@ -82,51 +74,4 @@ func (l *Leasing) ToLeased() *Leased {
 		StopTime:       l.StopTimes,
 		CreateTime:     time.Now(),
 	}
-}
-
-type MbingTask struct {
-	Id         string
-	Handler    string
-	Action     string
-	Conf       string
-	Runner     string
-	Status     string
-	RetryTimes int
-}
-
-func PbToMbingTask(ctx context.Context, req interface{}, handler, action string) (*MbingTask, error) {
-	b, err := yamlutil.Encode(req)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to encode struct to bytes: %+v", err)
-		return nil, err
-	}
-	mbingTask := &MbingTask{
-		Id:         NewMbingTaskId(),
-		Handler:    handler,
-		Action:     action,
-		Conf:       string(b),
-		Status:     constants.StatusReady,
-		RetryTimes: 0,
-	}
-	return mbingTask, nil
-}
-
-func (t *MbingTask) UpdateToRun(executor, runner string) (string, error) {
-	t.Runner = fmt.Sprintf("%s-%s", executor, runner)
-	t.Status = constants.StatusRunning
-	return t.String()
-}
-
-func (t *MbingTask) Fail() (string, error) {
-	t.Status = constants.StatusFailed
-	return t.String()
-}
-
-func (t *MbingTask) String() (string, error) {
-	b, err := yamlutil.Encode(t)
-	if err != nil {
-		logger.Errorf(nil, "Failed to encode MbingTask to string: %+v", err)
-		return "", err
-	}
-	return string(b), err
 }

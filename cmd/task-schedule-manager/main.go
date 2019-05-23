@@ -7,10 +7,10 @@ package main
 
 import (
 	"openpitrix.io/openpitrix/pkg/config"
-	"openpitrix.io/openpitrix/pkg/service/billing"
+	"openpitrix.io/openpitrix/pkg/service/task_schedule"
 )
 
 func main() {
 	cfg := config.LoadConf()
-	billing.ExecutorServe(cfg)
+	task_schedule.ExecutorServe(cfg)
 }
