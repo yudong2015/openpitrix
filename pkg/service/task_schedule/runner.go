@@ -79,7 +79,7 @@ func (tr *TaskRunner) ConsumeTask() (*models.ScheduleTask, error) {
 	var taskId string
 	//consume task id
 	for {
-		taskId, err := tr.TaskQueue.Dequeue()
+		taskId, err := tr.TaskQueue.DequeueTask()
 		if err != nil {
 			logger.Errorf(nil, "[TaskRunner-%d]Fail to dequeue task id from etcd queue: %+v", tr.index, err)
 			time.Sleep(3 * time.Second)

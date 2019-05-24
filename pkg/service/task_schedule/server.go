@@ -6,7 +6,6 @@ package task_schedule
 
 import (
 	"google.golang.org/grpc"
-	"openpitrix.io/openpitrix/pkg/etcd"
 
 	"openpitrix.io/logger"
 	"openpitrix.io/openpitrix/pkg/config"
@@ -17,14 +16,16 @@ import (
 )
 
 type ExecutorServer struct {
-	TaskQueue     *etcd.Queue
-	RunnerManager *TaskRunnerManager
+	*TaskInfoClient
+	*TaskQueue
+	*TaskRunnerManager
 }
 
 func NewExecutorServer() *ExecutorServer {
 	return &ExecutorServer{
-		TaskQueue:     pi.Global().Etcd(nil).NewQueue(TaskQueueTopic),
-		RunnerManager: NewTaskRunnerManager(),
+		TaskInfoClient: NewTaskInfoClient(),
+		TaskQueue: GetTaskQueue(),
+		TaskRunnerManager: NewTaskRunnerManager(),
 	}
 }
 
@@ -34,7 +35,7 @@ func ExecutorServe(cfg *config.Config) {
 
 	//** start task runner **
 	logger.Infof(nil, "[%s]", "** start TaskRunnerManager **")
-	go s.RunnerManager.Serve()
+	go s.TaskRunnerManager.Serve()
 
 	logger.Infof(nil, "[%s]", "** start TaskScheduleService **")
 	manager.NewGrpcServer(constants.MbingExecutorManagerHost, constants.MbingExecutorManagerPort).
