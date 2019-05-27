@@ -9,39 +9,36 @@ import (
 	"fmt"
 	"time"
 
+	"openpitrix.io/logger"
 	"openpitrix.io/openpitrix/pkg/constants"
+	"openpitrix.io/openpitrix/pkg/gerr"
+	"openpitrix.io/openpitrix/pkg/manager"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 )
 
-const (
-	MeterHandler            = "metering"
-	ActionInitMetering      = "InitMetering"
-	ActionUpdateMetering    = "UpdateMetering"
-	ActionStopMetering      = "StopMetering"
-	ActionStartMetering     = "StartMetering"
-	ActionTerminateMetering = "TerminateMetering"
-)
+
+func getTaskScheduleManagerClient() (pb.TaskScheduleManagerClient, error) {
+	conn, err := manager.NewClient(constants.TaskScheduleManagerHost, constants.TaskScheduleManagerPort)
+	if err != nil {
+		return nil, err
+	}
+	return pb.NewTaskScheduleManagerClient(conn), nil
+}
 
 func (s *Server) InitMetering(ctx context.Context, req *pb.InitMeteringRequest) (*pb.CommonMeteringResponse, error) {
-	var leasings []*models.Leasing
-	now := time.Now()
-	for _, skuM := range req.GetSkuMeterings() {
-		skuId := skuM.GetSkuId().GetValue()
-		renewalTime, _ := renewalTimeFromSku(ctx, skuId, now)
-		leasings = append(leasings, models.NewLeasing(skuM.GetValue(), req.GetUserId().GetValue(), req.GetResourceId().GetValue(), skuId, now, *renewalTime))
-	}
+	CreateTaskReq := newCreateTaskRequest(ActionInitMetering, req.String())
 
-	//insert leasings
-	err := insertLeasings(ctx, leasings)
+	cli, err := getTaskScheduleManagerClient()
 	if err != nil {
-		return nil, internalError(ctx, err)
+		logger.Errorf(ctx,"Failed to get task schedule manager client: %+v", err)
+		return nil, gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorInternalError)
 	}
 
-	//TODO: How to guarantee consistency operations.
-	for _, l := range leasings {
-		err = leasingToRedis(*l)
-		//TODO: check if BillingService exist, then add billing task for pre-charging by curl TaskService
+	_, err = cli.CreateTask(ctx, CreateTaskReq)
+	if err != nil {
+		logger.Errorf(ctx,"Failed to create task: %+v", err)
+		return nil, gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorInternalError)
 	}
 	return &pb.CommonMeteringResponse{ResourceId: req.GetResourceId()}, nil
 }

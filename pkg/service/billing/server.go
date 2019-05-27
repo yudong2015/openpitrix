@@ -32,5 +32,6 @@ func Serve(cfg *config.Config) {
 			pb.RegisterBillingManagerServer(server, s)
 			pb.RegisterChargingManagerServer(server, s)
 			pb.RegisterPromotionOperationManagerServer(server, s)
+			pb.RegisterTaskHandlerManagerServer(server, s)
 		})
 }

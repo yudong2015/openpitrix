@@ -17,19 +17,15 @@ import (
 
 type Server struct{}
 
-func NewServer() (*Server, error) {
-	server := &Server{}
-	return server, nil
-}
-
 func Serve(cfg *config.Config) {
 	pi.SetGlobal(cfg)
-	s := Server{}
+	s := &Server{}
 	manager.NewGrpcServer(constants.MeteringManagerHost, constants.MeteringManagerPort).
 		ShowErrorCause(cfg.Grpc.ShowErrorCause).
 		Serve(func(server *grpc.Server) {
-			pb.RegisterSkuManagerServer(server, &s)
-			pb.RegisterMeteringManagerServer(server, &s)
-			pb.RegisterPromotionSkuManagerServer(server, &s)
+			pb.RegisterSkuManagerServer(server, s)
+			pb.RegisterMeteringManagerServer(server, s)
+			pb.RegisterPromotionSkuManagerServer(server, s)
+			pb.RegisterTaskHandlerManagerServer(server, s)
 		})
 }

@@ -45,11 +45,14 @@ service TaskScheduleManager {
 }
 
 message HandleTaskRequest {
-	ScheduleTask task = 1;
+	google.protobuf.StringValue task_id = 1;
+	google.protobuf.StringValue action = 2;
+	google.protobuf.StringValue conf = 3;
+	google.protobuf.UInt32Value retry_times = 4;
 }
 
 message HandleTaskResponse {
-	google.protobuf.BoolValue succ = 1;
+	google.protobuf.BoolValue ok = 1;
 }
 
 service TaskHandlerManager {
