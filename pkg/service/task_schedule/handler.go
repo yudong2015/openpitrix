@@ -7,8 +7,8 @@ package task_schedule
 import (
 	"context"
 
-	"openpitrix.io/logger"
 	"openpitrix.io/openpitrix/pkg/gerr"
+	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/util/pbutil"
@@ -19,7 +19,7 @@ func (es *ExecutorServer) CreateTask(ctx context.Context, req *pb.CreateSchedule
 
 	err := es.TaskInfoClient.PublishTask(ctx, *task)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to publish task: %+v", err)
+		logger.Error(ctx, "Failed to publish task: %+v", err)
 		return nil, gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorCreateMbingTask)
 	}
 

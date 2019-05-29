@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"openpitrix.io/logger"
+	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/util/idutil"
@@ -69,7 +69,7 @@ func (t *ScheduleTask) Fail() (string, error) {
 func (t *ScheduleTask) String() (string, error) {
 	b, err := yamlutil.Encode(t)
 	if err != nil {
-		logger.Errorf(nil, "Failed to encode ScheduleTask to string: %+v", err)
+		logger.Error(nil, "Failed to encode ScheduleTask to string: %+v", err)
 		return "", err
 	}
 	return string(b), err

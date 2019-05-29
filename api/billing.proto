@@ -352,7 +352,7 @@ message DeleteAccountsResponse {
 message Recharge {
 	google.protobuf.StringValue recharge_id = 1;
 	google.protobuf.StringValue user_id = 2;
-	google.protobuf.DoubleValue balance = 3;
+	google.protobuf.DoubleValue amount = 3;
 	google.protobuf.StringValue currency = 4;
 	google.protobuf.StringValue status = 5;
 	google.protobuf.Timestamp create_time = 6;
@@ -361,7 +361,7 @@ message Recharge {
 
 message CreateRechargeRequest {
 	google.protobuf.StringValue user_id = 1;
-	google.protobuf.DoubleValue balance = 2;
+	google.protobuf.DoubleValue amount = 2;
 	google.protobuf.StringValue currency = 3;
 	google.protobuf.StringValue description = 4;
 }
@@ -386,7 +386,7 @@ message Income {
 	google.protobuf.StringValue income_id = 1;
 	google.protobuf.StringValue contract_id = 2;
 	google.protobuf.StringValue owner_id = 3;
-	google.protobuf.DoubleValue balance = 4;
+	google.protobuf.DoubleValue amount = 4;
 	google.protobuf.StringValue currency = 5;
 	google.protobuf.Timestamp create_time = 6;
 }
@@ -409,7 +409,7 @@ message DescribeIncomesResponse {
 message Withdraw {
 	google.protobuf.StringValue withdraw_id = 1;
 	google.protobuf.StringValue user_id = 2;
-	google.protobuf.DoubleValue balance = 3;
+	google.protobuf.DoubleValue amount = 3;
 	google.protobuf.Timestamp create_time = 4;
 	google.protobuf.StringValue status = 5;
 	google.protobuf.StringValue description = 6;
@@ -417,7 +417,7 @@ message Withdraw {
 
 message CreateWithdrawRequest {
 	google.protobuf.StringValue user_id = 1;
-	google.protobuf.DoubleValue balance = 2;
+	google.protobuf.DoubleValue amount = 2;
 	google.protobuf.StringValue description = 3;
 }
 
@@ -823,7 +823,7 @@ message Coupon {
 	google.protobuf.StringValue name = 2;
 	google.protobuf.StringValue owner = 3;
 	repeated string limit_ids = 4; //the ids of limit spu/sku/price, distinguish them by prefix.
-	google.protobuf.DoubleValue balance = 5;
+	google.protobuf.DoubleValue amount = 5;
 	google.protobuf.UInt32Value count = 6;
 	google.protobuf.UInt32Value remain = 7; //remain num of coupon
 	google.protobuf.UInt32Value limit_num_per = 8;
@@ -838,7 +838,7 @@ message Coupon {
 message CreateCouponRequest {
 	google.protobuf.StringValue name = 1;
 	repeated string limit_ids = 2;
-	google.protobuf.DoubleValue balance = 3;
+	google.protobuf.DoubleValue amount = 3;
 	google.protobuf.UInt32Value count = 4;
 	google.protobuf.UInt32Value limit_num_per = 5;
 	google.protobuf.Timestamp start_time = 6;
@@ -870,7 +870,7 @@ message ModifyCouponRequest {
 	google.protobuf.StringValue coupon_id = 1;
 	google.protobuf.StringValue name = 2;
 	repeated string limit_ids = 3;
-	google.protobuf.DoubleValue balance = 4;
+	google.protobuf.DoubleValue amount = 4;
 	google.protobuf.UInt32Value count = 5;
 	google.protobuf.UInt32Value limit_num_per = 6;
 	google.protobuf.Timestamp start_time = 7;
@@ -894,7 +894,7 @@ message CouponReceived {
 	google.protobuf.StringValue coupon_received_id = 1;
 	google.protobuf.StringValue coupon_id = 2;
 	google.protobuf.StringValue user_id = 3;
-	google.protobuf.DoubleValue remain = 4; //remain balance of coupon
+	google.protobuf.DoubleValue remain = 4; //remain amount of coupon
 	google.protobuf.StringValue status = 5;
 	google.protobuf.Timestamp create_time = 6;
 	google.protobuf.Timestamp status_time = 7;

@@ -7,9 +7,9 @@ package task_schedule
 import (
 	"google.golang.org/grpc"
 
-	"openpitrix.io/logger"
 	"openpitrix.io/openpitrix/pkg/config"
 	"openpitrix.io/openpitrix/pkg/constants"
+	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/manager"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/pi"
@@ -23,8 +23,8 @@ type ExecutorServer struct {
 
 func NewExecutorServer() *ExecutorServer {
 	return &ExecutorServer{
-		TaskInfoClient: NewTaskInfoClient(),
-		TaskQueue: GetTaskQueue(),
+		TaskInfoClient:    NewTaskInfoClient(),
+		TaskQueue:         GetTaskQueue(),
 		TaskRunnerManager: NewTaskRunnerManager(),
 	}
 }
@@ -34,11 +34,11 @@ func ExecutorServe(cfg *config.Config) {
 	s := NewExecutorServer()
 
 	//** start task runner **
-	logger.Infof(nil, "[%s]", "** start TaskRunnerManager **")
+	logger.Info(nil, "[%s]", "** start TaskRunnerManager **")
 	go s.TaskRunnerManager.Serve()
 
-	logger.Infof(nil, "[%s]", "** start TaskScheduleService **")
-	manager.NewGrpcServer(constants.MbingExecutorManagerHost, constants.MbingExecutorManagerPort).
+	logger.Info(nil, "[%s]", "** start TaskScheduleService **")
+	manager.NewGrpcServer(constants.TaskScheduleManagerHost, constants.TaskScheduleManagerPort).
 		ShowErrorCause(cfg.Grpc.ShowErrorCause).
 		Serve(func(server *grpc.Server) {
 			pb.RegisterTaskScheduleManagerServer(server, s)

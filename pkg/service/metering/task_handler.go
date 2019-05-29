@@ -7,18 +7,16 @@ package metering
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
-	"openpitrix.io/logger"
-	"openpitrix.io/openpitrix.bak/openpitrix/pkg/util/yamlutil"
-	"openpitrix.io/openpitrix/pkg/constants"
-	"openpitrix.io/openpitrix/pkg/gerr"
+
+	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/util/pbutil"
+	"openpitrix.io/openpitrix/pkg/util/yamlutil"
 )
 
 const (
@@ -46,8 +44,8 @@ func getConstantWrapper(constant string) *wrappers.StringValue {
 func newCreateTaskRequest(action, conf string) *pb.CreateScheduleTaskRequest {
 	return &pb.CreateScheduleTaskRequest{
 		Handler: getConstantWrapper(MeterHandler),
-		Action: getConstantWrapper(action),
-		Conf: pbutil.ToProtoString(conf),
+		Action:  getConstantWrapper(action),
+		Conf:    pbutil.ToProtoString(conf),
 	}
 }
 
@@ -59,13 +57,13 @@ func handleInitMeteringTask(ctx context.Context, req *pb.HandleTaskRequest) (*pb
 	initReq := &pb.InitMeteringRequest{}
 	err := yamlutil.Decode([]byte(req.GetConf().GetValue()), initReq)
 	if err != nil {
-		logger.Errorf(ctx, "Fail to parse configration to struct:%+v", err)
+		logger.Error(ctx, "Fail to parse configration to struct:%+v", err)
 		return nil, err
 	}
 
 	err = initMetering(ctx, initReq)
 	if err != nil {
-		logger.Errorf(ctx, "Fail to init metering:%+v", err)
+		logger.Error(ctx, "Fail to init metering:%+v", err)
 		return nil, err
 	}
 	return &pb.HandleTaskResponse{Ok: pbutil.ToProtoBool(true)}, nil
@@ -95,24 +93,12 @@ func initMetering(ctx context.Context, req *pb.InitMeteringRequest) error {
 	return nil
 }
 
-func updateMeteringHandler(ctx context.Context, req *pb.UpdateMeteringRequest) (*pb.CommonMeteringResponse, error) {
-	for _, metering := range req.GetUpdateSkuMeterings() {
-		leasing, _ := getLeasing(ctx,
-			NIL_STR,
-			req.GetResourceId().GetValue(),
-			metering.GetSkuId().GetValue(),
-		)
+func updateMeteringHandler(ctx context.Context, req *pb.HandleTaskRequest) (*pb.HandleTaskResponse, error) {
 
-		//TODO: Update lesasing metering_values and save leasing
-		//      check attribute_name, make sure not duration
-		leasingToRedis(*leasing)
-		//TODO: check if BillingService exist and if need to charging, then add billing task for pre-charging by curl TaskService
-	}
-
-	return &pb.CommonMeteringResponse{}, nil
+	return &pb.HandleTaskResponse{}, nil
 }
 
-func (s *Server) HandleTask(ctx context.Context, req *pb.HandleTaskRequest) (*pb.HandleTaskResponse, error){
+func (s *Server) HandleTask(ctx context.Context, req *pb.HandleTaskRequest) (*pb.HandleTaskResponse, error) {
 	switch req.GetAction().GetValue() {
 	case ActionInitMetering:
 		return handleInitMeteringTask(ctx, req)

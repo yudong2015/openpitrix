@@ -22,9 +22,9 @@ enum AttributeType {
 //***************************************************
 //********************* Sku *************************
 //***************************************************
-//attribute_name
-message AttributeName {
-	google.protobuf.StringValue attribute_name_id = 1;
+//attribute_term
+message AttributeTerm {
+	google.protobuf.StringValue attribute_term_id = 1;
 	google.protobuf.StringValue name = 2;
 	google.protobuf.StringValue description = 3;
 	AttributeType type = 4;
@@ -33,18 +33,18 @@ message AttributeName {
 	google.protobuf.Timestamp status_time = 7;
 }
 
-message CreateAttributeNameRequest {
+message CreateAttributeTermRequest {
 	google.protobuf.StringValue name = 1;
 	google.protobuf.StringValue description = 2;
 	AttributeType type = 3;
 }
 
-message CreateAttributeNameResponse {
-	google.protobuf.StringValue attribute_name_id = 1;
+message CreateAttributeTermResponse {
+	google.protobuf.StringValue attribute_term_id = 1;
 }
 
-message DescribeAttributeNamesRequest {
-	google.protobuf.StringValue attribute_name_id = 1;
+message DescribeAttributeTermsRequest {
+	google.protobuf.StringValue attribute_term_id = 1;
 	google.protobuf.StringValue name = 2;
 	AttributeType type = 3;
 	google.protobuf.StringValue status = 4;
@@ -54,28 +54,28 @@ message DescribeAttributeNamesRequest {
 	uint32 limit = 8;
 }
 
-message DescribeAttributeNamesResponse {
+message DescribeAttributeTermsResponse {
 	uint32 total_count = 1;
-	repeated AttributeName attribute_name_set = 2;
+	repeated AttributeTerm attribute_term_set = 2;
 }
 
-message ModifyAttributeNameRequest {
-	google.protobuf.StringValue attribute_name_id = 1;
+message ModifyAttributeTermRequest {
+	google.protobuf.StringValue attribute_term_id = 1;
 	google.protobuf.StringValue name = 2;
 	google.protobuf.StringValue description = 3;
 	AttributeType type = 4;
 }
 
-message ModifyAttributeNameResponse {
-	google.protobuf.StringValue attribute_name_id = 1;
+message ModifyAttributeTermResponse {
+	google.protobuf.StringValue attribute_term_id = 1;
 }
 
-message DeleteAttributeNamesRequest {
-	repeated string attribute_name_ids = 1;
+message DeleteAttributeTermsRequest {
+	repeated string attribute_term_ids = 1;
 }
 
-message DeleteAttributeNamesResponse {
-	repeated string attribute_name_ids = 1;
+message DeleteAttributeTermsResponse {
+	repeated string attribute_term_ids = 1;
 }
 
 //attribute_unit
@@ -130,7 +130,7 @@ message DeleteAttributeUnitsResponse {
 //attribute
 message Attribute {
 	google.protobuf.StringValue attribute_id = 1;
-	google.protobuf.StringValue attribute_name_id = 2;
+	google.protobuf.StringValue attribute_term_id = 2;
 	google.protobuf.StringValue attribute_unit_id = 3;
 	//the types of value: single int value, scope of value (min_value, max_value], string value
 	google.protobuf.StringValue value = 4;
@@ -141,7 +141,7 @@ message Attribute {
 }
 
 message CreateAttributeRequest {
-	google.protobuf.StringValue attribute_name_id = 1;
+	google.protobuf.StringValue attribute_term_id = 1;
 	google.protobuf.StringValue attribute_unit_id = 2;
 	google.protobuf.StringValue value = 3;
 }
@@ -152,7 +152,7 @@ message CreateAttributeResponse {
 
 message DescribeAttributesRequest {
 	google.protobuf.StringValue attribute_id = 1;
-	google.protobuf.StringValue attribute_name_id = 2;
+	google.protobuf.StringValue attribute_term_id = 2;
 	google.protobuf.StringValue attribute_unit_id = 3;
 	google.protobuf.StringValue owner = 4;
 	google.protobuf.StringValue status = 5;
@@ -169,7 +169,7 @@ message DescribeAttributesResponse {
 
 message ModifyAttributeRequest {
 	google.protobuf.StringValue attribute_id = 1;
-	google.protobuf.StringValue attribute_name_id = 2;
+	google.protobuf.StringValue attribute_term_id = 2;
 	google.protobuf.StringValue attribute_unit_id = 3;
 	google.protobuf.StringValue value = 4;
 }
@@ -293,41 +293,41 @@ message DeleteSkusResponse {
 }
 
 service SkuManager {
-	rpc CreateAttributeName (CreateAttributeNameRequest) returns (CreateAttributeNameResponse) {
+	rpc CreateAttributeTerm (CreateAttributeTermRequest) returns (CreateAttributeTermResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "create attribute name"
+			summary: "create attribute_term"
 		};
 		option (google.api.http) = {
-			post: "/v1/metering/attribute/name"
+			post: "/v1/metering/attribute/term"
 			body: "*"
 		};
 	}
 
-	rpc DescribeAttributeNames (DescribeAttributeNamesRequest) returns (DescribeAttributeNamesResponse) {
+	rpc DescribeAttributeTerms (DescribeAttributeTermsRequest) returns (DescribeAttributeTermsResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "describe attribute_names"
+			summary: "describe attribute_terms"
 		};
 		option (google.api.http) = {
-			get: "/v1/metering/attribute/names"
+			get: "/v1/metering/attribute/terms"
 		};
 	}
 
-	rpc ModifyAttributeName (ModifyAttributeNameRequest) returns (ModifyAttributeNameResponse) {
+	rpc ModifyAttributeTerm (ModifyAttributeTermRequest) returns (ModifyAttributeTermResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "modify attribute_name"
+			summary: "modify attribute_term"
 		};
 		option (google.api.http) = {
-			put: "/v1/metering/attribute/name"
+			put: "/v1/metering/attribute/term"
 			body: "*"
 		};
 	}
 
-	rpc DeleteAttributeNames (DeleteAttributeNamesRequest) returns (DeleteAttributeNamesResponse) {
+	rpc DeleteAttributeTerms (DeleteAttributeTermsRequest) returns (DeleteAttributeTermsResponse) {
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "delete attribute_names"
+			summary: "delete attribute_terms"
 		};
 		option (google.api.http) = {
-			delete: "/v1/metering/attribute/names"
+			delete: "/v1/metering/attribute/terms"
 			body: "*"
 		};
 	}

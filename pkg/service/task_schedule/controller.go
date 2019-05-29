@@ -13,9 +13,10 @@ import (
 	"time"
 
 	"go.etcd.io/etcd/clientv3"
-	"openpitrix.io/logger"
+
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/etcd"
+	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/manager"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"

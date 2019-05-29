@@ -10,9 +10,10 @@ import (
 	"strconv"
 	"time"
 
-	"openpitrix.io/logger"
+	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
+	"openpitrix.io/openpitrix/pkg/util/pbutil"
 	"openpitrix.io/openpitrix/pkg/util/yamlutil"
 )
 
@@ -31,10 +32,10 @@ func NewTaskRunnerManager() *TaskRunnerManager {
 	runners := make([]*TaskRunner, TaskRunnerNum)
 	for i := 0; i < TaskRunnerNum; i++ {
 		runners = append(runners, &TaskRunner{
-			index: i,
+			index:          i,
 			RegisterClient: NewRegisterClient(),
 			TaskInfoClient: NewTaskInfoClient(),
-			TaskQueue: GetTaskQueue(),
+			TaskQueue:      GetTaskQueue(),
 		})
 	}
 	return &TaskRunnerManager{runners}
@@ -51,7 +52,7 @@ func (tr *TaskRunner) GetTaskInfo(taskId string) (*models.ScheduleTask, error) {
 		}
 		// parse value
 		if get.Count == 0 {
-			logger.Debugf(nil, "[TaskRunner-%d]The task info of %s is null!", tr.index, taskId)
+			logger.Debug(nil, "[TaskRunner-%d]The task info of %s is null!", tr.index, taskId)
 		} else {
 			e = yamlutil.Decode(get.Kvs[0].Value, task)
 			if e != nil {
@@ -70,7 +71,7 @@ func (tr *TaskRunner) GetTaskInfo(taskId string) (*models.ScheduleTask, error) {
 		return e
 	})
 	if err != nil {
-		logger.Errorf(nil, "[TaskRunner-%d]Fail to get task(%s) info: %+v", tr.index, taskId, err)
+		logger.Error(nil, "[TaskRunner-%d]Fail to get task(%s) info: %+v", tr.index, taskId, err)
 	}
 	return task, err
 }
@@ -81,11 +82,11 @@ func (tr *TaskRunner) ConsumeTask() (*models.ScheduleTask, error) {
 	for {
 		taskId, err := tr.TaskQueue.DequeueTask()
 		if err != nil {
-			logger.Errorf(nil, "[TaskRunner-%d]Fail to dequeue task id from etcd queue: %+v", tr.index, err)
+			logger.Error(nil, "[TaskRunner-%d]Fail to dequeue task id from etcd queue: %+v", tr.index, err)
 			time.Sleep(3 * time.Second)
 			continue
 		}
-		logger.Debugf(nil, "[TaskRunner-%d]Dequeue task id [%s] from etcd queue succeed", tr.index, taskId)
+		logger.Debug(nil, "[TaskRunner-%d]Dequeue task id [%s] from etcd queue succeed", tr.index, taskId)
 		break
 	}
 
@@ -100,7 +101,9 @@ func (tr *TaskRunner) run(ctx context.Context, task models.ScheduleTask) error {
 	}
 
 	in := &pb.HandleTaskRequest{
-		Task: models.ToPbScheduleTask(task),
+		TaskId: pbutil.ToProtoString(task.Id),
+		Action: pbutil.ToProtoString(task.Action),
+		Conf:   pbutil.ToProtoString(task.Conf),
 	}
 
 	_, err = handlerClient.HandleTask(ctx, in)
@@ -116,7 +119,7 @@ func (tr *TaskRunner) Fail(task models.ScheduleTask) {
 		}
 		// parse value
 		if get.Count == 0 {
-			logger.Debugf(nil, "The task info of %s is null!", task.Id)
+			logger.Debug(nil, "The task info of %s is null!", task.Id)
 		} else {
 			e = yamlutil.Decode(get.Kvs[0].Value, task)
 			if e != nil {
@@ -141,7 +144,7 @@ func (tr *TaskRunner) Done(task models.ScheduleTask) {
 	tr.TaskInfoClient.DlockWithTimeout(key, 60*time.Second, func() error {
 		_, err := tr.TaskInfoClient.Delete(nil, key)
 		if err != nil {
-			logger.Errorf(nil, "[Runner-%d]Fail to update task[%s] to done: %+v", tr.index, task.Id, err)
+			logger.Error(nil, "[Runner-%d]Fail to update task[%s] to done: %+v", tr.index, task.Id, err)
 		}
 		return err
 	})
@@ -154,25 +157,25 @@ func (tr *TaskRunner) Start(ctx context.Context) error {
 	//register to etcd
 	err := tr.RegisterClient.Register(cancelCtx, tr.index)
 	if err != nil {
-		logger.Errorf(ctx, "[Runner-%d]Fail to register to etcd: %+v", tr.index, err)
+		logger.Error(ctx, "[Runner-%d]Fail to register to etcd: %+v", tr.index, err)
 		return err
 	}
 
 	//loop to consume and handle task
 	go func() {
 		for {
-			logger.Infof(cancelCtx, "[Runner-%d]Consume task..", tr.index)
+			logger.Info(cancelCtx, "[Runner-%d]Consume task..", tr.index)
 			task, err := tr.ConsumeTask()
 			if err != nil {
-				logger.Errorf(nil, "[Runner-%d]Fail to consume task: %+v", tr.index, err)
+				logger.Error(nil, "[Runner-%d]Fail to consume task: %+v", tr.index, err)
 				//TODO: send alert email
 				continue
 			}
 
-			logger.Infof(cancelCtx, "[Runner-%d]Run task %s", tr.index, task.Id)
+			logger.Info(cancelCtx, "[Runner-%d]Run task %s", tr.index, task.Id)
 			err = tr.run(cancelCtx, *task)
 			if err != nil {
-				logger.Errorf(nil, "[Runner-%d]Fail to run task: %+v", tr.index, err)
+				logger.Error(nil, "[Runner-%d]Fail to run task: %+v", tr.index, err)
 				tr.Fail(*task)
 				//TODO: send alert email
 				continue
@@ -183,7 +186,7 @@ func (tr *TaskRunner) Start(ctx context.Context) error {
 			//check if need to exit
 			select {
 			case <-ctx.Done():
-				logger.Errorf(ctx, "[Runner-%d]Exit.", tr.index)
+				logger.Error(ctx, "[Runner-%d]Exit.", tr.index)
 				break
 			}
 		}
@@ -197,7 +200,7 @@ func (manager *TaskRunnerManager) Serve() {
 	for i := 0; i < TaskRunnerNum; i++ {
 		err := manager.runners[i].Start(ctx)
 		if err != nil {
-			logger.Errorf(ctx, "Runner-%d failed to start: %+v", i, err)
+			logger.Error(ctx, "Runner-%d failed to start: %+v", i, err)
 			//TODO: handle err
 		}
 	}

@@ -9,14 +9,13 @@ import (
 	"fmt"
 	"time"
 
-	"openpitrix.io/logger"
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/gerr"
+	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/manager"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 )
-
 
 func getTaskScheduleManagerClient() (pb.TaskScheduleManagerClient, error) {
 	conn, err := manager.NewClient(constants.TaskScheduleManagerHost, constants.TaskScheduleManagerPort)
@@ -31,13 +30,13 @@ func (s *Server) InitMetering(ctx context.Context, req *pb.InitMeteringRequest) 
 
 	cli, err := getTaskScheduleManagerClient()
 	if err != nil {
-		logger.Errorf(ctx,"Failed to get task schedule manager client: %+v", err)
+		logger.Error(ctx, "Failed to get task schedule manager client: %+v", err)
 		return nil, gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorInternalError)
 	}
 
 	_, err = cli.CreateTask(ctx, CreateTaskReq)
 	if err != nil {
-		logger.Errorf(ctx,"Failed to create task: %+v", err)
+		logger.Error(ctx, "Failed to create task: %+v", err)
 		return nil, gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorInternalError)
 	}
 	return &pb.CommonMeteringResponse{ResourceId: req.GetResourceId()}, nil

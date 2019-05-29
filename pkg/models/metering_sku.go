@@ -14,7 +14,7 @@ import (
 	"openpitrix.io/openpitrix/pkg/util/pbutil"
 )
 
-func NewAttributeNameId() string {
+func NewAttributeTermId() string {
 	return idutil.GetUuid("attn-")
 }
 
@@ -34,12 +34,8 @@ func NewSkuId() string {
 	return idutil.GetUuid("sku-")
 }
 
-func NewMeteringAttributeBindingId() string {
-	return idutil.GetUuid("binding-")
-}
-
-type AttributeName struct {
-	AttributeNameId string
+type AttributeTerm struct {
+	AttributeTermId string
 	Name            string
 	Description     string
 	Type            string
@@ -48,10 +44,10 @@ type AttributeName struct {
 	StatusTime      time.Time
 }
 
-func NewAttributeName(name, description, attType string) *AttributeName {
+func NewAttributeTerm(name, description, attType string) *AttributeTerm {
 	now := time.Now()
-	return &AttributeName{
-		AttributeNameId: NewAttributeNameId(),
+	return &AttributeTerm{
+		AttributeTermId: NewAttributeTermId(),
 		Name:            name,
 		Description:     description,
 		Type:            attType,
@@ -61,17 +57,17 @@ func NewAttributeName(name, description, attType string) *AttributeName {
 	}
 }
 
-func PbToAttributeName(pbAttName *pb.CreateAttributeNameRequest) *AttributeName {
-	return NewAttributeName(
+func PbToAttributeTerm(pbAttName *pb.CreateAttributeTermRequest) *AttributeTerm {
+	return NewAttributeTerm(
 		pbAttName.GetName().GetValue(),
 		pbAttName.GetDescription().GetValue(),
 		pbAttName.GetType().String(),
 	)
 }
 
-func AttributeNameToPb(attName *AttributeName) *pb.AttributeName {
-	return &pb.AttributeName{
-		AttributeNameId: pbutil.ToProtoString(attName.AttributeNameId),
+func AttributeTermToPb(attName *AttributeTerm) *pb.AttributeTerm {
+	return &pb.AttributeTerm{
+		AttributeTermId: pbutil.ToProtoString(attName.AttributeTermId),
 		Name:            pbutil.ToProtoString(attName.Name),
 		Description:     pbutil.ToProtoString(attName.Description),
 		Type:            pb.AttributeType(pb.AttributeType_value[attName.Type]),
@@ -118,7 +114,7 @@ func AttributeUnitToPb(attUnit *AttributeUnit) *pb.AttributeUnit {
 
 type Attribute struct {
 	AttributeId     string
-	AttributeNameId string
+	AttributeTermId string
 	AttributeUnitId string
 	Value           string
 	Owner           string
@@ -133,7 +129,7 @@ func NewAttribute(attNameId, attUnitId, value, owner string) *Attribute {
 	now := time.Now()
 	return &Attribute{
 		AttributeId:     NewAttributeId(),
-		AttributeNameId: attNameId,
+		AttributeTermId: attNameId,
 		AttributeUnitId: attUnitId,
 		Value:           value,
 		Owner:           owner,
@@ -145,7 +141,7 @@ func NewAttribute(attNameId, attUnitId, value, owner string) *Attribute {
 
 func PbToAttribute(pbAttribute *pb.CreateAttributeRequest, owner string) *Attribute {
 	return NewAttribute(
-		pbAttribute.GetAttributeNameId().GetValue(),
+		pbAttribute.GetAttributeTermId().GetValue(),
 		pbAttribute.GetAttributeUnitId().GetValue(),
 		pbAttribute.GetValue().GetValue(),
 		owner,
@@ -155,7 +151,7 @@ func PbToAttribute(pbAttribute *pb.CreateAttributeRequest, owner string) *Attrib
 func AttributeToPb(att *Attribute) *pb.Attribute {
 	return &pb.Attribute{
 		AttributeId:     pbutil.ToProtoString(att.AttributeId),
-		AttributeNameId: pbutil.ToProtoString(att.AttributeNameId),
+		AttributeTermId: pbutil.ToProtoString(att.AttributeTermId),
 		AttributeUnitId: pbutil.ToProtoString(att.AttributeUnitId),
 		Value:           pbutil.ToProtoString(att.Value),
 		Owner:           pbutil.ToProtoString(att.Owner),
