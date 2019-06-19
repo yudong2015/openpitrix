@@ -194,6 +194,6 @@ func refundCoupon(ctx context.Context, contract *models.LeasingContract) error {
 	return nil
 }
 
-func (s *Server) HandleTask(ctx context.Context, req *pb.HandleTaskRequest) (*pb.HandleTaskResponse, error){
+func (s *Server) HandleTask(ctx context.Context, req *pb.HandleTaskRequest) (*pb.HandleTaskResponse, error) {
 	return &pb.HandleTaskResponse{}, nil
 }

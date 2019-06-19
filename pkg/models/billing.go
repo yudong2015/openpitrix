@@ -21,29 +21,60 @@ func NewContractId() string {
 	return idutil.GetUuid("contract-")
 }
 
-type Price struct {
-	PriceId     string
-	SkuId       string
-	AttributeId string
-	Prices      map[int64]float64
-	Currency    string
-	Status      string
-	StartTime   time.Time
-	EndTime     time.Time
-	CreateTime  time.Time
-	StatusTime  time.Time
+type PriceItem struct {
+	Price uint64
+	Range map[string]string
 }
 
-func NewPrice(skuId, attributeId, currency string, prices map[int64]float64, startTime, endTime time.Time) *Price {
+func pbPricesToPriceItems(pbPrices []*pb.PriceItem) []PriceItem {
+	priceItems := []PriceItem{}
+	for _, item := range pbPrices {
+		priceItems = append(priceItems, PriceItem{
+			Price: item.GetPrice().GetValue(),
+			Range: item.GetRange(),
+		})
+	}
+	return priceItems
+}
+
+func priceItemsToPbPrices(priceItems []PriceItem) []*pb.PriceItem {
+	pbPriceItems := []*pb.PriceItem{}
+	for _, item := range priceItems {
+		pbPriceItems = append(pbPriceItems, &pb.PriceItem{
+			Price: pbutil.ToProtoUInt64(item.Price),
+			Range: item.Range,
+		})
+	}
+	return pbPriceItems
+}
+
+type Price struct {
+	PriceId      string
+	PriceName    string
+	SkuId        string
+	AttributeIds []string
+	Prices       []PriceItem
+	PricePolicy  string
+	Currency     string
+	Status       string
+	StartTime    time.Time
+	EndTime      time.Time
+	CreateTime   time.Time
+	StatusTime   time.Time
+}
+
+func NewPrice(priceName, skuId, policy, currency string, attributeIds []string, prices []PriceItem, startTime, endTime time.Time) *Price {
 	now := time.Now()
 	if (time.Time{}) == startTime {
 		startTime = now
 	}
 	return &Price{
 		PriceId:     NewPriceId(),
+		PriceName:   priceName,
 		SkuId:       skuId,
-		AttributeId: attributeId,
+		AttributeIds: attributeIds,
 		Prices:      prices,
+		PricePolicy: policy,
 		Currency:    currency,
 		Status:      constants.StatusActive,
 		StartTime:   startTime,
@@ -55,10 +86,12 @@ func NewPrice(skuId, attributeId, currency string, prices map[int64]float64, sta
 
 func PbToPrice(pbPrice *pb.CreatePriceRequest) *Price {
 	return NewPrice(
+		pbPrice.GetPriceName().GetValue(),
 		pbPrice.GetSkuId().GetValue(),
-		pbPrice.GetAttributeId().GetValue(),
+		pbPrice.GetPricePolicy().GetValue(),
 		pbPrice.GetCurrency().String(),
-		pbPrice.GetPrices(),
+		pbPrice.GetAttributeIds(),
+		pbPricesToPriceItems(pbPrice.GetPrices()),
 		pbutil.FromProtoTimestamp(pbPrice.GetStartTime()),
 		pbutil.FromProtoTimestamp(pbPrice.GetEndTime()),
 	)
@@ -67,9 +100,11 @@ func PbToPrice(pbPrice *pb.CreatePriceRequest) *Price {
 func PriceToPb(price *Price) *pb.Price {
 	return &pb.Price{
 		PriceId:     pbutil.ToProtoString(price.PriceId),
+		PriceName:     pbutil.ToProtoString(price.PriceName),
 		SkuId:       pbutil.ToProtoString(price.SkuId),
-		AttributeId: pbutil.ToProtoString(price.AttributeId),
-		Prices:      price.Prices,
+		AttributeIds: price.AttributeIds,
+		Prices:      priceItemsToPbPrices(price.Prices),
+		PricePolicy: pbutil.ToProtoString(price.PricePolicy),
 		Currency:    pb.Currency(pb.Currency_value[price.Currency]),
 		Status:      pbutil.ToProtoString(price.Status),
 		StartTime:   pbutil.ToProtoTimestamp(price.StartTime),
@@ -168,4 +203,39 @@ type Account struct {
 	Status     string
 	CreateTime time.Time
 	StatusTime time.Time
+}
+
+type Charge struct {
+	ChargeId   string
+	ContractId string
+	Fee        float64
+	Currency   string
+	Status     string
+	CreateTime time.Time
+}
+
+type Refund struct {
+	RefundId   string
+	ContractId string
+	Fee        float64
+	Currency   string
+	Status     string
+	CreateTime time.Time
+}
+
+type Recharge struct {
+	ReChargeId  string
+	Balance     float64
+	Currency    string
+	Status      string
+	CreateTime  time.Time
+	Description string
+}
+
+type Income struct {
+	IncomeId   string
+	ContractId string
+	Balance    string
+	Currency   string
+	CreateTime time.Time
 }

@@ -1,6 +1,6 @@
 /**  Sku  **/
-CREATE TABLE IF NOT EXISTS attribute_name (
-	attribute_name_id VARCHAR(50)  NOT NULL UNIQUE,
+CREATE TABLE IF NOT EXISTS attribute_term (
+	attribute_term_id VARCHAR(50)  NOT NULL UNIQUE,
 	name              VARCHAR(255) NOT NULL,
 	type              VARCHAR(16)  NOT NULL DEFAULT 'normal'
 	COMMENT 'normal, metering',
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS attribute_name (
 	status_time       TIMESTAMP             DEFAULT CURRENT_TIMESTAMP
 	ON UPDATE CURRENT_TIMESTAMP,
 	description       TEXT,
-	PRIMARY KEY (attribute_name_id)
+	PRIMARY KEY (attribute_term_id)
 );
 
 
@@ -28,10 +28,11 @@ CREATE TABLE IF NOT EXISTS attribute_unit (
 
 CREATE TABLE IF NOT EXISTS attribute (
 	attribute_id      VARCHAR(50)  NOT NULL UNIQUE,
-	attribute_name_id VARCHAR(50)  NOT NULL,
+	attribute_term_id VARCHAR(50)  NOT NULL,
 	attribute_unit_id VARCHAR(50),
 	value             VARCHAR(255) NOT NULL
 	COMMENT 'attribute value, the types: single int value, scope of value (min_value, max_value], string value',
+	range             JSON COMMENT 'used for can not enumerated attribute',
 	owner             VARCHAR(50)  NOT NULL,
 	status            VARCHAR(16) DEFAULT 'active'
 	COMMENT 'active, deleted',
@@ -61,6 +62,7 @@ CREATE TABLE IF NOT EXISTS sku (
 	spu_id                 VARCHAR(50) NOT NULL,
 	attribute_ids          JSON COMMENT 'attributes of sku',
 	metering_attribute_ids JSON COMMENT 'metering attributes of sku',
+	fee_policy             VARCHAR(50) NOT NULL,
 	status                 VARCHAR(16) DEFAULT 'active'
 	COMMENT 'active, deleted',
 	create_time            TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
@@ -105,12 +107,12 @@ CREATE TABLE IF NOT EXISTS leased (
 );
 
 #Init data about duration
-INSERT INTO attribute_name (attribute_name_id, name, description)
-VALUES ("att-name-000001", "duration", "default attribute: duration");
+INSERT INTO attribute_term (attribute_term_id, name, description)
+VALUES ("att-term-000001", "duration", "default attribute: duration");
 
 INSERT INTO attribute_unit (attribute_unit_id, name)
 VALUES ("att-unit-000001", "hour"), ("att-unit-000002", "month"), ("att-unit-000003", "year");
 
-INSERT INTO attribute (attribute_id, attribute_name_id, attribute_unit_id, value)
+INSERT INTO attribute (attribute_id, attribute_term_id, attribute_unit_id, value)
 VALUES ("att-000001", "att-name-000001", "att-unit-000001", 1), ("att-000002", "att-name-000001", "att-unit-000002", 1),
 	("att-000003", "att-name-000001", "att-unit-000003", 1);

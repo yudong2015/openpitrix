@@ -7,15 +7,15 @@ package billing
 import (
 	"google.golang.org/grpc"
 
-	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/config"
 	"openpitrix.io/openpitrix/pkg/constants"
+	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/manager"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/pi"
 )
 
-type ExecutorServer struct {}
+type ExecutorServer struct{}
 
 func NewExecutorServer() *ExecutorServer {
 	return &ExecutorServer{}
