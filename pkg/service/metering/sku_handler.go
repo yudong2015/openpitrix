@@ -6,45 +6,54 @@ package metering
 
 import (
 	"context"
+	"openpitrix.io/openpitrix/pkg/constants"
+	"openpitrix.io/openpitrix/pkg/gerr"
 	"time"
 
 	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/util/pbutil"
+	"openpitrix.io/openpitrix/pkg/util/ctxutil"
 )
 
-func (s *Server) CreateAttributeName(ctx context.Context, req *pb.CreateAttributeNameRequest) (*pb.CreateAttributeNameResponse, error) {
-	attName := models.PbToAttributeName(req)
-	err := insertAttributeName(ctx, attName)
+func (s *Server) CreateAttributeTerm(ctx context.Context, req *pb.CreateAttributeTermRequest) (*pb.CreateAttributeTermResponse, error) {
+	attName := models.PbToAttributeTerm(req)
+	err := insertAttributeTerm(ctx, attName)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
-	return &pb.CreateAttributeNameResponse{AttributeNameId: pbutil.ToProtoString(attName.AttributeNameId)}, nil
+	return &pb.CreateAttributeTermResponse{AttributeTermId: pbutil.ToProtoString(attName.AttributeTermId)}, nil
 }
 
-func (s *Server) DescribeAttributeNames(ctx context.Context, req *pb.DescribeAttributeNamesRequest) (*pb.DescribeAttributeNamesResponse, error) {
-	attributeNames, err := DescribeAttributeNames(ctx, req)
+func (s *Server) DescribeAttributeTerms(ctx context.Context, req *pb.DescribeAttributeTermsRequest) (*pb.DescribeAttributeTermsResponse, error) {
+	attributeTerms, err := getAttributeTerms(ctx, req)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
 
-	var pbAttributeNames []*pb.AttributeName
-	for _, attName := range attributeNames {
-		pbAttributeNames = append(pbAttributeNames, models.AttributeNameToPb(attName))
+	var pbAttributeTerms []*pb.AttributeTerm
+	for _, attName := range attributeTerms {
+		pbAttributeTerms = append(pbAttributeTerms, models.AttributeTermToPb(attName))
 	}
 
-	return &pb.DescribeAttributeNamesResponse{AttributeNameSet: pbAttributeNames}, nil
+	return &pb.DescribeAttributeTermsResponse{AttributeTermSet: pbAttributeTerms}, nil
 }
 
-func (s *Server) ModifyAttributeName(ctx context.Context, req *pb.ModifyAttributeNameRequest) (*pb.ModifyAttributeNameResponse, error) {
-	//TODO: impl ModifyAttributeName
-	return &pb.ModifyAttributeNameResponse{AttributeNameId: pbutil.ToProtoString("tmp")}, nil
+func (s *Server) ModifyAttributeTerm(ctx context.Context, req *pb.ModifyAttributeTermRequest) (*pb.ModifyAttributeTermResponse, error) {
+	err := updateAttributeTerm(ctx, req)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+	return &pb.ModifyAttributeTermResponse{AttributeTermId: req.AttributeTermId}, nil
 }
 
-func (s *Server) DeleteAttributeNames(ctx context.Context, req *pb.DeleteAttributeNamesRequest) (*pb.DeleteAttributeNamesResponse, error) {
-	//TODO: impl DeleteAttributeNames
-	return &pb.DeleteAttributeNamesResponse{}, nil
+func (s *Server) DeleteAttributeTerms(ctx context.Context, req *pb.DeleteAttributeTermsRequest) (*pb.DeleteAttributeTermsResponse, error) {
+	err := deleteAttributeTerms(ctx, req)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+	return &pb.DeleteAttributeTermsResponse{AttributeTermIds: req.AttributeTermIds}, nil
 }
 
 func (s *Server) CreateAttributeUnit(ctx context.Context, req *pb.CreateAttributeUnitRequest) (*pb.CreateAttributeUnitResponse, error) {
@@ -57,7 +66,7 @@ func (s *Server) CreateAttributeUnit(ctx context.Context, req *pb.CreateAttribut
 }
 
 func (s *Server) DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsRequest) (*pb.DescribeAttributeUnitsResponse, error) {
-	attributeUnits, err := DescribeAttributeUnits(ctx, req)
+	attributeUnits, err := getAttributeUnits(ctx, req)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
@@ -71,31 +80,41 @@ func (s *Server) DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAtt
 }
 
 func (s *Server) ModifyAttributeUnit(ctx context.Context, req *pb.ModifyAttributeUnitRequest) (*pb.ModifyAttributeUnitResponse, error) {
-	//TODO: impl ModifyAttributeUnit
-	return &pb.ModifyAttributeUnitResponse{}, nil
+	err := updateAttributeUnit(ctx, req)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+	return &pb.ModifyAttributeUnitResponse{AttributeUnitId: req.GetAttributeUnitId()}, nil
 }
 
 func (s *Server) DeleteAttributeUnits(ctx context.Context, req *pb.DeleteAttributeUnitsRequest) (*pb.DeleteAttributeUnitsResponse, error) {
-	//TODO: impl DeleteAttributeUnits
-	return &pb.DeleteAttributeUnitsResponse{}, nil
+	err := deleteAttributeUnits(ctx, req)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+	return &pb.DeleteAttributeUnitsResponse{AttributeUnitIds: req.GetAttributeUnitIds()}, nil
 }
 
 func (s *Server) CreateAttribute(ctx context.Context, req *pb.CreateAttributeRequest) (*pb.CreateAttributeResponse, error) {
-	//TODO: get id of current user
-	attribute := models.PbToAttribute(req, "")
+	userId := ctxutil.GetSender(ctx).UserId
+	attribute := models.PbToAttribute(req, userId)
 
-	//check if attribute_name exist
-	err := checkStructExist(ctx, models.AttributeName{}, attribute.AttributeNameId)
+	//check if attribute_term exist
+	exist, err := checkExistById(ctx, constants.TableAttributeTerm, attribute.AttributeTermId)
 	if err != nil {
-		return nil, err
+		return nil, internalError(ctx, err)
+	}
+	if !exist {
+		return nil, gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExist, "attribute_term", "attribute_term", "属性项")
 	}
 
 	//check if attribute_unit exist
-	if attribute.AttributeUnitId != "" {
-		err = checkStructExist(ctx, models.AttributeUnit{}, attribute.AttributeUnitId)
-		if err != nil {
-			return nil, err
-		}
+	exist, err = checkExistById(ctx, constants.TableAttributeUnit, attribute.AttributeUnitId)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+	if !exist {
+		return nil, gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExist, "attribute_unit", "attribute_unit", "属性项")
 	}
 
 	//insert into attribute
@@ -107,7 +126,7 @@ func (s *Server) CreateAttribute(ctx context.Context, req *pb.CreateAttributeReq
 }
 
 func (s *Server) DescribeAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) (*pb.DescribeAttributesResponse, error) {
-	attributes, err := DescribeAttributes(ctx, req)
+	attributes, err := getAttributes(ctx, req)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}

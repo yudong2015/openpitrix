@@ -51,15 +51,12 @@ type AttributeTerm struct {
 }
 
 func NewAttributeTerm(name, termType, description string) *AttributeTerm {
-	now := time.Now()
 	return &AttributeTerm{
 		AttributeTermId: NewAttributeTermId(),
 		Name:            name,
 		Description:     description,
 		Type:            termType,
 		Status:          constants.StatusActive,
-		CreateTime:      now,
-		StatusTime:      now,
 	}
 }
 
@@ -92,13 +89,10 @@ type AttributeUnit struct {
 }
 
 func NewAttributeUnit(name string) *AttributeUnit {
-	now := time.Now()
 	return &AttributeUnit{
 		AttributeUnitId: NewAttributeUnitId(),
 		Name:            name,
 		Status:          constants.StatusActive,
-		CreateTime:      now,
-		StatusTime:      now,
 	}
 }
 
@@ -133,7 +127,6 @@ type Attribute struct {
 var AttributeColumns = db.GetColumnsFromStruct(&Attribute{})
 
 func NewAttribute(attNameId, attUnitId, value, valueRange, owner string) *Attribute {
-	now := time.Now()
 	return &Attribute{
 		AttributeId:     NewAttributeId(),
 		AttributeTermId: attNameId,
@@ -141,8 +134,6 @@ func NewAttribute(attNameId, attUnitId, value, valueRange, owner string) *Attrib
 		Value:           value,
 		Range:           valueRange,
 		Owner:           owner,
-		CreateTime:      now,
-		StatusTime:      now,
 		Status:          constants.StatusActive,
 	}
 }
@@ -182,14 +173,11 @@ type Spu struct {
 }
 
 func NewSpu(productId, owner string) *Spu {
-	now := time.Now()
 	return &Spu{
 		SpuId:      NewSpuId(),
 		ProductId:  productId,
 		Owner:      owner,
 		Status:     constants.StatusActive,
-		CreateTime: now,
-		StatusTime: now,
 	}
 }
 
@@ -221,7 +209,6 @@ type Sku struct {
 }
 
 func NewSku(spuId, feePolicy string, attributeIds, meteringAttributeIds []string) *Sku {
-	now := time.Now()
 	return &Sku{
 		SkuId:                NewSkuId(),
 		SpuId:                spuId,
@@ -229,8 +216,6 @@ func NewSku(spuId, feePolicy string, attributeIds, meteringAttributeIds []string
 		MeteringAttributeIds: meteringAttributeIds,
 		Status:               constants.StatusActive,
 		FeePolicy:            feePolicy,
-		CreateTime:           now,
-		StatusTime:           now,
 	}
 }
 
@@ -311,6 +296,5 @@ func (l *Leasing) ToLeased() *Leased {
 		MeteringValues: l.MeteringValues,
 		LeaseTime:      l.LeaseTime,
 		StopTime:       l.StopTimes,
-		CreateTime:     time.Now(),
 	}
 }

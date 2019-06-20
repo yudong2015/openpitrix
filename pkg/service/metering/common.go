@@ -88,18 +88,3 @@ func notExistError(ctx context.Context, structObj interface{}, id string) error 
 	}
 	return gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExist, a)
 }
-
-func notExistInOtherError(ctx context.Context, structObj, targetStructObj interface{}) error {
-	//SN: Struct Name
-	structObjSN := structs.Name(structObj)
-	targetStructObjSn := structs.Name(targetStructObj)
-	logger.Error(ctx, "The %s not exist in %s!", structObjSN, targetStructObjSn)
-	a := []string{
-		structDisName[structObjSN][EN],
-		structDisName[structObjSN][EN],
-		structDisName[targetStructObjSn][EN],
-		structDisName[targetStructObjSn][ZH],
-		structDisName[structObjSN][ZH],
-	}
-	return gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExistInOther, a)
-}

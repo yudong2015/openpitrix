@@ -6,7 +6,6 @@ package metering
 
 import (
 	"context"
-
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/db"
 	"openpitrix.io/openpitrix/pkg/logger"
@@ -15,57 +14,113 @@ import (
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/pi"
 	"openpitrix.io/openpitrix/pkg/util/pbutil"
-	"openpitrix.io/openpitrix/pkg/util/stringutil"
 )
 
-func checkExistById(ctx context.Context, structName, idValue string) (bool, error) {
-	tableName := stringutil.CamelCaseToUnderscore(structName)
-	idName := tableName + "_id"
+func checkExistById(ctx context.Context, table, id string) (bool, error) {
+	idName := table + "_id"
 	count, err := pi.Global().DB(ctx).
 		Select(idName).
-		From(tableName).
-		Where(db.Eq(idName, idValue)).
+		From(table).
+		Where(db.Eq(idName, id)).
 		Limit(1).Count()
 
 	if err != nil {
-		logger.Error(ctx, "Failed to connect DB: [%+v]", err)
+		logger.Error(ctx, "Failed to connect to database: [%+v]", err)
 		return false, err
 	}
 
 	if count > 0 {
 		return true, nil
 	}
+	logger.Info(ctx, "The %s not exist in %s!", id, table)
 	return false, nil
 }
 
-//Sku
-func insertAttributeName(ctx context.Context, attributeName *models.AttributeName) error {
+func insertAttributeTerm(ctx context.Context, term *models.AttributeTerm) error {
 	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableAttributeName).
-		Record(attributeName).
+		InsertInto(constants.TableAttributeTerm).
+		Record(term).
 		Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert attribute_name: [%+v]", err)
+		logger.Error(ctx, "Failed to insert attribute_term: [%+v]", err)
 	}
 	return err
 }
 
-func DescribeAttributeNames(ctx context.Context, req *pb.DescribeAttributeNamesRequest) ([]*models.AttributeName, error) {
-	var attributeNames []*models.AttributeName
+func getAttributeTerms(ctx context.Context, req *pb.DescribeAttributeTermsRequest) ([]*models.AttributeTerm, error) {
+	orderKey := req.GetSortKey().GetValue()
+	if orderKey == "" {
+		orderKey = constants.ColumnCreateTime
+	}
+
+	var attributeTerms []*models.AttributeTerm
 	_, err := pi.Global().DB(ctx).
-		Select(constants.IndexedColumns[constants.TableAttributeName]...).
-		From(constants.TableAttributeName).
+		Select(constants.IndexedColumns[constants.TableAttributeTerm]...).
+		From(constants.TableAttributeTerm).
 		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
-		Where(manager.BuildFilterConditions(req, constants.TableAttributeName)).
-		OrderDir(constants.ColumnCreateTime, false).
+		Where(manager.BuildFilterConditions(req, constants.TableAttributeTerm)).
+		OrderDir(orderKey, !req.GetReverse().GetValue()).
 		Offset(pbutil.GetOffsetFromRequest(req)).
 		Limit(pbutil.GetLimitFromRequest(req)).
-		Load(&attributeNames)
+		Load(&attributeTerms)
 
 	if err != nil {
-		logger.Error(ctx, "Failed to describe attribute_name: [%+v]", err)
+		logger.Error(ctx, "Failed to describe attribute_terms: [%+v]", err)
 	}
-	return attributeNames, err
+	return attributeTerms, err
+}
+
+func updateAttributeTerm(ctx context.Context, req *pb.ModifyAttributeTermRequest) error {
+	attributeTermId := req.GetAttributeTermId().GetValue()
+	buildedAttributes := manager.BuildUpdateAttributes(req, constants.ColumnName, constants.ColumnDescription)
+
+	var err error
+	if len(buildedAttributes) > 0 {
+		_, err = pi.Global().DB(ctx).
+			Update(constants.TableAttributeTerm).
+			SetMap(buildedAttributes).
+			Where(db.Eq(constants.ColumnAttributeTermId, attributeTermId)).
+			Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+			Exec()
+
+		if err != nil {
+			logger.Error(ctx, "Failed to update attribute_term: [%+v]", err)
+		}
+	}
+
+	return err
+}
+
+func deleteAttributeTerms(ctx context.Context, req *pb.DeleteAttributeTermsRequest) error {
+	sess := pi.Global().DB(ctx).Session
+	tx, err := sess.Begin()
+	defer tx.RollbackUnlessCommitted()
+	if err != nil {
+		logger.Error(ctx, "Failed to get database transaction: [%+v]", err)
+		return err
+	}
+
+	for _, id := range req.GetAttributeTermIds() {
+		_, err := tx.Update(constants.TableAttributeTerm).
+			Set(constants.ColumnStatus, constants.StatusDeleted).
+			Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+			Where(db.Eq(constants.ColumnAttributeTermId, id)).
+			Exec()
+
+		if err != nil {
+			logger.Error(ctx, "Failed to set status of attribute_term to deleted: [%+v]", err)
+			return err
+		}
+	}
+
+	//commit transaction
+	err = tx.Commit()
+	if err != nil {
+		logger.Error(ctx, "Failed to commit transaction: [%+v]", err)
+		return err
+	}
+
+	return err
 }
 
 func insertAttributeUnit(ctx context.Context, attUnit *models.AttributeUnit) error {
@@ -79,14 +134,18 @@ func insertAttributeUnit(ctx context.Context, attUnit *models.AttributeUnit) err
 	return err
 }
 
-func DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsRequest) ([]*models.AttributeUnit, error) {
+func getAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsRequest) ([]*models.AttributeUnit, error) {
+	orderKey := req.GetSortKey().GetValue()
+	if orderKey == "" {
+		orderKey = constants.ColumnCreateTime
+	}
+
 	var attUnits []*models.AttributeUnit
 	_, err := pi.Global().DB(ctx).
 		Select(constants.IndexedColumns[constants.TableAttributeUnit]...).
 		From(constants.TableAttributeUnit).
 		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
 		Where(manager.BuildFilterConditions(req, constants.TableAttributeUnit)).
-		OrderDir(constants.ColumnCreateTime, false).
 		Offset(pbutil.GetOffsetFromRequest(req)).
 		Limit(pbutil.GetLimitFromRequest(req)).
 		Load(&attUnits)
@@ -95,6 +154,53 @@ func DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsR
 		logger.Error(ctx, "Failed to describe attribute_unit: [%+v]", err)
 	}
 	return attUnits, err
+}
+
+func updateAttributeUnit(ctx context.Context, req *pb.ModifyAttributeUnitRequest) error {
+	_, err := pi.Global().DB(ctx).
+		Update(constants.TableAttributeUnit).
+		Set(constants.ColumnName, req.GetName().GetValue()).
+		Where(db.Eq(constants.ColumnAttributeUnitId, req.GetAttributeUnitId().GetValue())).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Exec()
+
+	if err != nil {
+		logger.Error(ctx, "Failed to update attribute_unit: [%+v]", err)
+	}
+
+	return err
+}
+
+func deleteAttributeUnits(ctx context.Context, req *pb.DeleteAttributeUnitsRequest) error {
+	sess := pi.Global().DB(ctx).Session
+	tx, err := sess.Begin()
+	defer tx.RollbackUnlessCommitted()
+	if err != nil {
+		logger.Error(ctx, "Failed to get DB transaction: [%+v]", err)
+		return err
+	}
+
+	for _, id := range req.GetAttributeUnitIds() {
+		_, err := tx.Update(constants.TableAttributeUnit).
+			Set(constants.ColumnStatus, constants.StatusDeleted).
+			Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+			Where(db.Eq(constants.ColumnAttributeUnitId, id)).
+			Exec()
+
+		if err != nil {
+			logger.Error(ctx, "Failed to set status of attribute_unit to deleted: [%+v]", err)
+			return err
+		}
+	}
+
+	//commit transaction
+	err = tx.Commit()
+	if err != nil {
+		logger.Error(ctx, "Failed to commit transaction: [%+v]", err)
+		return err
+	}
+
+	return err
 }
 
 func insertAttribute(ctx context.Context, attribute *models.Attribute) error {
@@ -125,7 +231,7 @@ func getAttribute(ctx context.Context, attributeId string) (*models.Attribute, e
 	return attribute, err
 }
 
-func DescribeAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) ([]*models.Attribute, error) {
+func getAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) ([]*models.Attribute, error) {
 	var attributes []*models.Attribute
 	_, err := pi.Global().DB(ctx).
 		Select(constants.IndexedColumns[constants.TableAttribute]...).

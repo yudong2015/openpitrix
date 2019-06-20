@@ -47,7 +47,6 @@ message DescribeAttributeTermsRequest {
 	google.protobuf.StringValue attribute_term_id = 1;
 	google.protobuf.StringValue name = 2;
 	AttributeTermType type = 3;
-	google.protobuf.StringValue status = 4;
 	google.protobuf.StringValue sort_key = 5;
 	google.protobuf.BoolValue reverse = 6;
 	uint32 offset = 7;
@@ -63,7 +62,6 @@ message ModifyAttributeTermRequest {
 	google.protobuf.StringValue attribute_term_id = 1;
 	google.protobuf.StringValue name = 2;
 	google.protobuf.StringValue description = 3;
-	AttributeTermType type = 4;
 }
 
 message ModifyAttributeTermResponse {
@@ -98,7 +96,6 @@ message CreateAttributeUnitResponse {
 message DescribeAttributeUnitsRequest {
 	google.protobuf.StringValue attribute_unit_id = 1;
 	google.protobuf.StringValue name = 2;
-	google.protobuf.StringValue status = 3;
 	google.protobuf.StringValue sort_key = 4;
 	google.protobuf.BoolValue reverse = 5;
 	uint32 offset = 6;
@@ -157,7 +154,6 @@ message DescribeAttributesRequest {
 	google.protobuf.StringValue attribute_term_id = 2;
 	google.protobuf.StringValue attribute_unit_id = 3;
 	google.protobuf.StringValue owner = 4;
-	google.protobuf.StringValue status = 5;
 	google.protobuf.StringValue sort_key = 6;
 	google.protobuf.BoolValue reverse = 7;
 	uint32 offset = 8;

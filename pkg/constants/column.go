@@ -104,13 +104,13 @@ const (
 	ColumnRejectMessage            = "reject_message"
 	ColumnSubmitTime               = "submit_time"
 	ColumnApprover                 = "approver"
-	ColumnAttributeNameId          = "attribute_name_id"
+	ColumnAttributeTermId          = "attribute_term_id"
 	ColumnAttributeUnitId          = "attribute_unit_id"
 	ColumnAttributeId              = "attribute_id"
 	ColumnValue                    = "value"
+	ColumnRange                    = "range"
 	ColumnSpuId                    = "spu_id"
-	ColumnAttributeNameIds         = "attribute_name_ids"
-	ColumnMeteringAttributeNameIds = "metering_attribute_name_ids"
+	ColumnProductId                = "product_id"
 	ColumnSkuId                    = "sku_id"
 	ColumnAttributeIds             = "attribute_ids"
 	ColumnMeteringAttributeIds     = "metering_attribute_ids"
@@ -196,18 +196,17 @@ var IndexedColumns = map[string][]string{
 	TableVendorVerifyInfo: {
 		ColumnUserId, ColumnStatus,
 	},
-	TableAttributeName: {
-		ColumnAttributeNameId, ColumnName,
+	TableAttributeTerm: {
+		ColumnAttributeTermId, ColumnName, ColumnDescription,
 	},
 	TableAttributeUnit: {
 		ColumnAttributeUnitId, ColumnName,
 	},
 	TableAttribute: {
-		ColumnAttributeId, ColumnAttributeNameId, ColumnAttributeUnitId, ColumnValue,
+		ColumnAttributeId, ColumnAttributeTermId, ColumnAttributeUnitId, ColumnValue, ColumnRange,
 	},
 	TableSpu: {
-		ColumnSpuId, ColumnAttributeNameIds,
-		ColumnMeteringAttributeNameIds,
+		ColumnSpuId, ColumnProductId,
 	},
 	TableSku: {
 		ColumnSkuId, ColumnSpuId, ColumnAttributeIds, ColumnMeteringAttributeIds,

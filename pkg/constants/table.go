@@ -43,7 +43,7 @@ const (
 	TableVendorVerifyInfo = "vendor_verify_info"
 
 	// mbing
-	TableAttributeName    = "attribute_name"
+	TableAttributeTerm    = "attribute_term"
 	TableAttributeUnit    = "attribute_unit"
 	TableAttribute        = "attribute"
 	TableSpu              = "spu"

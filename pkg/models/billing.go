@@ -69,18 +69,18 @@ func NewPrice(priceName, skuId, policy, currency string, attributeIds []string, 
 		startTime = now
 	}
 	return &Price{
-		PriceId:     NewPriceId(),
-		PriceName:   priceName,
-		SkuId:       skuId,
+		PriceId:      NewPriceId(),
+		PriceName:    priceName,
+		SkuId:        skuId,
 		AttributeIds: attributeIds,
-		Prices:      prices,
-		PricePolicy: policy,
-		Currency:    currency,
-		Status:      constants.StatusActive,
-		StartTime:   startTime,
-		EndTime:     endTime,
-		CreateTime:  now,
-		StatusTime:  now,
+		Prices:       prices,
+		PricePolicy:  policy,
+		Currency:     currency,
+		Status:       constants.StatusActive,
+		StartTime:    startTime,
+		EndTime:      endTime,
+		CreateTime:   now,
+		StatusTime:   now,
 	}
 }
 
@@ -99,18 +99,18 @@ func PbToPrice(pbPrice *pb.CreatePriceRequest) *Price {
 
 func PriceToPb(price *Price) *pb.Price {
 	return &pb.Price{
-		PriceId:     pbutil.ToProtoString(price.PriceId),
-		PriceName:     pbutil.ToProtoString(price.PriceName),
-		SkuId:       pbutil.ToProtoString(price.SkuId),
+		PriceId:      pbutil.ToProtoString(price.PriceId),
+		PriceName:    pbutil.ToProtoString(price.PriceName),
+		SkuId:        pbutil.ToProtoString(price.SkuId),
 		AttributeIds: price.AttributeIds,
-		Prices:      priceItemsToPbPrices(price.Prices),
-		PricePolicy: pbutil.ToProtoString(price.PricePolicy),
-		Currency:    pb.Currency(pb.Currency_value[price.Currency]),
-		Status:      pbutil.ToProtoString(price.Status),
-		StartTime:   pbutil.ToProtoTimestamp(price.StartTime),
-		EndTime:     pbutil.ToProtoTimestamp(price.EndTime),
-		CreateTime:  pbutil.ToProtoTimestamp(price.CreateTime),
-		StatusTime:  pbutil.ToProtoTimestamp(price.StatusTime),
+		Prices:       priceItemsToPbPrices(price.Prices),
+		PricePolicy:  pbutil.ToProtoString(price.PricePolicy),
+		Currency:     pb.Currency(pb.Currency_value[price.Currency]),
+		Status:       pbutil.ToProtoString(price.Status),
+		StartTime:    pbutil.ToProtoTimestamp(price.StartTime),
+		EndTime:      pbutil.ToProtoTimestamp(price.EndTime),
+		CreateTime:   pbutil.ToProtoTimestamp(price.CreateTime),
+		StatusTime:   pbutil.ToProtoTimestamp(price.StatusTime),
 	}
 }
 
