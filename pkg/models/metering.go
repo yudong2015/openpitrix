@@ -45,26 +45,29 @@ type AttributeTerm struct {
 	Name            string
 	Description     string
 	Type            string
+	Provider        string
 	Status          string
 	CreateTime      time.Time
 	StatusTime      time.Time
 }
 
-func NewAttributeTerm(name, termType, description string) *AttributeTerm {
+func NewAttributeTerm(name, termType, description, provider string) *AttributeTerm {
 	return &AttributeTerm{
 		AttributeTermId: NewAttributeTermId(),
 		Name:            name,
 		Description:     description,
 		Type:            termType,
+		Provider:		 provider,
 		Status:          constants.StatusActive,
 	}
 }
 
-func PbToAttributeTerm(pbAttTerm *pb.CreateAttributeTermRequest) *AttributeTerm {
+func PbToAttributeTerm(pbAttTerm *pb.CreateAttributeTermRequest, provider string) *AttributeTerm {
 	return NewAttributeTerm(
 		pbAttTerm.GetName().GetValue(),
 		pbAttTerm.GetDescription().GetValue(),
 		pbAttTerm.GetType().String(),
+		provider,
 	)
 }
 
@@ -83,22 +86,25 @@ func AttributeTermToPb(attName *AttributeTerm) *pb.AttributeTerm {
 type AttributeUnit struct {
 	AttributeUnitId string
 	Name            string
+	Provider        string
 	Status          string
 	CreateTime      time.Time
 	StatusTime      time.Time
 }
 
-func NewAttributeUnit(name string) *AttributeUnit {
+func NewAttributeUnit(name, provider string) *AttributeUnit {
 	return &AttributeUnit{
 		AttributeUnitId: NewAttributeUnitId(),
 		Name:            name,
+		Provider:            provider,
 		Status:          constants.StatusActive,
 	}
 }
 
-func PbToAttributeUnit(pbAttUnit *pb.CreateAttributeUnitRequest) *AttributeUnit {
+func PbToAttributeUnit(pbAttUnit *pb.CreateAttributeUnitRequest, providor string) *AttributeUnit {
 	return NewAttributeUnit(
 		pbAttUnit.GetName().GetValue(),
+		providor,
 	)
 }
 
@@ -118,7 +124,7 @@ type Attribute struct {
 	AttributeUnitId string
 	Value           string
 	Range           string
-	Owner           string
+	Provider        string
 	Status          string
 	CreateTime      time.Time
 	StatusTime      time.Time
@@ -126,25 +132,25 @@ type Attribute struct {
 
 var AttributeColumns = db.GetColumnsFromStruct(&Attribute{})
 
-func NewAttribute(attNameId, attUnitId, value, valueRange, owner string) *Attribute {
+func NewAttribute(attNameId, attUnitId, value, valueRange, provider string) *Attribute {
 	return &Attribute{
 		AttributeId:     NewAttributeId(),
 		AttributeTermId: attNameId,
 		AttributeUnitId: attUnitId,
 		Value:           value,
 		Range:           valueRange,
-		Owner:           owner,
+		Provider:        provider,
 		Status:          constants.StatusActive,
 	}
 }
 
-func PbToAttribute(pbAttribute *pb.CreateAttributeRequest, owner string) *Attribute {
+func PbToAttribute(pbAttribute *pb.CreateAttributeRequest, provider string) *Attribute {
 	return NewAttribute(
 		pbAttribute.GetAttributeTermId().GetValue(),
 		pbAttribute.GetAttributeUnitId().GetValue(),
 		pbAttribute.GetValue().GetValue(),
 		pbAttribute.GetRange().GetValue(),
-		owner,
+		provider,
 	)
 }
 
@@ -155,7 +161,6 @@ func AttributeToPb(att *Attribute) *pb.Attribute {
 		AttributeUnitId: pbutil.ToProtoString(att.AttributeUnitId),
 		Value:           pbutil.ToProtoString(att.Value),
 		Range:           pbutil.ToProtoString(att.Range),
-		Owner:           pbutil.ToProtoString(att.Owner),
 		Status:          pbutil.ToProtoString(att.Status),
 		CreateTime:      pbutil.ToProtoTimestamp(att.CreateTime),
 		StatusTime:      pbutil.ToProtoTimestamp(att.StatusTime),
@@ -174,10 +179,10 @@ type Spu struct {
 
 func NewSpu(productId, owner string) *Spu {
 	return &Spu{
-		SpuId:      NewSpuId(),
-		ProductId:  productId,
-		Owner:      owner,
-		Status:     constants.StatusActive,
+		SpuId:     NewSpuId(),
+		ProductId: productId,
+		Owner:     owner,
+		Status:    constants.StatusActive,
 	}
 }
 

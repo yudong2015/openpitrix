@@ -24,9 +24,14 @@ type RequestHadLimit interface {
 	GetLimit() uint32
 }
 
+type RequestSortKey interface {
+	GetSortKey() *wrappers.StringValue
+}
+
 const (
 	DefaultOffset = uint64(0)
 	DefaultLimit  = uint64(20)
+	DefaultSortKey = "create_time"
 )
 
 func GetOffsetFromRequest(req RequestHadOffset) uint64 {
@@ -43,6 +48,14 @@ func GetLimitFromRequest(req RequestHadLimit) uint64 {
 		return DefaultLimit
 	}
 	return db.GetLimit(uint64(n))
+}
+
+func GetSortKey(req RequestSortKey) string {
+	key := req.GetSortKey().GetValue()
+	if key == "" {
+		key = DefaultSortKey
+	}
+	return key
 }
 
 func GetTime(t *timestamp.Timestamp) (tt time.Time) {

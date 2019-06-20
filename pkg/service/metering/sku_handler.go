@@ -79,14 +79,6 @@ func (s *Server) DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAtt
 	return &pb.DescribeAttributeUnitsResponse{AttributeUnitSet: pbAttributeUnits}, nil
 }
 
-func (s *Server) ModifyAttributeUnit(ctx context.Context, req *pb.ModifyAttributeUnitRequest) (*pb.ModifyAttributeUnitResponse, error) {
-	err := updateAttributeUnit(ctx, req)
-	if err != nil {
-		return nil, internalError(ctx, err)
-	}
-	return &pb.ModifyAttributeUnitResponse{AttributeUnitId: req.GetAttributeUnitId()}, nil
-}
-
 func (s *Server) DeleteAttributeUnits(ctx context.Context, req *pb.DeleteAttributeUnitsRequest) (*pb.DeleteAttributeUnitsResponse, error) {
 	err := deleteAttributeUnits(ctx, req)
 	if err != nil {
@@ -140,12 +132,14 @@ func (s *Server) DescribeAttributes(ctx context.Context, req *pb.DescribeAttribu
 }
 
 func (s *Server) ModifyAttribute(ctx context.Context, req *pb.ModifyAttributeRequest) (*pb.ModifyAttributeResponse, error) {
-	//TODO: impl ModifyAttribute
-	return &pb.ModifyAttributeResponse{}, nil
+	userId := ctxutil.GetSender(ctx).UserId
+	err := updateAttribute(ctx)
+
+	return &pb.ModifyAttributeResponse{AttributeId: req.GetAttributeId()}, nil
 }
 
 func (s *Server) DeleteAttributes(ctx context.Context, req *pb.DeleteAttributesRequest) (*pb.DeleteAttributesResponse, error) {
-	//TODO: impl DeleteAttributes
+	//TODO: impl
 	return &pb.DeleteAttributesResponse{}, nil
 }
 
