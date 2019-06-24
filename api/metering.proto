@@ -28,8 +28,7 @@ message AttributeTerm {
 	google.protobuf.StringValue name = 2;
 	google.protobuf.StringValue description = 3;
 	AttributeTermType type = 4;
-	google.protobuf.StringValue provider = 7; //the user_id created attribute
-	google.protobuf.StringValue status = 5;
+	google.protobuf.StringValue provider = 5;
 	google.protobuf.Timestamp create_time = 6;
 	google.protobuf.Timestamp status_time = 7;
 }
@@ -48,6 +47,7 @@ message DescribeAttributeTermsRequest {
 	google.protobuf.StringValue attribute_term_id = 1;
 	google.protobuf.StringValue name = 2;
 	AttributeTermType type = 3;
+	google.protobuf.StringValue provider = 4;
 	google.protobuf.StringValue sort_key = 5;
 	google.protobuf.BoolValue reverse = 6;
 	uint32 offset = 7;
@@ -59,6 +59,7 @@ message DescribeAttributeTermsResponse {
 	repeated AttributeTerm attribute_term_set = 2;
 }
 
+//only modify name and description
 message ModifyAttributeTermRequest {
 	google.protobuf.StringValue attribute_term_id = 1;
 	google.protobuf.StringValue name = 2;
@@ -81,7 +82,7 @@ message DeleteAttributeTermsResponse {
 message AttributeUnit {
 	google.protobuf.StringValue attribute_unit_id = 1;
 	google.protobuf.StringValue name = 2;
-	google.protobuf.StringValue status = 3;
+	google.protobuf.StringValue provider = 3;
 	google.protobuf.Timestamp create_time = 4;
 	google.protobuf.Timestamp status_time = 5;
 }
@@ -97,6 +98,7 @@ message CreateAttributeUnitResponse {
 message DescribeAttributeUnitsRequest {
 	google.protobuf.StringValue attribute_unit_id = 1;
 	google.protobuf.StringValue name = 2;
+	google.protobuf.StringValue provider = 3;
 	google.protobuf.StringValue sort_key = 4;
 	google.protobuf.BoolValue reverse = 5;
 	uint32 offset = 6;
@@ -123,8 +125,8 @@ message Attribute {
 	google.protobuf.StringValue attribute_unit_id = 3;
 	//the types of value: single int value, range of value (min_value, max_value], string value
 	google.protobuf.StringValue value = 4;
-	google.protobuf.StringValue range = 6; //used for that value can not be enumerated.
-	google.protobuf.StringValue status = 8;
+	google.protobuf.StringValue value_range = 6; //used for that value can not be enumerated.
+	google.protobuf.StringValue provider = 7; //the user_id created attribute
 	google.protobuf.Timestamp create_time = 9;
 	google.protobuf.Timestamp status_time = 10;
 }
@@ -133,7 +135,7 @@ message CreateAttributeRequest {
 	google.protobuf.StringValue attribute_term_id = 1;
 	google.protobuf.StringValue attribute_unit_id = 2;
 	google.protobuf.StringValue value = 3;
-	google.protobuf.StringValue range = 4;
+	google.protobuf.StringValue value_range = 4;
 }
 
 message CreateAttributeResponse {
@@ -144,6 +146,7 @@ message DescribeAttributesRequest {
 	google.protobuf.StringValue attribute_id = 1;
 	google.protobuf.StringValue attribute_term_id = 2;
 	google.protobuf.StringValue attribute_unit_id = 3;
+	google.protobuf.StringValue provider = 4;
 	google.protobuf.StringValue sort_key = 6;
 	google.protobuf.BoolValue reverse = 7;
 	uint32 offset = 8;
@@ -160,7 +163,7 @@ message ModifyAttributeRequest {
 	google.protobuf.StringValue attribute_term_id = 2;
 	google.protobuf.StringValue attribute_unit_id = 3;
 	google.protobuf.StringValue value = 4;
-	google.protobuf.StringValue range = 5;
+	google.protobuf.StringValue value_range = 5;
 }
 
 message ModifyAttributeResponse {

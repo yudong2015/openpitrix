@@ -1,29 +1,27 @@
-// Copyright 2017 The OpenPitrix Authors. All rights reserved.
+// Copyright 2019 The OpenPitrix Authors. All rights reserved.
 // Use of this source code is governed by a Apache license
 // that can be found in the LICENSE file.
 
-package metering
+package main
 
 import (
 	"context"
-	"openpitrix.io/openpitrix/pkg/constants"
-	"openpitrix.io/openpitrix/pkg/gerr"
 	"time"
 
 	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/util/pbutil"
-	"openpitrix.io/openpitrix/pkg/util/ctxutil"
 )
 
+
 func (s *Server) CreateAttributeTerm(ctx context.Context, req *pb.CreateAttributeTermRequest) (*pb.CreateAttributeTermResponse, error) {
-	attName := models.PbToAttributeTerm(req)
-	err := insertAttributeTerm(ctx, attName)
+	term := models.PbToAttributeTerm(req, UserId(ctx))
+	err := insertAttributeTerm(ctx, term)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
-	return &pb.CreateAttributeTermResponse{AttributeTermId: pbutil.ToProtoString(attName.AttributeTermId)}, nil
+	return &pb.CreateAttributeTermResponse{AttributeTermId: pbutil.ToProtoString(term.AttributeTermId)}, nil
 }
 
 func (s *Server) DescribeAttributeTerms(ctx context.Context, req *pb.DescribeAttributeTermsRequest) (*pb.DescribeAttributeTermsResponse, error) {
@@ -33,15 +31,23 @@ func (s *Server) DescribeAttributeTerms(ctx context.Context, req *pb.DescribeAtt
 	}
 
 	var pbAttributeTerms []*pb.AttributeTerm
-	for _, attName := range attributeTerms {
-		pbAttributeTerms = append(pbAttributeTerms, models.AttributeTermToPb(attName))
+	for _, attTerm := range attributeTerms {
+			pbAttributeTerms = append(pbAttributeTerms, models.AttributeTermToPb(attTerm))
 	}
 
 	return &pb.DescribeAttributeTermsResponse{AttributeTermSet: pbAttributeTerms}, nil
 }
 
 func (s *Server) ModifyAttributeTerm(ctx context.Context, req *pb.ModifyAttributeTermRequest) (*pb.ModifyAttributeTermResponse, error) {
-	err := updateAttributeTerm(ctx, req)
+	attTerm, err := CheckAttributeTermPermission(ctx, req.GetAttributeTermId().GetValue())
+	if err != nil {
+		return nil, err
+	}
+
+	attTerm.Name = req.GetName().GetValue()
+	attTerm.Description = req.GetDescription().GetValue()
+
+	err = updateAttributeTerm(ctx, req)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
@@ -49,7 +55,13 @@ func (s *Server) ModifyAttributeTerm(ctx context.Context, req *pb.ModifyAttribut
 }
 
 func (s *Server) DeleteAttributeTerms(ctx context.Context, req *pb.DeleteAttributeTermsRequest) (*pb.DeleteAttributeTermsResponse, error) {
-	err := deleteAttributeTerms(ctx, req)
+	attTermIds := req.GetAttributeTermIds()
+	_, err := CheckAttributeTermsPermission(ctx, attTermIds)
+	if err != nil {
+		return nil, err
+	}
+
+	err = deleteAttributeTerms(ctx, attTermIds)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
@@ -57,7 +69,7 @@ func (s *Server) DeleteAttributeTerms(ctx context.Context, req *pb.DeleteAttribu
 }
 
 func (s *Server) CreateAttributeUnit(ctx context.Context, req *pb.CreateAttributeUnitRequest) (*pb.CreateAttributeUnitResponse, error) {
-	attributeUnit := models.PbToAttributeUnit(req)
+	attributeUnit := models.PbToAttributeUnit(req, UserId(ctx))
 	err := insertAttributeUnit(ctx, attributeUnit)
 	if err != nil {
 		return nil, internalError(ctx, err)
@@ -80,7 +92,13 @@ func (s *Server) DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAtt
 }
 
 func (s *Server) DeleteAttributeUnits(ctx context.Context, req *pb.DeleteAttributeUnitsRequest) (*pb.DeleteAttributeUnitsResponse, error) {
-	err := deleteAttributeUnits(ctx, req)
+	attUnitIds := req.GetAttributeUnitIds()
+	_, err := CheckAttributeUnitsPermission(ctx, attUnitIds)
+	if err != nil {
+		return nil, err
+	}
+
+	err = deleteAttributeUnits(ctx, attUnitIds)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
@@ -88,25 +106,11 @@ func (s *Server) DeleteAttributeUnits(ctx context.Context, req *pb.DeleteAttribu
 }
 
 func (s *Server) CreateAttribute(ctx context.Context, req *pb.CreateAttributeRequest) (*pb.CreateAttributeResponse, error) {
-	userId := ctxutil.GetSender(ctx).UserId
-	attribute := models.PbToAttribute(req, userId)
+	attribute := models.PbToAttribute(req, UserId(ctx))
 
-	//check if attribute_term exist
-	exist, err := checkExistById(ctx, constants.TableAttributeTerm, attribute.AttributeTermId)
+	err := CheckAttributeRequirements(ctx, *attribute)
 	if err != nil {
-		return nil, internalError(ctx, err)
-	}
-	if !exist {
-		return nil, gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExist, "attribute_term", "attribute_term", "属性项")
-	}
-
-	//check if attribute_unit exist
-	exist, err = checkExistById(ctx, constants.TableAttributeUnit, attribute.AttributeUnitId)
-	if err != nil {
-		return nil, internalError(ctx, err)
-	}
-	if !exist {
-		return nil, gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExist, "attribute_unit", "attribute_unit", "属性项")
+		return nil, err
 	}
 
 	//insert into attribute
@@ -132,20 +136,41 @@ func (s *Server) DescribeAttributes(ctx context.Context, req *pb.DescribeAttribu
 }
 
 func (s *Server) ModifyAttribute(ctx context.Context, req *pb.ModifyAttributeRequest) (*pb.ModifyAttributeResponse, error) {
-	userId := ctxutil.GetSender(ctx).UserId
-	err := updateAttribute(ctx)
+	attribute, err := CheckAttributePermission(ctx, req.GetAttributeId().GetValue())
+	if err != nil {
+		return nil, err
+	}
+
+	attribute.AttributeTermId = req.GetAttributeTermId().GetValue()
+	attribute.AttributeUnitId = req.GetAttributeUnitId().GetValue()
+	err = CheckAttributeRequirements(ctx, *attribute)
+	if err != nil {
+		return nil, err
+	}
+
+	err = updateAttribute(ctx, req)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
 
 	return &pb.ModifyAttributeResponse{AttributeId: req.GetAttributeId()}, nil
 }
 
 func (s *Server) DeleteAttributes(ctx context.Context, req *pb.DeleteAttributesRequest) (*pb.DeleteAttributesResponse, error) {
-	//TODO: impl
-	return &pb.DeleteAttributesResponse{}, nil
+	attributeIds := req.GetAttributeIds()
+	_, err := CheckAttributesPermission(ctx, attributeIds)
+	if err != nil {
+		return nil, err
+	}
+
+	err = deleteAttributes(ctx, attributeIds)
+
+	return &pb.DeleteAttributesResponse{AttributeIds: req.GetAttributeIds()}, nil
 }
 
 func (s *Server) CreateSpu(ctx context.Context, req *pb.CreateSpuRequest) (*pb.CreateSpuResponse, error) {
 	//TODO: get id of current user
-	spu := models.PbToSpu(req, "")
+	spu := models.PbToSpu(req, UserId(ctx))
 
 	//insert spu
 	err := insertSpu(ctx, spu)

@@ -4,12 +4,12 @@
 package pb
 
 import (
-	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	_ "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options"
+	context "golang.org/x/net/context"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	math "math"
@@ -24,7 +24,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Currency int32
 
@@ -1414,9 +1414,9 @@ func (m *DescribeLeasedContractsResponse) GetLeasedContractSet() []*LeasedContra
 	return nil
 }
 
-//*************************************************************
-//******************** ChargingManager ************************
-//*************************************************************
+// *************************************************************
+// ******************** ChargingManager ************************
+// *************************************************************
 type Charge struct {
 	ChargeId             *wrappers.StringValue `protobuf:"bytes,1,opt,name=charge_id,json=chargeId,proto3" json:"charge_id,omitempty"`
 	ContractId           *wrappers.StringValue `protobuf:"bytes,2,opt,name=contract_id,json=contractId,proto3" json:"contract_id,omitempty"`
@@ -3346,10 +3346,10 @@ func (m *CommonBillingResponse) GetContractId() *wrappers.StringValue {
 	return nil
 }
 
-//*************************************************************************
-//*************************** Promotion Operation *************************
-//*************************************************************************
-//combination_price
+// *************************************************************************
+// *************************** Promotion Operation *************************
+// *************************************************************************
+// combination_price
 type CombinationPrice struct {
 	CombinationPriceId   *wrappers.StringValue `protobuf:"bytes,1,opt,name=combination_price_id,json=combinationPriceId,proto3" json:"combination_price_id,omitempty"`
 	CombinationSkuId     *wrappers.StringValue `protobuf:"bytes,2,opt,name=combination_sku_id,json=combinationSkuId,proto3" json:"combination_sku_id,omitempty"`
@@ -3885,7 +3885,7 @@ func (m *DeleteCombinationPricesResponse) GetCombinationPriceIds() []string {
 	return nil
 }
 
-//probation
+// probation
 type Probation struct {
 	ProbationId          *wrappers.StringValue `protobuf:"bytes,1,opt,name=probation_id,json=probationId,proto3" json:"probation_id,omitempty"`
 	SkuId                *wrappers.StringValue `protobuf:"bytes,2,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`
@@ -4405,7 +4405,7 @@ func (m *DeleteProbationsResponse) GetProbationIds() []string {
 	return nil
 }
 
-//Discount
+// Discount
 type Discount struct {
 	DiscountId           *wrappers.StringValue `protobuf:"bytes,1,opt,name=discount_id,json=discountId,proto3" json:"discount_id,omitempty"`
 	Name                 *wrappers.StringValue `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`

@@ -499,8 +499,8 @@ var (
 	}
 	ErrorNotExist = ErrorMessage{
 		Name: "%s_not_exist",
-		en:   "%s(%s) not exist",
-		zhCN: "%s(%s)不存在",
+		en:   "%s not exist",
+		zhCN: "%s不存在",
 	}
 	ErrorNotExistInOther = ErrorMessage{
 		Name: "%s_not_exist",

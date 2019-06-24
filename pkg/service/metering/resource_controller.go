@@ -2,10 +2,13 @@
 // Use of this source code is governed by a Apache license
 // that can be found in the LICENSE file.
 
-package metering
+package main
 
 import (
 	"context"
+	"openpitrix.io/openpitrix/pkg/gerr"
+	"openpitrix.io/openpitrix/pkg/util/stringutil"
+
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/db"
 	"openpitrix.io/openpitrix/pkg/logger"
@@ -16,15 +19,14 @@ import (
 	"openpitrix.io/openpitrix/pkg/util/pbutil"
 )
 
-func checkExist(ctx context.Context, table string, columnValue map[string]interface{}) (bool, error) {
-	idName := table + "_id"
+func CheckExist(ctx context.Context, table string, id string) (bool, error) {
+	idName := stringutil.CamelCaseToUnderscore(table) + "_id"
 	count, err := pi.Global().DB(ctx).
 		Select(idName).
 		From(table).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
 		Where(db.Eq(idName, id)).
 		Limit(1).Count()
-
-	query := pi.Global().DB(ctx).Select()
 
 	if err != nil {
 		logger.Error(ctx, "Failed to connect to database: [%+v]", err)
@@ -35,7 +37,29 @@ func checkExist(ctx context.Context, table string, columnValue map[string]interf
 		return true, nil
 	}
 	logger.Info(ctx, "The %s not exist in %s!", id, table)
+
 	return false, nil
+}
+
+func CheckAttributeRequirements(ctx context.Context, attribute models.Attribute) error {
+	//check if attribute_term exist
+	exist, err := CheckExist(ctx, constants.TableAttributeTerm, attribute.AttributeTermId)
+	if err != nil {
+		return internalError(ctx, err)
+	}
+	if !exist {
+		return gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExist, "attribute_term", "attribute_term", "属性项")
+	}
+
+	//check if attribute_unit exist
+	exist, err = CheckExist(ctx, constants.TableAttributeUnit, attribute.AttributeUnitId)
+	if err != nil {
+		return internalError(ctx, err)
+	}
+	if !exist {
+		return gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExist, "attribute_unit", "attribute_unit", "属性项")
+	}
+	return nil
 }
 
 func insertAttributeTerm(ctx context.Context, term *models.AttributeTerm) error {
@@ -47,6 +71,24 @@ func insertAttributeTerm(ctx context.Context, term *models.AttributeTerm) error 
 		logger.Error(ctx, "Failed to insert attribute_term: [%+v]", err)
 	}
 	return err
+}
+
+func getAttributeTermsByIds(ctx context.Context, ids []string) ([]*models.AttributeTerm, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
+	var attributeTerms []*models.AttributeTerm
+	_, err := pi.Global().DB(ctx).
+		Select(constants.IndexedColumns[constants.TableAttributeTerm]...).
+		From(constants.TableAttributeTerm).
+		Where(db.Eq(constants.ColumnAttributeTermId, ids)).
+		Load(&attributeTerms)
+
+	if err != nil {
+		logger.Error(ctx, "Failed to get attribute_term by ids: [%+v]", err)
+	}
+	return attributeTerms, err
 }
 
 func getAttributeTerms(ctx context.Context, req *pb.DescribeAttributeTermsRequest) ([]*models.AttributeTerm, error) {
@@ -62,21 +104,22 @@ func getAttributeTerms(ctx context.Context, req *pb.DescribeAttributeTermsReques
 		Load(&attributeTerms)
 
 	if err != nil {
-		logger.Error(ctx, "Failed to describe attribute_terms: [%+v]", err)
+		logger.Error(ctx, "Failed to get attribute_terms: [%+v]", err)
 	}
 	return attributeTerms, err
 }
 
 func updateAttributeTerm(ctx context.Context, req *pb.ModifyAttributeTermRequest) error {
-	attributeTermId := req.GetAttributeTermId().GetValue()
-	buildedAttributes := manager.BuildUpdateAttributes(req, constants.ColumnName, constants.ColumnDescription)
+	buildedAttributes := manager.BuildUpdateAttributes(req,
+		constants.ColumnName,
+		constants.ColumnDescription)
 
 	var err error
 	if len(buildedAttributes) > 0 {
 		_, err = pi.Global().DB(ctx).
 			Update(constants.TableAttributeTerm).
 			SetMap(buildedAttributes).
-			Where(db.Eq(constants.ColumnAttributeTermId, attributeTermId)).
+			Where(db.Eq(constants.ColumnAttributeTermId, req.GetAttributeTermId().GetValue())).
 			Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
 			Exec()
 
@@ -88,32 +131,16 @@ func updateAttributeTerm(ctx context.Context, req *pb.ModifyAttributeTermRequest
 	return err
 }
 
-func deleteAttributeTerms(ctx context.Context, req *pb.DeleteAttributeTermsRequest) error {
-	tx, err := pi.Global().DB(ctx).Session.Begin()
+func deleteAttributeTerms(ctx context.Context, attTermIds []string) error {
+	_, err := pi.Global().DB(ctx).
+		Update(constants.TableAttributeTerm).
+		Set(constants.ColumnStatus, constants.StatusDeleted).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(constants.ColumnAttributeTermId, attTermIds)).
+		Exec()
+
 	if err != nil {
-		logger.Error(ctx, "Failed to get database transaction: [%+v]", err)
-		return err
-	}
-	defer tx.RollbackUnlessCommitted()
-
-	for _, id := range req.GetAttributeTermIds() {
-		_, err := tx.Update(constants.TableAttributeTerm).
-			Set(constants.ColumnStatus, constants.StatusDeleted).
-			Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
-			Where(db.Eq(constants.ColumnAttributeTermId, id)).
-			Exec()
-
-		if err != nil {
-			logger.Error(ctx, "Failed to delete attribute_term(set status to deleted): [%+v]", err)
-			return err
-		}
-	}
-
-	//commit transaction
-	err = tx.Commit()
-	if err != nil {
-		logger.Error(ctx, "Failed to commit transaction: [%+v]", err)
-		return err
+		logger.Error(ctx, "Failed to delete attribute_term(set status to deleted): [%+v]", err)
 	}
 
 	return err
@@ -143,37 +170,36 @@ func getAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsReques
 		Load(&attUnits)
 
 	if err != nil {
-		logger.Error(ctx, "Failed to describe attribute_unit: [%+v]", err)
+		logger.Error(ctx, "Failed to get attribute_units: [%+v]", err)
 	}
 	return attUnits, err
 }
 
-func deleteAttributeUnits(ctx context.Context, req *pb.DeleteAttributeUnitsRequest) error {
-	tx, err := pi.Global().DB(ctx).Session.Begin()
+func getAttributeUnitsByIds(ctx context.Context, attributeUnitIds []string) ([]*models.AttributeUnit, error) {
+	var attUnits []*models.AttributeUnit
+	_, err := pi.Global().DB(ctx).
+		Select(constants.IndexedColumns[constants.TableAttributeUnit]...).
+		From(constants.TableAttributeUnit).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(constants.ColumnAttributeUnitId, attributeUnitIds)).
+		Load(&attUnits)
+
 	if err != nil {
-		logger.Error(ctx, "Failed to get database transaction: [%+v]", err)
-		return err
+		logger.Error(ctx, "Failed to get attribute_units: [%+v]", err)
 	}
-	defer tx.RollbackUnlessCommitted()
+	return attUnits, err
+}
 
-	for _, id := range req.GetAttributeUnitIds() {
-		_, err := tx.Update(constants.TableAttributeUnit).
-			Set(constants.ColumnStatus, constants.StatusDeleted).
-			Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
-			Where(db.Eq(constants.ColumnAttributeUnitId, id)).
-			Exec()
+func deleteAttributeUnits(ctx context.Context, attUnitIds []string) error {
+	_, err := pi.Global().DB(ctx).
+		Update(constants.TableAttributeUnit).
+		Set(constants.ColumnStatus, constants.StatusDeleted).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(constants.ColumnAttributeUnitId, attUnitIds)).
+		Exec()
 
-		if err != nil {
-			logger.Error(ctx, "Failed to delete attribute_unit(set status to deleted): [%+v]", err)
-			return err
-		}
-	}
-
-	//commit transaction
-	err = tx.Commit()
 	if err != nil {
-		logger.Error(ctx, "Failed to commit transaction: [%+v]", err)
-		return err
+		logger.Error(ctx, "Failed to delete attribute_unit(set status to deleted): [%+v]", err)
 	}
 
 	return err
@@ -203,18 +229,38 @@ func getAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) ([]*m
 		Load(&attributes)
 
 	if err != nil {
-		logger.Error(ctx, "Failed to describe attribute: [%+v]", err)
+		logger.Error(ctx, "Failed to get attributes: [%+v]", err)
 	}
 	return attributes, err
 }
 
-func updateAttribute(ctx context.Context, attribute *models.Attribute) error {
+func getAttributesByIds(ctx context.Context, attIds []string) ([]*models.Attribute, error) {
+	var attributes []*models.Attribute
+	_, err := pi.Global().DB(ctx).
+		Select(constants.IndexedColumns[constants.TableAttribute]...).
+		From(constants.TableAttribute).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(constants.ColumnAttributeId, attIds)).
+		Load(&attributes)
+
+	if err != nil {
+		logger.Error(ctx, "Failed to get attributes: [%+v]", err)
+	}
+	return attributes, err
+}
+
+func updateAttribute(ctx context.Context, req *pb.ModifyAttributeRequest) error {
+	buildAttributes := manager.BuildUpdateAttributes(req,
+		constants.ColumnAttributeTermId,
+		constants.ColumnAttributeUnitId,
+		constants.ColumnValue,
+		constants.ColumnValueRange)
+
 	_, err := pi.Global().DB(ctx).
 		Update(constants.TableAttribute).
-		Set(constants.ColumnValue, attribute.Value).
-		Set(constants.ColumnRange, attribute.Value).
-		Where(db.Eq(constants.ColumnAttributeId, attribute.AttributeId)).
+		SetMap(buildAttributes).
 		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(constants.ColumnAttributeId, req.GetAttributeId().GetValue())).
 		Exec()
 
 	if err != nil {
@@ -224,32 +270,15 @@ func updateAttribute(ctx context.Context, attribute *models.Attribute) error {
 	return err
 }
 
-func deleteAttributes(ctx context.Context, req *pb.DeleteAttributesRequest) error {
-	tx, err := pi.Global().DB(ctx).Session.Begin()
+func deleteAttributes(ctx context.Context, attributeIds []string) error {
+	_, err := pi.Global().DB(ctx).
+		Update(constants.TableAttribute).
+		Set(constants.ColumnStatus, constants.StatusDeleted).
+		Where(db.Eq(constants.ColumnAttributeId, attributeIds)).
+		Exec()
+
 	if err != nil {
-		logger.Error(ctx, "Failed to get database transaction: [%+v]", err)
-		return err
-	}
-	defer tx.RollbackUnlessCommitted()
-
-	for _, id := range req.GetAttributeIds() {
-		_, err := tx.Update(constants.TableAttribute).
-			Set(constants.ColumnStatus, constants.StatusDeleted).
-			Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
-			Where(db.Eq(constants.ColumnAttributeId, id)).
-			Exec()
-
-		if err != nil {
-			logger.Error(ctx, "Failed to delete attribute(set status to deleted): [%+v]", err)
-			return err
-		}
-	}
-
-	//commit transaction
-	err = tx.Commit()
-	if err != nil {
-		logger.Error(ctx, "Failed to commit transaction: [%+v]", err)
-		return err
+		logger.Error(ctx, "Failed to delete attribute(set status to deleted): [%+v]", err)
 	}
 
 	return err

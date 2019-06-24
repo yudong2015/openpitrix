@@ -108,7 +108,7 @@ const (
 	ColumnAttributeUnitId          = "attribute_unit_id"
 	ColumnAttributeId              = "attribute_id"
 	ColumnValue                    = "value"
-	ColumnRange                    = "range"
+	ColumnValueRange               = "value_range"
 	ColumnSpuId                    = "spu_id"
 	ColumnProductId                = "product_id"
 	ColumnSkuId                    = "sku_id"
@@ -197,13 +197,15 @@ var IndexedColumns = map[string][]string{
 		ColumnUserId, ColumnStatus,
 	},
 	TableAttributeTerm: {
-		ColumnAttributeTermId, ColumnName, ColumnDescription,
+		ColumnAttributeTermId, ColumnName, ColumnDescription, ColumnType, ColumnProvider,
+		ColumnCreateTime, ColumnStatusTime,
 	},
 	TableAttributeUnit: {
-		ColumnAttributeUnitId, ColumnName,
+		ColumnAttributeUnitId, ColumnName, ColumnProvider, ColumnCreateTime, ColumnStatusTime,
 	},
 	TableAttribute: {
-		ColumnAttributeId, ColumnAttributeTermId, ColumnAttributeUnitId, ColumnValue, ColumnRange,
+		ColumnAttributeId, ColumnAttributeTermId, ColumnAttributeUnitId, ColumnValue,
+		ColumnValueRange, ColumnProvider, ColumnCreateTime, ColumnStatusTime,
 	},
 	TableSpu: {
 		ColumnSpuId, ColumnProductId,

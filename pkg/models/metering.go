@@ -57,7 +57,7 @@ func NewAttributeTerm(name, termType, description, provider string) *AttributeTe
 		Name:            name,
 		Description:     description,
 		Type:            termType,
-		Provider:		 provider,
+		Provider:        provider,
 		Status:          constants.StatusActive,
 	}
 }
@@ -77,7 +77,6 @@ func AttributeTermToPb(attName *AttributeTerm) *pb.AttributeTerm {
 		Name:            pbutil.ToProtoString(attName.Name),
 		Description:     pbutil.ToProtoString(attName.Description),
 		Type:            pb.AttributeTermType(pb.AttributeTermType_value[attName.Type]),
-		Status:          pbutil.ToProtoString(attName.Status),
 		CreateTime:      pbutil.ToProtoTimestamp(attName.CreateTime),
 		StatusTime:      pbutil.ToProtoTimestamp(attName.StatusTime),
 	}
@@ -96,7 +95,7 @@ func NewAttributeUnit(name, provider string) *AttributeUnit {
 	return &AttributeUnit{
 		AttributeUnitId: NewAttributeUnitId(),
 		Name:            name,
-		Provider:            provider,
+		Provider:        provider,
 		Status:          constants.StatusActive,
 	}
 }
@@ -112,7 +111,6 @@ func AttributeUnitToPb(attUnit *AttributeUnit) *pb.AttributeUnit {
 	return &pb.AttributeUnit{
 		AttributeUnitId: pbutil.ToProtoString(attUnit.AttributeUnitId),
 		Name:            pbutil.ToProtoString(attUnit.Name),
-		Status:          pbutil.ToProtoString(attUnit.Status),
 		CreateTime:      pbutil.ToProtoTimestamp(attUnit.CreateTime),
 		StatusTime:      pbutil.ToProtoTimestamp(attUnit.StatusTime),
 	}
@@ -123,7 +121,7 @@ type Attribute struct {
 	AttributeTermId string
 	AttributeUnitId string
 	Value           string
-	Range           string
+	ValueRange      string
 	Provider        string
 	Status          string
 	CreateTime      time.Time
@@ -138,7 +136,7 @@ func NewAttribute(attNameId, attUnitId, value, valueRange, provider string) *Att
 		AttributeTermId: attNameId,
 		AttributeUnitId: attUnitId,
 		Value:           value,
-		Range:           valueRange,
+		ValueRange:      valueRange,
 		Provider:        provider,
 		Status:          constants.StatusActive,
 	}
@@ -149,7 +147,7 @@ func PbToAttribute(pbAttribute *pb.CreateAttributeRequest, provider string) *Att
 		pbAttribute.GetAttributeTermId().GetValue(),
 		pbAttribute.GetAttributeUnitId().GetValue(),
 		pbAttribute.GetValue().GetValue(),
-		pbAttribute.GetRange().GetValue(),
+		pbAttribute.GetValueRange().GetValue(),
 		provider,
 	)
 }
@@ -160,8 +158,7 @@ func AttributeToPb(att *Attribute) *pb.Attribute {
 		AttributeTermId: pbutil.ToProtoString(att.AttributeTermId),
 		AttributeUnitId: pbutil.ToProtoString(att.AttributeUnitId),
 		Value:           pbutil.ToProtoString(att.Value),
-		Range:           pbutil.ToProtoString(att.Range),
-		Status:          pbutil.ToProtoString(att.Status),
+		ValueRange:      pbutil.ToProtoString(att.ValueRange),
 		CreateTime:      pbutil.ToProtoTimestamp(att.CreateTime),
 		StatusTime:      pbutil.ToProtoTimestamp(att.StatusTime),
 	}

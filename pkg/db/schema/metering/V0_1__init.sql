@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS attribute_term
 	name              VARCHAR(255) NOT NULL,
 	type              VARCHAR(16)  NOT NULL DEFAULT 'normal' COMMENT 'normal, metering',
 	status            VARCHAR(16)           DEFAULT 'active' COMMENT 'active, deleted',
-	provider          VARCHAR(50)  NOT NULL DEFAULT 'admin',
+	provider          VARCHAR(50)  NOT NULL DEFAULT 'system',
 	create_time       TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
 	status_time       TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	description       TEXT,
@@ -18,10 +18,9 @@ CREATE TABLE IF NOT EXISTS attribute_unit
 	attribute_unit_id VARCHAR(50) NOT NULL UNIQUE,
 	name              VARCHAR(30) NOT NULL,
 	status            VARCHAR(16)          DEFAULT 'active' COMMENT 'active, deleted',
-	provider          VARCHAR(50) NOT NULL DEFAULT 'admin',
+	provider          VARCHAR(50) NOT NULL DEFAULT 'system',
 	create_time       TIMESTAMP            DEFAULT CURRENT_TIMESTAMP,
-	status_time       TIMESTAMP            DEFAULT CURRENT_TIMESTAMP
-		ON UPDATE CURRENT_TIMESTAMP,
+	status_time       TIMESTAMP            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (attribute_unit_id)
 );
 
@@ -32,12 +31,11 @@ CREATE TABLE IF NOT EXISTS attribute
 	attribute_term_id VARCHAR(50)  NOT NULL,
 	attribute_unit_id VARCHAR(50),
 	value             VARCHAR(255) NOT NULL COMMENT 'attribute value, the types: single int value, scope of value (min_value, max_value], string value',
-	range             JSON COMMENT 'used for can not enumerated attribute',
-	provider          VARCHAR(50)  NOT NULL DEFAULT 'admin',
+	value_range       VARCHAR(255) COMMENT 'used for can not enumerated attribute',
+	provider          VARCHAR(50)  NOT NULL DEFAULT 'system',
 	status            VARCHAR(16)           DEFAULT 'active' COMMENT 'active, deleted',
 	create_time       TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-	status_time       TIMESTAMP             DEFAULT CURRENT_TIMESTAMP
-		ON UPDATE CURRENT_TIMESTAMP,
+	status_time       TIMESTAMP             DEFAULT CURRENT_TIMESTAMP	ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (attribute_id)
 );
 
@@ -63,8 +61,7 @@ CREATE TABLE IF NOT EXISTS sku
 	fee_policy             VARCHAR(50) NOT NULL,
 	status                 VARCHAR(16) DEFAULT 'active' COMMENT 'active, deleted',
 	create_time            TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-	status_time            TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
-		ON UPDATE CURRENT_TIMESTAMP,
+	status_time            TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (sku_id)
 );
 

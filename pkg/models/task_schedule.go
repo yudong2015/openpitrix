@@ -10,9 +10,7 @@ import (
 
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/logger"
-	"openpitrix.io/openpitrix/pkg/pb"
 	"openpitrix.io/openpitrix/pkg/util/idutil"
-	"openpitrix.io/openpitrix/pkg/util/pbutil"
 	"openpitrix.io/openpitrix/pkg/util/yamlutil"
 )
 
@@ -31,28 +29,13 @@ type ScheduleTask struct {
 	CreateTime time.Time
 }
 
-func PbToScheduleTask(req *pb.CreateScheduleTaskRequest) *ScheduleTask {
-	return &ScheduleTask{
-		Id:         NewScheduleTaskId(),
-		Handler:    req.Handler.GetValue(),
-		Action:     req.Action.GetValue(),
-		Conf:       req.Conf.GetValue(),
-		Status:     constants.StatusReady,
-		RetryTimes: 0,
-		CreateTime: time.Now(),
-	}
+func PbToScheduleTask() *ScheduleTask {
+	//TODO: impl
+	return nil
 }
 
-func ToPbScheduleTask(task ScheduleTask) *pb.ScheduleTask {
-	return &pb.ScheduleTask{
-		TaskId:     pbutil.ToProtoString(task.Id),
-		Handler:    pbutil.ToProtoString(task.Handler),
-		Action:     pbutil.ToProtoString(task.Action),
-		Conf:       pbutil.ToProtoString(task.Conf),
-		Status:     pbutil.ToProtoString(task.Status),
-		RetryTimes: pbutil.ToProtoUInt32(task.RetryTimes),
-		CreateTime: pbutil.ToProtoTimestamp(task.CreateTime),
-	}
+func ToPbScheduleTask(task ScheduleTask) {
+	//TODO: impl
 }
 
 func (t *ScheduleTask) UpdateToRun(executor, runner string) (string, error) {

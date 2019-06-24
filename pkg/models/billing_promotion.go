@@ -232,7 +232,7 @@ func PbToCoupon(req *pb.CreateCouponRequest, owner string) *Coupon {
 		owner,
 		req.GetDescription().GetValue(),
 		req.GetLimitIds(),
-		req.GetBalance().GetValue(),
+		0, //TODO: add balance
 		req.GetCount().GetValue(),
 		req.GetLimitNumPer().GetValue(),
 		pbutil.FromProtoTimestamp(req.GetStartTime()),
