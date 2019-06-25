@@ -64,8 +64,16 @@ func main() {
 		"att_02",
 	}
 
-	conn := conn()
+	//conn := conn()
 	//selectAttributes(conn, ids)
-	deleteAtts(conn, ids)
+	//deleteAtts(conn, ids)
+
+	var aa []*models.Sku
+
+	for _, i := range ids {
+		aa = append(aa, models.NewSku(i, "aaa", []string{}, []string{}))
+	}
+
+	fmt.Printf("%+v", aa)
 
 }

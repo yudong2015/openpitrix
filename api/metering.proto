@@ -183,7 +183,6 @@ message Spu {
 	google.protobuf.StringValue spu_id = 1;
 	google.protobuf.StringValue product_id = 2;  //product_id: the  app_id / app_version_id / other_ids..
 	google.protobuf.StringValue owner = 3;
-	google.protobuf.StringValue status = 4;
 	google.protobuf.Timestamp create_time = 5;
 	google.protobuf.Timestamp status_time = 6;
 }
@@ -200,7 +199,6 @@ message DescribeSpusRequest {
 	google.protobuf.StringValue spu_id = 1;
 	google.protobuf.StringValue product_id = 2;
 	google.protobuf.StringValue owner = 3; //created user_id
-	google.protobuf.StringValue status = 4;
 	google.protobuf.StringValue sort_key = 5;
 	google.protobuf.BoolValue reverse = 6;
 	uint32 offset = 7;
@@ -210,15 +208,6 @@ message DescribeSpusRequest {
 message DescribeSpusResponse {
 	uint32 total_count = 1;
 	repeated Spu spu_set = 2;
-}
-
-message ModifySpuRequest {
-	google.protobuf.StringValue spu_id = 1;
-	google.protobuf.StringValue product_id = 2;
-}
-
-message ModifySpuResponse {
-	google.protobuf.StringValue spu_id = 1;
 }
 
 message DeleteSpusRequest {
@@ -235,7 +224,6 @@ message Sku {
 	google.protobuf.StringValue spu_id = 2;
 	repeated string attribute_ids = 3;
 	repeated string metering_attribute_ids = 4;
-	google.protobuf.StringValue status = 5;
 	google.protobuf.StringValue fee_policy = 6;
 	google.protobuf.Timestamp create_time = 7;
 	google.protobuf.Timestamp status_time = 8;
@@ -269,7 +257,6 @@ message DescribeSkusResponse {
 
 message ModifySkuRequest {
 	google.protobuf.StringValue sku_id = 1;
-	google.protobuf.StringValue spu_id = 2;
 	repeated string attribute_ids = 3;
 	repeated string metering_attribute_ids = 4;
 	google.protobuf.StringValue fee_policy = 5;
@@ -411,16 +398,6 @@ service SkuManager {
 		};
 		option (google.api.http) = {
 			get: "/v1/metering/spus"
-		};
-	}
-
-	rpc ModifySpu (ModifySpuRequest) returns (ModifySpuResponse) {
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			summary: "modify spu"
-		};
-		option (google.api.http) = {
-			put: "/v1/metering/spu"
-			body: "*"
 		};
 	}
 

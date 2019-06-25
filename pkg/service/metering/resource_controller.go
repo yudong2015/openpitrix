@@ -91,9 +91,9 @@ func getAttributeTermsByIds(ctx context.Context, ids []string) ([]*models.Attrib
 	return attributeTerms, err
 }
 
-func getAttributeTerms(ctx context.Context, req *pb.DescribeAttributeTermsRequest) ([]*models.AttributeTerm, error) {
+func getAttributeTerms(ctx context.Context, req *pb.DescribeAttributeTermsRequest) (int, []*models.AttributeTerm, error) {
 	var attributeTerms []*models.AttributeTerm
-	_, err := pi.Global().DB(ctx).
+	count, err := pi.Global().DB(ctx).
 		Select(constants.IndexedColumns[constants.TableAttributeTerm]...).
 		From(constants.TableAttributeTerm).
 		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
@@ -106,7 +106,7 @@ func getAttributeTerms(ctx context.Context, req *pb.DescribeAttributeTermsReques
 	if err != nil {
 		logger.Error(ctx, "Failed to get attribute_terms: [%+v]", err)
 	}
-	return attributeTerms, err
+	return count, attributeTerms, err
 }
 
 func updateAttributeTerm(ctx context.Context, req *pb.ModifyAttributeTermRequest) error {
@@ -157,9 +157,9 @@ func insertAttributeUnit(ctx context.Context, attUnit *models.AttributeUnit) err
 	return err
 }
 
-func getAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsRequest) ([]*models.AttributeUnit, error) {
+func getAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsRequest) (int, []*models.AttributeUnit, error) {
 	var attUnits []*models.AttributeUnit
-	_, err := pi.Global().DB(ctx).
+	count, err := pi.Global().DB(ctx).
 		Select(constants.IndexedColumns[constants.TableAttributeUnit]...).
 		From(constants.TableAttributeUnit).
 		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
@@ -172,7 +172,7 @@ func getAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsReques
 	if err != nil {
 		logger.Error(ctx, "Failed to get attribute_units: [%+v]", err)
 	}
-	return attUnits, err
+	return count, attUnits, err
 }
 
 func getAttributeUnitsByIds(ctx context.Context, attributeUnitIds []string) ([]*models.AttributeUnit, error) {
@@ -216,9 +216,9 @@ func insertAttribute(ctx context.Context, attribute *models.Attribute) error {
 	return err
 }
 
-func getAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) ([]*models.Attribute, error) {
+func getAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) (int, []*models.Attribute, error) {
 	var attributes []*models.Attribute
-	_, err := pi.Global().DB(ctx).
+	count, err := pi.Global().DB(ctx).
 		Select(constants.IndexedColumns[constants.TableAttribute]...).
 		From(constants.TableAttribute).
 		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
@@ -231,7 +231,7 @@ func getAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) ([]*m
 	if err != nil {
 		logger.Error(ctx, "Failed to get attributes: [%+v]", err)
 	}
-	return attributes, err
+	return count, attributes, err
 }
 
 func getAttributesByIds(ctx context.Context, attIds []string) ([]*models.Attribute, error) {
@@ -295,21 +295,62 @@ func insertSpu(ctx context.Context, spu *models.Spu) error {
 	return err
 }
 
-func getSpu(ctx context.Context, spuId string) (*models.Spu, error) {
-	spu := &models.Spu{}
-	err := pi.Global().DB(ctx).
+func getSpus(ctx context.Context, req *pb.DescribeSpusRequest) (int, []*models.Spu, error) {
+	var spus []*models.Spu
+	count, err := pi.Global().DB(ctx).
 		Select(constants.IndexedColumns[constants.TableSpu]...).
 		From(constants.TableSpu).
 		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
-		Where(db.Eq(constants.ColumnSpuId, spuId)).
-		LoadOne(&spu)
+		Where(manager.BuildFilterConditions(req, constants.TableSpu)).
+		OrderDir(pbutil.GetSortKey(req), !req.GetReverse().GetValue()).
+		Offset(pbutil.GetOffsetFromRequest(req)).
+		Limit(pbutil.GetLimitFromRequest(req)).
+		Load(&spus)
+
 	if err != nil {
-		logger.Error(ctx, "Failed to get spu: [%+v]", err)
+		logger.Error(ctx, "Failed to get spus: [%+v]", err)
 	}
-	if err == db.ErrNotFound {
-		return nil, nil
+	return count, spus, err
+}
+
+func getSpusByIds(ctx context.Context, spuIds []string) ([]*models.Spu, error) {
+	var spus []*models.Spu
+	_, err := pi.Global().DB(ctx).
+		Select(constants.IndexedColumns[constants.TableSpu]...).
+		From(constants.TableSpu).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(constants.ColumnSpuId, spuIds)).
+		Load(&spus)
+
+	if err != nil {
+		logger.Error(ctx, "Failed to get spus: [%+v]", err)
 	}
-	return spu, err
+	return spus, err
+}
+
+func deleteSpus(ctx context.Context, spuIds []string) error {
+	tx, err := pi.Global().DB(ctx).Begin()
+	defer tx.RollbackUnlessCommitted()
+	if err != nil {
+		logger.Error(ctx, "Failed to delete spus: [%+v]", err)
+		return err
+	}
+
+	tx.Update(constants.TableSpu).
+		Set(constants.ColumnStatus, constants.StatusDeleted).
+		Where(db.Eq(constants.ColumnSpuId, spuIds))
+
+	tx.Update(constants.TableSku).
+		Set(constants.ColumnStatus, constants.StatusDeleted).
+		Where(db.Eq(constants.ColumnSpuId, spuIds))
+
+	err = tx.Commit()
+
+	if err != nil {
+		logger.Error(ctx, "Failed to delete spus: [%+v]", err)
+		return err
+	}
+	return err
 }
 
 func insertSku(ctx context.Context, sku *models.Sku) error {
@@ -323,31 +364,70 @@ func insertSku(ctx context.Context, sku *models.Sku) error {
 	return err
 }
 
-func getSku(ctx context.Context, skuId string) (*models.Sku, error) {
-	sku := &models.Sku{}
-	err := pi.Global().DB(ctx).
+func getSkus(ctx context.Context, req *pb.DescribeSkusRequest) (int, []*models.Sku, error) {
+	var skus []*models.Sku
+	count, err := pi.Global().DB(ctx).
 		Select(constants.IndexedColumns[constants.TableSku]...).
 		From(constants.TableSku).
 		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
-		Where(db.Eq(constants.ColumnSkuId, skuId)).
-		LoadOne(sku)
+		Where(manager.BuildFilterConditions(req, constants.TableSku)).
+		OrderDir(pbutil.GetSortKey(req), !req.GetReverse().GetValue()).
+		Offset(pbutil.GetOffsetFromRequest(req)).
+		Limit(pbutil.GetLimitFromRequest(req)).
+		Load(&skus)
 
 	if err != nil {
-		logger.Error(ctx, "Failed to get sku: [%+v]", err)
+		logger.Error(ctx, "Failed to get skus: [%+v]", err)
 	}
-	if err == db.ErrNotFound {
-		return nil, nil
-	}
-	return sku, err
+	return count, skus, err
 }
 
-func insertPrice(ctx context.Context, price *models.Price) error {
+func getSkusByIds(ctx context.Context, skuIds, columns []string) ([]*models.Sku, error) {
+	var skus []*models.Sku
+	if len(columns) == 0 {
+		columns = constants.IndexedColumns[constants.TableSku]
+	}
 	_, err := pi.Global().DB(ctx).
-		InsertInto(constants.TablePrice).
-		Record(price).
+		Select(columns...).
+		From(constants.TableSku).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(constants.ColumnSkuId, skuIds)).
+		Load(&skus)
+
+	if err != nil {
+		logger.Error(ctx, "Failed to get skus: [%+v]", err)
+	}
+	return skus, err
+}
+
+func updateSku(ctx context.Context, req *pb.ModifySkuRequest) error {
+	buildAttributes := manager.BuildUpdateAttributes(req,
+		constants.ColumnAttributeIds,
+		constants.ColumnMeteringAttributeIds,
+		constants.ColumnFeePolicy)
+
+	_, err := pi.Global().DB(ctx).
+		Update(constants.TableSku).
+		SetMap(buildAttributes).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(constants.ColumnSkuId, req.GetSkuId().GetValue())).
+		Exec()
+
+	if err != nil {
+		logger.Error(ctx, "Failed to update sku: [%+v]", err)
+	}
+
+	return err
+}
+
+func deleteSkus(ctx context.Context, skuIds []string) error {
+	_, err := pi.Global().DB(ctx).
+		Update(constants.TableSku).
+		Set(constants.ColumnStatus, constants.StatusDeleted).
+		Where(db.Eq(constants.ColumnSkuId, skuIds)).
 		Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert price: [%+v]", err)
+		logger.Error(ctx, "Failed to delete skus: [%+v]", err)
 	}
 	return err
 }

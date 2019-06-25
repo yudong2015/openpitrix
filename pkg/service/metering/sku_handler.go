@@ -25,7 +25,7 @@ func (s *Server) CreateAttributeTerm(ctx context.Context, req *pb.CreateAttribut
 }
 
 func (s *Server) DescribeAttributeTerms(ctx context.Context, req *pb.DescribeAttributeTermsRequest) (*pb.DescribeAttributeTermsResponse, error) {
-	attributeTerms, err := getAttributeTerms(ctx, req)
+	count, attributeTerms, err := getAttributeTerms(ctx, req)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
@@ -35,7 +35,7 @@ func (s *Server) DescribeAttributeTerms(ctx context.Context, req *pb.DescribeAtt
 			pbAttributeTerms = append(pbAttributeTerms, models.AttributeTermToPb(attTerm))
 	}
 
-	return &pb.DescribeAttributeTermsResponse{AttributeTermSet: pbAttributeTerms}, nil
+	return &pb.DescribeAttributeTermsResponse{TotalCount: uint32(count), AttributeTermSet: pbAttributeTerms}, nil
 }
 
 func (s *Server) ModifyAttributeTerm(ctx context.Context, req *pb.ModifyAttributeTermRequest) (*pb.ModifyAttributeTermResponse, error) {
@@ -78,7 +78,7 @@ func (s *Server) CreateAttributeUnit(ctx context.Context, req *pb.CreateAttribut
 }
 
 func (s *Server) DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAttributeUnitsRequest) (*pb.DescribeAttributeUnitsResponse, error) {
-	attributeUnits, err := getAttributeUnits(ctx, req)
+	count, attributeUnits, err := getAttributeUnits(ctx, req)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
@@ -88,7 +88,7 @@ func (s *Server) DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAtt
 		pbAttributeUnits = append(pbAttributeUnits, models.AttributeUnitToPb(attUnit))
 	}
 
-	return &pb.DescribeAttributeUnitsResponse{AttributeUnitSet: pbAttributeUnits}, nil
+	return &pb.DescribeAttributeUnitsResponse{TotalCount: uint32(count), AttributeUnitSet: pbAttributeUnits}, nil
 }
 
 func (s *Server) DeleteAttributeUnits(ctx context.Context, req *pb.DeleteAttributeUnitsRequest) (*pb.DeleteAttributeUnitsResponse, error) {
@@ -122,7 +122,7 @@ func (s *Server) CreateAttribute(ctx context.Context, req *pb.CreateAttributeReq
 }
 
 func (s *Server) DescribeAttributes(ctx context.Context, req *pb.DescribeAttributesRequest) (*pb.DescribeAttributesResponse, error) {
-	attributes, err := getAttributes(ctx, req)
+	count, attributes, err := getAttributes(ctx, req)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
@@ -132,7 +132,7 @@ func (s *Server) DescribeAttributes(ctx context.Context, req *pb.DescribeAttribu
 		pbAttributes = append(pbAttributes, models.AttributeToPb(att))
 	}
 
-	return &pb.DescribeAttributesResponse{AttributeSet: pbAttributes}, nil
+	return &pb.DescribeAttributesResponse{TotalCount: uint32(count), AttributeSet: pbAttributes}, nil
 }
 
 func (s *Server) ModifyAttribute(ctx context.Context, req *pb.ModifyAttributeRequest) (*pb.ModifyAttributeResponse, error) {
@@ -169,7 +169,6 @@ func (s *Server) DeleteAttributes(ctx context.Context, req *pb.DeleteAttributesR
 }
 
 func (s *Server) CreateSpu(ctx context.Context, req *pb.CreateSpuRequest) (*pb.CreateSpuResponse, error) {
-	//TODO: get id of current user
 	spu := models.PbToSpu(req, UserId(ctx))
 
 	//insert spu
@@ -181,34 +180,42 @@ func (s *Server) CreateSpu(ctx context.Context, req *pb.CreateSpuRequest) (*pb.C
 }
 
 func (s *Server) DescribeSpus(ctx context.Context, req *pb.DescribeSpusRequest) (*pb.DescribeSpusResponse, error) {
-	//TODO: impl DescribeSpus
-	return &pb.DescribeSpusResponse{}, nil
-}
+	count, spus, err := getSpus(ctx, req)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
 
-func (s *Server) ModifySpu(ctx context.Context, req *pb.ModifySpuRequest) (*pb.ModifySpuResponse, error) {
-	//TODO: impl ModifySpu
-	return &pb.ModifySpuResponse{}, nil
+	var pbSpus []*pb.Spu
+	for _, spu := range spus {
+		pbSpus = append(pbSpus, models.SpuToPb(spu))
+	}
+
+	return &pb.DescribeSpusResponse{TotalCount: uint32(count), SpuSet: pbSpus}, nil
 }
 
 func (s *Server) DeleteSpus(ctx context.Context, req *pb.DeleteSpusRequest) (*pb.DeleteSpusResponse, error) {
-	//TODO: impl DeleteSpus
-	return &pb.DeleteSpusResponse{}, nil
+	spuIds := req.GetSpuIds()
+	err := CheckSpusPermission(ctx, spuIds)
+	if err != nil {
+		return nil, err
+	}
+
+	err = deleteSpus(ctx, spuIds)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+	return &pb.DeleteSpusResponse{SpuIds: spuIds}, nil
 }
 
 func (s *Server) CreateSku(ctx context.Context, req *pb.CreateSkuRequest) (*pb.CreateSkuResponse, error) {
 	sku := models.PbToSku(req)
 
-	//get spu
-	spu, err := getSpu(ctx, sku.SpuId)
+	err := CheckSpuPermission(ctx, sku.SpuId)
 	if err != nil {
-		return nil, internalError(ctx, err)
-	}
-	if spu == nil {
-		return nil, notExistError(ctx, models.Spu{}, sku.SpuId)
+		return nil, err
 	}
 
 	//TODO: check attribute_ids
-
 	//insert sku
 	err = insertSku(ctx, sku)
 	if err != nil {
@@ -218,18 +225,42 @@ func (s *Server) CreateSku(ctx context.Context, req *pb.CreateSkuRequest) (*pb.C
 }
 
 func (s *Server) DescribeSkus(ctx context.Context, req *pb.DescribeSkusRequest) (*pb.DescribeSkusResponse, error) {
-	//TODO: impl DescribeSkus
-	return &pb.DescribeSkusResponse{}, nil
+	count, skus, err := getSkus(ctx, req)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+
+	var pbSkus []*pb.Sku
+	for _, sku := range skus {
+		pbSkus = append(pbSkus, models.SkuToPb(sku))
+	}
+
+	return &pb.DescribeSkusResponse{TotalCount: uint32(count), SkuSet: pbSkus}, nil
 }
 
 func (s *Server) ModifySku(ctx context.Context, req *pb.ModifySkuRequest) (*pb.ModifySkuResponse, error) {
-	//TODO: impl ModifySku
-	return &pb.ModifySkuResponse{}, nil
+	err := checkSkuPermission(ctx, req.GetSkuId().GetValue())
+	if err != nil {
+		return nil, err
+	}
+
+	//TODO: check attribute_ids
+	err = updateSku(ctx, req)
+	return &pb.ModifySkuResponse{SkuId: req.GetSkuId()}, nil
 }
 
 func (s *Server) DeleteSkus(ctx context.Context, req *pb.DeleteSkusRequest) (*pb.DeleteSkusResponse, error) {
-	//TODO: impl DeleteSkus
-	return &pb.DeleteSkusResponse{}, nil
+	err := checkSkusPermission(ctx, req.GetSkuIds())
+	if err != nil {
+		return nil, err
+	}
+
+	err = deleteSkus(ctx, req.GetSkuIds())
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+
+	return &pb.DeleteSkusResponse{SkuIds: req.GetSkuIds()}, nil
 }
 
 func renewalTimeFromSku(ctx context.Context, skuId string, actionTime time.Time) (*time.Time, error) {

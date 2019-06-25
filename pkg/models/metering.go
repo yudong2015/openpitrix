@@ -192,7 +192,6 @@ func SpuToPb(spu *Spu) *pb.Spu {
 		SpuId:      pbutil.ToProtoString(spu.SpuId),
 		ProductId:  pbutil.ToProtoString(spu.ProductId),
 		Owner:      pbutil.ToProtoString(spu.Owner),
-		Status:     pbutil.ToProtoString(spu.Status),
 		CreateTime: pbutil.ToProtoTimestamp(spu.CreateTime),
 		StatusTime: pbutil.ToProtoTimestamp(spu.StatusTime),
 	}
@@ -237,7 +236,6 @@ func SkuToPb(sku *Sku) *pb.Sku {
 		FeePolicy:            pbutil.ToProtoString(sku.FeePolicy),
 		AttributeIds:         sku.AttributeIds,
 		MeteringAttributeIds: sku.MeteringAttributeIds,
-		Status:               pbutil.ToProtoString(sku.Status),
 		CreateTime:           pbutil.ToProtoTimestamp(sku.CreateTime),
 		StatusTime:           pbutil.ToProtoTimestamp(sku.StatusTime),
 	}
