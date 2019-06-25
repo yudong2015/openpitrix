@@ -106,7 +106,6 @@ func PriceToPb(price *Price) *pb.Price {
 		Prices:       priceItemsToPbPrices(price.Prices),
 		PricePolicy:  pbutil.ToProtoString(price.PricePolicy),
 		Currency:     pb.Currency(pb.Currency_value[price.Currency]),
-		Status:       pbutil.ToProtoString(price.Status),
 		StartTime:    pbutil.ToProtoTimestamp(price.StartTime),
 		EndTime:      pbutil.ToProtoTimestamp(price.EndTime),
 		CreateTime:   pbutil.ToProtoTimestamp(price.CreateTime),

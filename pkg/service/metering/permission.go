@@ -7,6 +7,7 @@ package main
 import (
 	"context"
 	"openpitrix.io/openpitrix/pkg/constants"
+	"openpitrix.io/openpitrix/pkg/models"
 
 	"openpitrix.io/openpitrix/pkg/gerr"
 	"openpitrix.io/openpitrix/pkg/util/ctxutil"
@@ -59,27 +60,31 @@ func CheckAttributeUnitsPermission(ctx context.Context, attributeUnitIds []strin
 	return nil
 }
 
-func CheckAttributePermission(ctx context.Context, attributeId string) error {
-	return CheckAttributesPermission(ctx, []string{attributeId})
+func CheckAttributePermission(ctx context.Context, attributeId string) (*models.Attribute, error) {
+	atts, err := CheckAttributesPermission(ctx, []string{attributeId})
+	if err != nil {
+		return nil, err
+	}
+	return atts[0], nil
 }
 
-func CheckAttributesPermission(ctx context.Context, attributeIds []string) error {
+func CheckAttributesPermission(ctx context.Context, attributeIds []string) ([]*models.Attribute, error) {
 	atts, err := getAttributesByIds(ctx, attributeIds)
 	if err != nil {
-		return internalError(ctx, err)
+		return nil, internalError(ctx, err)
 	}
 
 	if atts != nil {
-		return gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExist, "Attribute", "Attribute", "属性")
+		return nil, gerr.New(ctx, gerr.NotFound, gerr.ErrorNotExist, "Attribute", "Attribute", "属性")
 	}
 
 	for _, att := range atts {
 		if att.Provider != UserId(ctx) {
-			return gerr.New(ctx, gerr.PermissionDenied, gerr.ErrorResourceAccessDenied, att.AttributeUnitId)
+			return nil, gerr.New(ctx, gerr.PermissionDenied, gerr.ErrorResourceAccessDenied, att.AttributeUnitId)
 		}
 	}
 
-	return nil
+	return atts, nil
 }
 
 func CheckSpuPermission(ctx context.Context, spuId string) error {

@@ -6,6 +6,7 @@ package billing
 
 import (
 	"context"
+	"openpitrix.io/openpitrix/pkg/constants"
 
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
@@ -15,7 +16,8 @@ import (
 func (s *Server) CreatePrice(ctx context.Context, req *pb.CreatePriceRequest) (*pb.CreatePriceResponse, error) {
 	price := models.PbToPrice(req)
 
-	//TODO: how to check skuId and attributeId
+	//TODO: how to check skuId and attributeIds
+	//TODO: check if duplicate attributeIds
 
 	//insert price
 	err := insertPrice(ctx, price)
@@ -26,18 +28,35 @@ func (s *Server) CreatePrice(ctx context.Context, req *pb.CreatePriceRequest) (*
 }
 
 func (s *Server) DescribePrices(ctx context.Context, req *pb.DescribePricesRequest) (*pb.DescribePricesResponse, error) {
-	//TODO: impl DescribePrices
-	return &pb.DescribePricesResponse{}, nil
+	count, prices, err := getPrices(ctx, req)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+
+	var pbPrices []*pb.Price
+	for _, price := range prices {
+		pbPrices = append(pbPrices, models.PriceToPb(price))
+	}
+
+	return &pb.DescribePricesResponse{TotalCount: uint32(count), PriceSet: pbPrices}, nil
 }
 
 func (s *Server) ModifyPrice(ctx context.Context, req *pb.ModifyPriceRequest) (*pb.ModifyPriceResponse, error) {
-	//TODO: impl ModifyPrice
-	return &pb.ModifyPriceResponse{}, nil
+	//TODO: how to check skuId and attributeIds
+	//TODO: check if duplicate attributeIds
+	err := updatePrice(ctx, req)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+	return &pb.ModifyPriceResponse{PriceId: req.GetPriceId()}, nil
 }
 
 func (s *Server) DeletePrices(ctx context.Context, req *pb.DeletePricesRequest) (*pb.DeletePricesResponse, error) {
-	//TODO: impl DeletePrices
-	return &pb.DeletePricesResponse{}, nil
+	err := updateStatusToDeleted(ctx, constants.TablePrice, req.GetPriceIds())
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+	return &pb.DeletePricesResponse{PriceIds: req.GetPriceIds()}, nil
 }
 
 func (s *Server) DescribeLeasingContracts(ctx context.Context, req *pb.DescribeLeasingContractsRequest) (*pb.DescribeLeasingContractsResponse, error) {

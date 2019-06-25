@@ -6,34 +6,29 @@ package billing
 
 import (
 	"context"
-
-	"openpitrix.io/openpitrix/pkg/db"
-	"openpitrix.io/openpitrix/pkg/models"
-	"openpitrix.io/openpitrix/pkg/util/stringutil"
+	"openpitrix.io/openpitrix/pkg/manager"
+	"openpitrix.io/openpitrix/pkg/pb"
 
 	"openpitrix.io/openpitrix/pkg/constants"
+	"openpitrix.io/openpitrix/pkg/db"
 	"openpitrix.io/openpitrix/pkg/logger"
+	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pi"
 )
 
-func checkExistById(ctx context.Context, structName, idValue string) (bool, error) {
-	tableName := stringutil.CamelCaseToUnderscore(structName)
-	idName := tableName + "_id"
-	count, err := pi.Global().DB(ctx).
-		Select(idName).
-		From(tableName).
-		Where(db.Eq(idName, idValue)).
-		Limit(1).Count()
+func updateStatusToDeleted(ctx context.Context, table string, ids []string) error {
+	columnId := table + "_id"
+	_, err := pi.Global().DB(ctx).
+		Update(table).
+		Set(constants.ColumnStatus, constants.StatusDeleted).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(columnId, ids)).
+		Exec()
 
 	if err != nil {
-		logger.Error(ctx, "Failed to connect DB, Errors: [%+v]", err)
-		return false, err
+		logger.Error(ctx, "Failed to status of %s to deleted: [%+v]", table, err)
 	}
-
-	if count > 0 {
-		return true, nil
-	}
-	return false, nil
+	return err
 }
 
 func insertPrice(ctx context.Context, price *models.Price) error {
@@ -44,6 +39,45 @@ func insertPrice(ctx context.Context, price *models.Price) error {
 	if err != nil {
 		logger.Error(ctx, "Failed to insert price, Errors: [%+v]", err)
 	}
+	return err
+}
+
+func getPrices(ctx context.Context, req *pb.DescribePricesRequest) (int, []*models.Price, error) {
+	var prices []*models.Price
+	count, err := pi.Global().DB(ctx).
+		Select(constants.IndexedColumns[constants.TablePrice]...).
+		From(constants.TablePrice).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(manager.BuildFilterConditions(req, constants.TablePrice)).
+		Load(&prices)
+
+	if err != nil {
+		logger.Error(ctx, "Failed to insert price, Errors: [%+v]", err)
+	}
+	return count, prices, err
+}
+
+func updatePrice(ctx context.Context, req *pb.ModifyPriceRequest) error {
+	buildedAttributes := manager.BuildUpdateAttributes(req,
+		constants.ColumnPriceName,
+		constants.ColumnAttributeIds,
+		constants.ColumnPrices,
+		constants.ColumnPricePolicy)
+
+	var err error
+	if len(buildedAttributes) > 0 {
+		_, err = pi.Global().DB(ctx).
+			Update(constants.TablePrice).
+			SetMap(buildedAttributes).
+			Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+			Where(db.Eq(constants.ColumnPriceId, req.GetPriceId().GetValue())).
+			Exec()
+
+		if err != nil {
+			logger.Error(ctx, "Failed to update attribute_term: [%+v]", err)
+		}
+	}
+
 	return err
 }
 

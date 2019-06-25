@@ -62,6 +62,21 @@ func CheckAttributeRequirements(ctx context.Context, attribute models.Attribute)
 	return nil
 }
 
+func updateStatusToDeleted(ctx context.Context, table string, ids []string) error {
+	columnId := table + "_id"
+	_, err := pi.Global().DB(ctx).
+		Update(table).
+		Set(constants.ColumnStatus, constants.StatusDeleted).
+		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
+		Where(db.Eq(columnId, ids)).
+		Exec()
+
+	if err != nil {
+		logger.Error(ctx, "Failed to status of %s to deleted: [%+v]", table, err)
+	}
+	return err
+}
+
 func insertAttributeTerm(ctx context.Context, term *models.AttributeTerm) error {
 	_, err := pi.Global().DB(ctx).
 		InsertInto(constants.TableAttributeTerm).
@@ -131,20 +146,6 @@ func updateAttributeTerm(ctx context.Context, req *pb.ModifyAttributeTermRequest
 	return err
 }
 
-func deleteAttributeTerms(ctx context.Context, attTermIds []string) error {
-	_, err := pi.Global().DB(ctx).
-		Update(constants.TableAttributeTerm).
-		Set(constants.ColumnStatus, constants.StatusDeleted).
-		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
-		Where(db.Eq(constants.ColumnAttributeTermId, attTermIds)).
-		Exec()
-
-	if err != nil {
-		logger.Error(ctx, "Failed to delete attribute_term(set status to deleted): [%+v]", err)
-	}
-
-	return err
-}
 
 func insertAttributeUnit(ctx context.Context, attUnit *models.AttributeUnit) error {
 	_, err := pi.Global().DB(ctx).
@@ -188,21 +189,6 @@ func getAttributeUnitsByIds(ctx context.Context, attributeUnitIds []string) ([]*
 		logger.Error(ctx, "Failed to get attribute_units: [%+v]", err)
 	}
 	return attUnits, err
-}
-
-func deleteAttributeUnits(ctx context.Context, attUnitIds []string) error {
-	_, err := pi.Global().DB(ctx).
-		Update(constants.TableAttributeUnit).
-		Set(constants.ColumnStatus, constants.StatusDeleted).
-		Where(db.Eq(constants.ColumnStatus, constants.StatusActive)).
-		Where(db.Eq(constants.ColumnAttributeUnitId, attUnitIds)).
-		Exec()
-
-	if err != nil {
-		logger.Error(ctx, "Failed to delete attribute_unit(set status to deleted): [%+v]", err)
-	}
-
-	return err
 }
 
 func insertAttribute(ctx context.Context, attribute *models.Attribute) error {
@@ -265,20 +251,6 @@ func updateAttribute(ctx context.Context, req *pb.ModifyAttributeRequest) error 
 
 	if err != nil {
 		logger.Error(ctx, "Failed to update attribute: [%+v]", err)
-	}
-
-	return err
-}
-
-func deleteAttributes(ctx context.Context, attributeIds []string) error {
-	_, err := pi.Global().DB(ctx).
-		Update(constants.TableAttribute).
-		Set(constants.ColumnStatus, constants.StatusDeleted).
-		Where(db.Eq(constants.ColumnAttributeId, attributeIds)).
-		Exec()
-
-	if err != nil {
-		logger.Error(ctx, "Failed to delete attribute(set status to deleted): [%+v]", err)
 	}
 
 	return err
@@ -417,18 +389,6 @@ func updateSku(ctx context.Context, req *pb.ModifySkuRequest) error {
 		logger.Error(ctx, "Failed to update sku: [%+v]", err)
 	}
 
-	return err
-}
-
-func deleteSkus(ctx context.Context, skuIds []string) error {
-	_, err := pi.Global().DB(ctx).
-		Update(constants.TableSku).
-		Set(constants.ColumnStatus, constants.StatusDeleted).
-		Where(db.Eq(constants.ColumnSkuId, skuIds)).
-		Exec()
-	if err != nil {
-		logger.Error(ctx, "Failed to delete skus: [%+v]", err)
-	}
 	return err
 }
 

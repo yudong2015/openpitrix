@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"openpitrix.io/openpitrix/pkg/constants"
 	"time"
 
 	"openpitrix.io/openpitrix/pkg/logger"
@@ -39,13 +40,10 @@ func (s *Server) DescribeAttributeTerms(ctx context.Context, req *pb.DescribeAtt
 }
 
 func (s *Server) ModifyAttributeTerm(ctx context.Context, req *pb.ModifyAttributeTermRequest) (*pb.ModifyAttributeTermResponse, error) {
-	attTerm, err := CheckAttributeTermPermission(ctx, req.GetAttributeTermId().GetValue())
+	err := CheckAttributeTermPermission(ctx, req.GetAttributeTermId().GetValue())
 	if err != nil {
 		return nil, err
 	}
-
-	attTerm.Name = req.GetName().GetValue()
-	attTerm.Description = req.GetDescription().GetValue()
 
 	err = updateAttributeTerm(ctx, req)
 	if err != nil {
@@ -56,12 +54,12 @@ func (s *Server) ModifyAttributeTerm(ctx context.Context, req *pb.ModifyAttribut
 
 func (s *Server) DeleteAttributeTerms(ctx context.Context, req *pb.DeleteAttributeTermsRequest) (*pb.DeleteAttributeTermsResponse, error) {
 	attTermIds := req.GetAttributeTermIds()
-	_, err := CheckAttributeTermsPermission(ctx, attTermIds)
+	err := CheckAttributeTermsPermission(ctx, attTermIds)
 	if err != nil {
 		return nil, err
 	}
 
-	err = deleteAttributeTerms(ctx, attTermIds)
+	err = updateStatusToDeleted(ctx, constants.TableAttributeTerm, attTermIds)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
@@ -93,12 +91,12 @@ func (s *Server) DescribeAttributeUnits(ctx context.Context, req *pb.DescribeAtt
 
 func (s *Server) DeleteAttributeUnits(ctx context.Context, req *pb.DeleteAttributeUnitsRequest) (*pb.DeleteAttributeUnitsResponse, error) {
 	attUnitIds := req.GetAttributeUnitIds()
-	_, err := CheckAttributeUnitsPermission(ctx, attUnitIds)
+	err := CheckAttributeUnitsPermission(ctx, attUnitIds)
 	if err != nil {
 		return nil, err
 	}
 
-	err = deleteAttributeUnits(ctx, attUnitIds)
+	err = updateStatusToDeleted(ctx, constants.TableAttributeUnit, attUnitIds)
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}
@@ -163,7 +161,7 @@ func (s *Server) DeleteAttributes(ctx context.Context, req *pb.DeleteAttributesR
 		return nil, err
 	}
 
-	err = deleteAttributes(ctx, attributeIds)
+	err = updateStatusToDeleted(ctx, constants.TableAttribute, attributeIds)
 
 	return &pb.DeleteAttributesResponse{AttributeIds: req.GetAttributeIds()}, nil
 }
@@ -255,7 +253,7 @@ func (s *Server) DeleteSkus(ctx context.Context, req *pb.DeleteSkusRequest) (*pb
 		return nil, err
 	}
 
-	err = deleteSkus(ctx, req.GetSkuIds())
+	err = updateStatusToDeleted(ctx, constants.TableSku, req.GetSkuIds())
 	if err != nil {
 		return nil, internalError(ctx, err)
 	}

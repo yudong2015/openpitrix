@@ -40,7 +40,7 @@ message Price {
 	repeated PriceItem prices = 5;  //{upto1: price1, upto2: price2, ...}, if upto is 0, the price is unchanged.
 	google.protobuf.StringValue price_policy = 6; // eg: att1 * att2 * price, default: att1 * price
 	Currency currency = 7;
-	google.protobuf.StringValue status = 8;
+//	google.protobuf.StringValue status = 8;
 	google.protobuf.Timestamp start_time = 9; //start time for this price, default now
 	google.protobuf.Timestamp end_time = 10; //overdue time for this price, default null(forever)
 	google.protobuf.Timestamp create_time = 11;
@@ -85,14 +85,9 @@ message DescribePricesResponse {
 message ModifyPriceRequest {
     google.protobuf.StringValue price_id = 1;
 	google.protobuf.StringValue price_name = 2;
-	google.protobuf.StringValue sku_id = 3;
 	repeated string attribute_ids = 4;
 	repeated PriceItem prices = 5;
 	google.protobuf.StringValue price_policy = 6;
-	Currency currency = 7;
-	google.protobuf.StringValue status = 8;
-	google.protobuf.Timestamp start_time = 9;
-	google.protobuf.Timestamp end_time = 10;
 }
 
 message ModifyPriceResponse {

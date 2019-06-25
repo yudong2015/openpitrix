@@ -115,6 +115,13 @@ const (
 	ColumnAttributeIds             = "attribute_ids"
 	ColumnMeteringAttributeIds     = "metering_attribute_ids"
 	ColumnFeePolicy                = "fee_policy"
+	ColumnPriceId = "price_id"
+	ColumnPriceName = "price_name"
+	ColumnPrices = "prices"
+	ColumnPricePolicy = "price_policy"
+	ColumnCurrency = "currency"
+	ColumnStartTime = "start_time"
+	ColumnEndTime = "end_time"
 )
 
 var PushEventTables = map[string][]string{
@@ -212,6 +219,10 @@ var IndexedColumns = map[string][]string{
 		ColumnSpuId, ColumnProductId, ColumnCreateTime, ColumnStatusTime,
 	},
 	TableSku: {
+		ColumnSkuId, ColumnSpuId, ColumnAttributeIds, ColumnMeteringAttributeIds,
+		ColumnFeePolicy, ColumnCreateTime, ColumnStatusTime,
+	},
+	TablePrice: {
 		ColumnSkuId, ColumnSpuId, ColumnAttributeIds, ColumnMeteringAttributeIds,
 		ColumnFeePolicy, ColumnCreateTime, ColumnStatusTime,
 	},
