@@ -264,7 +264,7 @@ func (s *Server) DeleteSkus(ctx context.Context, req *pb.DeleteSkusRequest) (*pb
 }
 
 func renewalTimeFromSku(ctx context.Context, skuId string, actionTime time.Time) (*time.Time, error) {
-	sku, err := getSku(ctx, skuId)
+	skus, err := getSkusByIds(ctx, []string{skuId}, nil)
 
 	if err != nil {
 		logger.Error(ctx, "Failed to convert renewal time from sku, Error: [%+v]", err)
@@ -273,7 +273,7 @@ func renewalTimeFromSku(ctx context.Context, skuId string, actionTime time.Time)
 
 	//TODO: calculate renewalTime
 	//TODO: check if duration in metering_attributes
-	renewalTime := sku.CreateTime
+	renewalTime := skus[0].CreateTime
 
 	return &renewalTime, nil
 }
