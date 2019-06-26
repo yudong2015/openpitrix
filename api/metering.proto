@@ -457,13 +457,13 @@ service SkuManager {
 //********************************************************************
 message SkuMetering {
 	google.protobuf.StringValue sku_id = 1;
-	map<string, double> value = 2; //{attribute_id: value}
+	map<string, string> value = 2; //{attribute_id: value}
 
 }
 
 message UpdateMeteringValue {
 	google.protobuf.StringValue attribute_id = 1;
-	google.protobuf.DoubleValue value = 2;
+	google.protobuf.StringValue value = 2;
 	enum UpdateValueTypes {
 		INCREMENTAL = 0;
 		REPLACE = 1;

@@ -16,28 +16,32 @@ import (
 	"openpitrix.io/openpitrix/pkg/util/pbutil"
 )
 
-func NewAttributeTermId() string {
+func newAttributeTermId() string {
 	return idutil.GetUuid("term-")
 }
 
-func NewAttributeUnitId() string {
+func newAttributeUnitId() string {
 	return idutil.GetUuid("unit-")
 }
 
-func NewAttributeId() string {
+func newAttributeId() string {
 	return idutil.GetUuid("att-")
 }
 
-func NewSpuId() string {
+func newSpuId() string {
 	return idutil.GetUuid("spu-")
 }
 
-func NewSkuId() string {
+func newSkuId() string {
 	return idutil.GetUuid("sku-")
 }
 
-func NewLeasingId() string {
+func newLeasingId() string {
 	return idutil.GetUuid("leasing-")
+}
+
+func newMeteringId() string {
+	return idutil.GetUuid("metering-")
 }
 
 type AttributeTerm struct {
@@ -53,7 +57,7 @@ type AttributeTerm struct {
 
 func NewAttributeTerm(name, termType, description, provider string) *AttributeTerm {
 	return &AttributeTerm{
-		AttributeTermId: NewAttributeTermId(),
+		AttributeTermId: newAttributeTermId(),
 		Name:            name,
 		Description:     description,
 		Type:            termType,
@@ -93,7 +97,7 @@ type AttributeUnit struct {
 
 func NewAttributeUnit(name, provider string) *AttributeUnit {
 	return &AttributeUnit{
-		AttributeUnitId: NewAttributeUnitId(),
+		AttributeUnitId: newAttributeUnitId(),
 		Name:            name,
 		Provider:        provider,
 		Status:          constants.StatusActive,
@@ -132,7 +136,7 @@ var AttributeColumns = db.GetColumnsFromStruct(&Attribute{})
 
 func NewAttribute(attNameId, attUnitId, value, valueRange, provider string) *Attribute {
 	return &Attribute{
-		AttributeId:     NewAttributeId(),
+		AttributeId:     newAttributeId(),
 		AttributeTermId: attNameId,
 		AttributeUnitId: attUnitId,
 		Value:           value,
@@ -176,7 +180,7 @@ type Spu struct {
 
 func NewSpu(productId, owner string) *Spu {
 	return &Spu{
-		SpuId:     NewSpuId(),
+		SpuId:     newSpuId(),
 		ProductId: productId,
 		Owner:     owner,
 		Status:    constants.StatusActive,
@@ -211,7 +215,7 @@ type Sku struct {
 
 func NewSku(spuId, feePolicy string, attributeIds, meteringAttributeIds []string) *Sku {
 	return &Sku{
-		SkuId:                NewSkuId(),
+		SkuId:                newSkuId(),
 		SpuId:                spuId,
 		AttributeIds:         attributeIds,
 		MeteringAttributeIds: meteringAttributeIds,
@@ -241,60 +245,70 @@ func SkuToPb(sku *Sku) *pb.Sku {
 	}
 }
 
-//SkuMetering
 type Leasing struct {
+	LeasingId  string
+	UserId     string
+	ResourceId string
+	CreateTime time.Time
+	StatusTime time.Time
+	Status     string
+}
+
+var LeasingColumns = db.GetColumnsFromStruct(&Leasing{})
+
+func NewLeasing(userId, resourceId string) *Leasing {
+	return &Leasing{
+		LeasingId:  newLeasingId(),
+		UserId:     userId,
+		ResourceId: resourceId,
+		Status:     constants.StatusActive,
+	}
+}
+
+type Leased struct {
+	LeasedId          string
+	UserId            string
+	ResourceId        string
+	LeasingCreateTime time.Time
+	CreateTime        time.Time
+}
+
+func (l *Leasing) ToLeased() *Leased {
+	return &Leased{
+		LeasedId:          l.LeasingId,
+		UserId:            l.UserId,
+		ResourceId:        l.ResourceId,
+		LeasingCreateTime: l.CreateTime,
+	}
+}
+
+//SkuMetering
+type Metering struct {
+	MeteringId         string
 	LeasingId          string
-	UserId             string
-	ResourceId         string
 	SkuId              string
-	MeteringValues     map[string]float64 //
-	LeaseTime          time.Time          //action_time
-	UpdateDurationTime time.Time          //update time for duration
-	RenewalTime        time.Time          //next update time
+	Values     map[string]string //{attributeId: value, ..}
+	StartTime          time.Time         //action_time
+	UpdateDurationTime time.Time         //update time for duration
+	RenewalTime        time.Time         //next update time
 	CreateTime         time.Time
 	StatusTime         time.Time               //update time by other services(cluster_manager)
 	StopTimes          map[time.Time]time.Time //{closeTime: restartTime, ..}
 	Status             string
 }
 
-var LeasingColumns = db.GetColumnsFromStruct(&Leasing{})
-
-func NewLeasing(values map[string]float64, userId, resourceId, skuId string, actionTime, renewalTime time.Time) *Leasing {
-	return &Leasing{
-		LeasingId:          NewLeasingId(),
-		UserId:             userId,
-		ResourceId:         resourceId,
-		SkuId:              skuId,
-		MeteringValues:     values,
-		LeaseTime:          actionTime,
-		UpdateDurationTime: actionTime,
-		RenewalTime:        renewalTime,
-		Status:             constants.StatusActive,
-		CreateTime:         actionTime,
-		StatusTime:         actionTime,
-		StopTimes:          nil,
+func NewMetering(leasingId, skuId string, startTime, renewalTime time.Time, values map[string]string) *Metering {
+	return &Metering{
+		MeteringId: newMeteringId(),
+		LeasingId: leasingId,
+		SkuId: skuId,
+		Values: values,
+		StartTime: startTime,
+		RenewalTime: renewalTime,
+		Status: constants.StatusActive,
 	}
 }
 
-type Leased struct {
-	LeasedId       string
-	UserId         string
-	ResourceId     string
-	SkuId          string
-	MeteringValues map[string]float64
-	LeaseTime      time.Time // action_time
-	CreateTime     time.Time
-	StopTime       map[time.Time]time.Time //{closeTime: restartTime, ..}
-}
-
-func (l *Leasing) ToLeased() *Leased {
-	return &Leased{
-		LeasedId:       l.LeasingId,
-		UserId:         l.UserId,
-		ResourceId:     l.ResourceId,
-		SkuId:          l.SkuId,
-		MeteringValues: l.MeteringValues,
-		LeaseTime:      l.LeaseTime,
-		StopTime:       l.StopTimes,
-	}
+func PbToMetering(leasingId string, pbMetering pb.SkuMetering) *Metering {
+	return NewMetering(leasingId, pbMetering.GetSkuId().GetValue())
 }
