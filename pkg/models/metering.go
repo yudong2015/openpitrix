@@ -312,7 +312,7 @@ func NewMetering(leasingId, skuId string, startTime time.Time, values map[string
 	}
 }
 
-func PbToMetering(leasingId string, pbMetering pb.SkuMetering) *Metering {
+func PbToMetering(leasingId string, pbMetering *pb.SkuMetering) *Metering {
 	return NewMetering(leasingId,
 		pbMetering.GetSkuId().GetValue(),
 		pbutil.FromProtoTimestamp(pbMetering.GetActionTime()),

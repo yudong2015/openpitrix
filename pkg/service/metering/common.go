@@ -20,10 +20,16 @@ const (
 )
 
 const (
-	InitAttId          = "att-000001"
+	InitAttId          = "att-001"
 	InitAttUnitHourId  = "att-unit-000001"
 	InitAttUnitMonthId = "att-unit-000002"
 	InitAttUnitYearId  = "att-unit-000003"
+)
+
+const (
+	DurationHourId  = "att-001"
+	DurationMonthId = "att-001"
+	DurationYearId  = "att-001"
 )
 
 //struct english name and chinese name

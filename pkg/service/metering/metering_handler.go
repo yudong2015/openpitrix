@@ -10,9 +10,8 @@ import (
 	"fmt"
 	"time"
 
-	"openpitrix.io/openpitrix/pkg/logger"
-	"openpitrix.io/openpitrix/pkg/util/stringutil"
 	"openpitrix.io/openpitrix/pkg/constants"
+	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 )
@@ -39,16 +38,30 @@ func UpdateRenewalTime(ctx context.Context, m *models.Metering) error {
 	}
 
 	for _, attId := range skus[0].MeteringAttributeIds {
-		if stringutil.StringIn(attId, DurationAttributeIds) {
-
+		if attId == DurationHourId {
+			//TODO: handle
+		} else if attId == DurationMonthId {
+			//TODO: handle
+		} else if attId == DurationYearId {
+			//TODO: handle
 		}
 	}
-
+	return nil
 }
 
 func (s *Server) InitMetering(ctx context.Context, req *pb.InitMeteringRequest) (*pb.CommonMeteringResponse, error) {
-	//leasing := models.PbToLeasing(req) //TODO: check if user_id exist
+	leasing := models.PbToLeasing(req) //TODO: check if user_id exist
+	var meterings []*models.Metering
+	for _, sku := range req.GetSkuMeterings() {
+		meterings = append(meterings, models.PbToMetering(leasing.LeasingId, sku))
+	}
 
+	//TODO: pre-billing
+
+
+	//TODO: add cron-task for duration
+
+	//TODO: save-to-db
 
 	return &pb.CommonMeteringResponse{ResourceId: req.GetResourceId()}, nil
 }
