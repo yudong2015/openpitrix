@@ -60,20 +60,18 @@ func deleteAtts(conn *db.Conn, ids []string) {
 func main() {
 
 	ids := []string{
-		"att_01",
-		"att_02",
+		"att_0001",
+		"att_0002",
 	}
 
-	//conn := conn()
-	//selectAttributes(conn, ids)
+	conn := conn()
+	selectAttributes(conn, ids)
 	//deleteAtts(conn, ids)
 
-	var aa []*models.Sku
-
-	for _, i := range ids {
-		aa = append(aa, models.NewSku(i, "aaa", []string{}, []string{}))
-	}
-
-	fmt.Printf("%+v", aa)
+	//var aa []*models.Sku
+	//for _, i := range ids {
+	//	aa = append(aa, models.NewSku(i, "aaa", []string{}, []string{}))
+	//}
+	//fmt.Printf("%+v", aa)
 
 }

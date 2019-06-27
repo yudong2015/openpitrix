@@ -265,6 +265,10 @@ func NewLeasing(userId, resourceId string) *Leasing {
 	}
 }
 
+func PbToLeasing(req *pb.InitMeteringRequest) *Leasing {
+	return NewLeasing(req.GetUserId().GetValue(), req.GetResourceId().GetValue())
+}
+
 type Leased struct {
 	LeasedId          string
 	UserId            string
@@ -287,7 +291,7 @@ type Metering struct {
 	MeteringId         string
 	LeasingId          string
 	SkuId              string
-	Values     map[string]string //{attributeId: value, ..}
+	Values             map[string]string //{attributeId: value, ..}
 	StartTime          time.Time         //action_time
 	UpdateDurationTime time.Time         //update time for duration
 	RenewalTime        time.Time         //next update time
@@ -297,18 +301,21 @@ type Metering struct {
 	Status             string
 }
 
-func NewMetering(leasingId, skuId string, startTime, renewalTime time.Time, values map[string]string) *Metering {
+func NewMetering(leasingId, skuId string, startTime time.Time, values map[string]string) *Metering {
 	return &Metering{
-		MeteringId: newMeteringId(),
-		LeasingId: leasingId,
-		SkuId: skuId,
-		Values: values,
-		StartTime: startTime,
-		RenewalTime: renewalTime,
-		Status: constants.StatusActive,
+		MeteringId:  newMeteringId(),
+		LeasingId:   leasingId,
+		SkuId:       skuId,
+		Values:      values,
+		StartTime:   startTime,
+		Status:      constants.StatusActive,
 	}
 }
 
 func PbToMetering(leasingId string, pbMetering pb.SkuMetering) *Metering {
-	return NewMetering(leasingId, pbMetering.GetSkuId().GetValue())
+	return NewMetering(leasingId,
+		pbMetering.GetSkuId().GetValue(),
+		pbutil.FromProtoTimestamp(pbMetering.GetActionTime()),
+		pbMetering.GetValue(),
+	)
 }

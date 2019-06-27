@@ -6,15 +6,49 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"openpitrix.io/openpitrix/pkg/logger"
+	"openpitrix.io/openpitrix/pkg/util/stringutil"
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
 )
 
+var SelectMeteringAttributes = []string{
+	constants.ColumnSkuId,
+	constants.ColumnMeteringAttributeIds,
+}
+
+var DurationAttributeIds = []string{
+	"att-01",
+	"att-02",
+	"att-03",
+}
+
+func UpdateRenewalTime(ctx context.Context, m *models.Metering) error {
+	skus, err := getSkusByIds(ctx, []string{m.SkuId}, SelectMeteringAttributes)
+	if err != nil {
+		return err
+	}
+	if len(skus) == 0 {
+		logger.Error(ctx, "Failed to update renewal_time of sku(%s), not exist!", m.SkuId)
+		return errors.New(fmt.Sprintf("The sku(%s) not exist!", m.SkuId))
+	}
+
+	for _, attId := range skus[0].MeteringAttributeIds {
+		if stringutil.StringIn(attId, DurationAttributeIds) {
+
+		}
+	}
+
+}
+
 func (s *Server) InitMetering(ctx context.Context, req *pb.InitMeteringRequest) (*pb.CommonMeteringResponse, error) {
+	//leasing := models.PbToLeasing(req) //TODO: check if user_id exist
+
 
 	return &pb.CommonMeteringResponse{ResourceId: req.GetResourceId()}, nil
 }
