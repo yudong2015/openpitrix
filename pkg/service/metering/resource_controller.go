@@ -393,15 +393,21 @@ func updateSku(ctx context.Context, req *pb.ModifySkuRequest) error {
 }
 
 //Metering
-func insertLeasings(ctx context.Context, leasings []*models.Leasing) error {
-	result, err := pi.Global().DB(ctx).
-		InsertInto(constants.TableLeasing).
-		Record(leasings).Exec()
+func insertLeasingMeterings(ctx context.Context, leasing *models.Leasing, meterings []*models.Metering) error {
+	tx, err := pi.Global().DB(ctx).Begin()
+	defer tx.RollbackUnlessCommitted()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert leasings, Error: [%+v].", err)
-	} else {
-		count, _ := result.RowsAffected()
-		logger.Info(ctx, "Insert %d leasings successfully.", count)
+		logger.Error(ctx, "Failed to get database transation: [%+v]", err)
+	}
+
+	tx.InsertInto(constants.TableLeasing).Record(leasing)
+
+	tx.InsertInto(constants.TableMetering).Record(meterings)
+
+	err = tx.Commit()
+
+	if err != nil {
+		logger.Error(ctx, "Failed to insert leasing and leasings: [%+v]", err)
 	}
 	return err
 }
@@ -418,7 +424,7 @@ func insertCombination(ctx context.Context, com *models.Combination) error {
 		InsertInto(constants.TableCombination).
 		Record(com).Exec()
 	if err != nil {
-		logger.Error(ctx, "Failed to insert combination, Error: [%+v].", err)
+		logger.Error(ctx, "Failed to insert combination: [%+v].", err)
 	} else {
 		logger.Info(ctx, "Insert combination successfully.")
 	}

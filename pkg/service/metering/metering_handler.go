@@ -14,50 +14,28 @@ import (
 	"openpitrix.io/openpitrix/pkg/logger"
 	"openpitrix.io/openpitrix/pkg/models"
 	"openpitrix.io/openpitrix/pkg/pb"
+	"openpitrix.io/openpitrix/pkg/util/stringutil"
 )
-
-var SelectMeteringAttributes = []string{
-	constants.ColumnSkuId,
-	constants.ColumnMeteringAttributeIds,
-}
-
-var DurationAttributeIds = []string{
-	"att-01",
-	"att-02",
-	"att-03",
-}
-
-func UpdateRenewalTime(ctx context.Context, m *models.Metering) error {
-	skus, err := getSkusByIds(ctx, []string{m.SkuId}, SelectMeteringAttributes)
-	if err != nil {
-		return err
-	}
-	if len(skus) == 0 {
-		logger.Error(ctx, "Failed to update renewal_time of sku(%s), not exist!", m.SkuId)
-		return errors.New(fmt.Sprintf("The sku(%s) not exist!", m.SkuId))
-	}
-
-	for _, attId := range skus[0].MeteringAttributeIds {
-		if attId == DurationHourId {
-			//TODO: handle
-		} else if attId == DurationMonthId {
-			//TODO: handle
-		} else if attId == DurationYearId {
-			//TODO: handle
-		}
-	}
-	return nil
-}
 
 func (s *Server) InitMetering(ctx context.Context, req *pb.InitMeteringRequest) (*pb.CommonMeteringResponse, error) {
 	leasing := models.PbToLeasing(req) //TODO: check if user_id exist
 	var meterings []*models.Metering
+	var err error
 	for _, sku := range req.GetSkuMeterings() {
+		metering := models.PbToMetering(leasing.LeasingId, sku)
+		err = UpdateRenewalTime(ctx, metering)
+		if err != nil {
+			return nil, internalError(ctx, err)
+		}
 		meterings = append(meterings, models.PbToMetering(leasing.LeasingId, sku))
 	}
+	err = insertLeasingMeterings(ctx, leasing, meterings)
+	if err != nil {
+		return nil, internalError(ctx, err)
+	}
+
 
 	//TODO: pre-billing
-
 
 	//TODO: add cron-task for duration
 
@@ -164,4 +142,39 @@ func (s *Server) DescribeLeasings(ctx context.Context, req *pb.DescribeLeasingsR
 	//TODO: get leasings by DescribeLeasingsRequest
 
 	return &pb.DescribeLeasingsResponse{LeasingSet: leasings}, nil
+}
+
+var SelectMeteringAttributes = []string{
+	constants.ColumnSkuId,
+	constants.ColumnMeteringAttributeIds,
+}
+
+func UpdateRenewalTime(ctx context.Context, m *models.Metering) error {
+	skus, err := getSkusByIds(ctx, []string{m.SkuId}, SelectMeteringAttributes)
+	if err != nil {
+		return err
+	}
+	if len(skus) == 0 {
+		logger.Error(ctx, "Failed to update renewal_time of sku(%s), not exist!", m.SkuId)
+		return errors.New(fmt.Sprintf("The sku(%s) not exist!", m.SkuId))
+	}
+
+	for _, attId := range skus[0].MeteringAttributeIds {
+		if stringutil.StringIn(attId, DurationAttributeIds) {
+			var renewalTime time.Time
+			if m.RenewalTime != nil { //if m.RenewalTime = nil, the m is new, don't need to update UpdateDurationTime
+				m.UpdateDurationTime = *m.RenewalTime
+			}
+			switch attId {
+			case DurationHourId:
+				renewalTime = m.UpdateDurationTime.Add(time.Hour)
+			case DurationMonthId:
+				renewalTime = m.UpdateDurationTime.AddDate(0, 1, 0)
+			case DurationYearId:
+				renewalTime = m.UpdateDurationTime.AddDate(1, 0, 0)
+			}
+			m.RenewalTime = &renewalTime
+		}
+	}
+	return nil
 }

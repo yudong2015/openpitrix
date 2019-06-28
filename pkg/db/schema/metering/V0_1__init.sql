@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS attribute
 	provider          VARCHAR(50)  NOT NULL DEFAULT 'system',
 	status            VARCHAR(16)           DEFAULT 'active' COMMENT 'active, deleted',
 	create_time       TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-	status_time       TIMESTAMP             DEFAULT CURRENT_TIMESTAMP	ON UPDATE CURRENT_TIMESTAMP,
+	status_time       TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (attribute_id)
 );
 
@@ -69,21 +69,30 @@ CREATE TABLE IF NOT EXISTS sku
 /**  Metering  **/
 CREATE TABLE IF NOT EXISTS leasing
 (
-	leasing_id           VARCHAR(50) NOT NULL UNIQUE,
-	user_id              VARCHAR(50) NOT NULL,
-	resource_id          VARCHAR(50) NOT NULL,
+	leasing_id  VARCHAR(50) NOT NULL UNIQUE,
+	user_id     VARCHAR(50) NOT NULL,
+	resource_id VARCHAR(50) NOT NULL,
+	lease_time  TIMESTAMP   NOT NULL,
+	create_time TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+	status_time TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	status      VARCHAR(16) DEFAULT 'active' COMMENT 'active, handStop, forceStop, terminate',
+	PRIMARY KEY (leasing_id)
+);
+
+CREATE TABLE IF NOT EXISTS metering
+(
+	metering_id          VARCHAR(50) NOT NULL UNIQUE,
+	leasing_id           VARCHAR(50) NOT NULL,
 	sku_id               VARCHAR(50) NOT NULL,
 	metering_values      JSON COMMENT 'the values of metering_attributes, {att_id: value, ..}',
-	lease_time           TIMESTAMP   NOT NULL,
 	update_duration_time TIMESTAMP   NULL,
 	renewal_time         TIMESTAMP   NULL,
 	create_time          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
 	status_time          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	stop_times           JSON COMMENT '[{close_time: restart_time}, ..]',
 	status               VARCHAR(16) DEFAULT 'active' COMMENT 'active, handStop, forceStop, terminate',
-	PRIMARY KEY (leasing_id)
+	PRIMARY KEY (metering_id)
 );
-
 
 CREATE TABLE IF NOT EXISTS leased
 (

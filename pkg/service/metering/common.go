@@ -6,7 +6,6 @@ package main
 
 import (
 	"context"
-
 	"github.com/fatih/structs"
 	"openpitrix.io/openpitrix/pkg/gerr"
 	"openpitrix.io/openpitrix/pkg/logger"
@@ -28,9 +27,15 @@ const (
 
 const (
 	DurationHourId  = "att-001"
-	DurationMonthId = "att-001"
-	DurationYearId  = "att-001"
+	DurationMonthId = "att-002"
+	DurationYearId  = "att-003"
 )
+
+var DurationAttributeIds = []string{
+	DurationHourId,
+	DurationMonthId,
+	DurationYearId,
+}
 
 //struct english name and chinese name
 var structDisName = map[string]map[string]string{
@@ -66,20 +71,6 @@ var structDisName = map[string]map[string]string{
 
 func internalError(ctx context.Context, err error) error {
 	return gerr.NewWithDetail(ctx, gerr.Internal, err, gerr.ErrorInternalError)
-}
-
-//check if structObj exist
-func checkStructExist(ctx context.Context, structObj interface{}, id string) error {
-	structName := structs.Name(structObj)
-	exist, err := checkExistById(ctx, structName, id)
-	if err != nil {
-		logger.Error(ctx, "Failed to get %s(%s), Error: [%+v]!", structName, id, err)
-		return internalError(ctx, err)
-	}
-	if !exist {
-		return notExistError(ctx, structObj, id)
-	}
-	return nil
 }
 
 func notExistError(ctx context.Context, structObj interface{}, id string) error {

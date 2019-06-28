@@ -55,4 +55,5 @@ const (
 	TableProbation        = "probation"
 	TableLeasing          = "leasing"
 	TableLeased           = "leased"
+	TableMetering         = "metering"
 )

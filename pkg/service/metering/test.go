@@ -7,6 +7,7 @@ import (
 	"openpitrix.io/openpitrix/pkg/constants"
 	"openpitrix.io/openpitrix/pkg/db"
 	"openpitrix.io/openpitrix/pkg/models"
+	"time"
 )
 
 func conn() *db.Conn {
@@ -59,13 +60,12 @@ func deleteAtts(conn *db.Conn, ids []string) {
 
 func main() {
 
-	ids := []string{
-		"att_0001",
-		"att_0002",
-	}
-
-	conn := conn()
-	selectAttributes(conn, ids)
+	//ids := []string{
+	//	"att_0001",
+	//	"att_0002",
+	//}
+	//conn := conn()
+	//selectAttributes(conn, ids)
 	//deleteAtts(conn, ids)
 
 	//var aa []*models.Sku
@@ -73,5 +73,14 @@ func main() {
 	//	aa = append(aa, models.NewSku(i, "aaa", []string{}, []string{}))
 	//}
 	//fmt.Printf("%+v", aa)
+
+	type AAA struct {
+		id string
+		name string
+		now *time.Time
+	}
+
+	aaa := AAA{id: "aaa"}
+	fmt.Printf("%+v", aaa)
 
 }

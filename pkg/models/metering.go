@@ -273,7 +273,7 @@ type Leased struct {
 	LeasedId          string
 	UserId            string
 	ResourceId        string
-	LeasingCreateTime time.Time
+	LeasingTime time.Time
 	CreateTime        time.Time
 }
 
@@ -282,7 +282,7 @@ func (l *Leasing) ToLeased() *Leased {
 		LeasedId:          l.LeasingId,
 		UserId:            l.UserId,
 		ResourceId:        l.ResourceId,
-		LeasingCreateTime: l.CreateTime,
+		LeasingTime: l.CreateTime,
 	}
 }
 
@@ -294,7 +294,7 @@ type Metering struct {
 	Values             map[string]string //{attributeId: value, ..}
 	StartTime          time.Time         //action_time
 	UpdateDurationTime time.Time         //update time for duration
-	RenewalTime        time.Time         //next update time
+	RenewalTime        *time.Time         //next update time
 	CreateTime         time.Time
 	StatusTime         time.Time               //update time by other services(cluster_manager)
 	StopTimes          map[time.Time]time.Time //{closeTime: restartTime, ..}
@@ -303,12 +303,13 @@ type Metering struct {
 
 func NewMetering(leasingId, skuId string, startTime time.Time, values map[string]string) *Metering {
 	return &Metering{
-		MeteringId:  newMeteringId(),
-		LeasingId:   leasingId,
-		SkuId:       skuId,
-		Values:      values,
-		StartTime:   startTime,
-		Status:      constants.StatusActive,
+		MeteringId:         newMeteringId(),
+		LeasingId:          leasingId,
+		SkuId:              skuId,
+		Values:             values,
+		StartTime:          startTime,
+		UpdateDurationTime: startTime,
+		Status:             constants.StatusActive,
 	}
 }
 
